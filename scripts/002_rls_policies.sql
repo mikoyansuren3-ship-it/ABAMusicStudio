@@ -31,6 +31,14 @@ CREATE POLICY "New users can insert their profile" ON profiles
 CREATE POLICY "Parents can view their children" ON students
   FOR SELECT USING (parent_id = auth.uid());
 
+CREATE POLICY "Teachers can view all students" ON students
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'teacher'
+    )
+  );
+
 CREATE POLICY "Parents can update their children" ON students
   FOR UPDATE USING (parent_id = auth.uid());
 
@@ -79,6 +87,14 @@ CREATE POLICY "Admins can delete exceptions" ON availability_exceptions
 CREATE POLICY "Anyone can view booked lesson times" ON bookings
   FOR SELECT USING (status IN ('pending', 'confirmed'));
 
+CREATE POLICY "Teachers can view all bookings" ON bookings
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'teacher'
+    )
+  );
+
 CREATE POLICY "Parents can view their children bookings" ON bookings
   FOR SELECT USING (
     EXISTS (
@@ -112,6 +128,22 @@ CREATE POLICY "Parents can update their children bookings" ON bookings
 -- Inquiries policies (public insert, admin manage)
 CREATE POLICY "Anyone can insert inquiries" ON inquiries
   FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Teachers can view inquiries" ON inquiries
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'teacher'
+    )
+  );
+
+CREATE POLICY "Teachers can update inquiries" ON inquiries
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'teacher'
+    )
+  );
 
 CREATE POLICY "Admins can view all inquiries" ON inquiries
   FOR SELECT USING (is_admin());
@@ -176,3 +208,16 @@ CREATE POLICY "Admins can insert studio settings" ON studio_settings
 
 CREATE POLICY "Admins can update studio settings" ON studio_settings
   FOR UPDATE USING (is_admin());
+
+-- Teacher availability policies
+CREATE POLICY "Teachers can view own availability" ON teacher_availability
+  FOR SELECT USING (teacher_id = auth.uid());
+
+CREATE POLICY "Teachers can insert own availability" ON teacher_availability
+  FOR INSERT WITH CHECK (teacher_id = auth.uid());
+
+CREATE POLICY "Teachers can update own availability" ON teacher_availability
+  FOR UPDATE USING (teacher_id = auth.uid());
+
+CREATE POLICY "Teachers can delete own availability" ON teacher_availability
+  FOR DELETE USING (teacher_id = auth.uid());
