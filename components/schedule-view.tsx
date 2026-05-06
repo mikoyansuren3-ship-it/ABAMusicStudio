@@ -22,15 +22,16 @@ interface ScheduleViewProps {
   bookings: Booking[]
   availability: Availability[]
   exceptions: AvailabilityException[]
-  studentId?: string
 }
 
-export function ScheduleView({ bookings, availability, exceptions, studentId }: ScheduleViewProps) {
+export function ScheduleView({ bookings, availability, exceptions }: ScheduleViewProps) {
   const router = useRouter()
+  const [now] = useState(() => Date.now())
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const upcomingBookings = bookings.filter((b) => new Date(b.start_time) >= new Date() && b.status !== "cancelled")
@@ -39,8 +40,13 @@ export function ScheduleView({ bookings, availability, exceptions, studentId }: 
   async function handleCancel() {
     if (!selectedBooking) return
     setIsLoading(true)
-    await cancelBooking(selectedBooking.id)
+    setActionError(null)
+    const result = await cancelBooking(selectedBooking.id)
     setIsLoading(false)
+    if (result?.error) {
+      setActionError(result.error)
+      return
+    }
     setCancelDialogOpen(false)
     setSelectedBooking(null)
     router.refresh()
@@ -49,8 +55,13 @@ export function ScheduleView({ bookings, availability, exceptions, studentId }: 
   async function handleReschedule() {
     if (!selectedBooking || !selectedSlot) return
     setIsLoading(true)
-    await rescheduleBooking(selectedBooking.id, selectedSlot.start.toISOString(), selectedSlot.end.toISOString())
+    setActionError(null)
+    const result = await rescheduleBooking(selectedBooking.id, selectedSlot.start.toISOString(), selectedSlot.end.toISOString())
     setIsLoading(false)
+    if (result?.error) {
+      setActionError(result.error)
+      return
+    }
     setRescheduleDialogOpen(false)
     setSelectedBooking(null)
     setSelectedSlot(null)
@@ -89,7 +100,7 @@ export function ScheduleView({ bookings, availability, exceptions, studentId }: 
               {upcomingBookings.map((booking) => {
                 const startDate = new Date(booking.start_time)
                 const endDate = new Date(booking.end_time)
-                const canModify = startDate.getTime() - Date.now() > 24 * 60 * 60 * 1000 // 24+ hours
+                const canModify = startDate.getTime() - now > 24 * 60 * 60 * 1000
 
                 return (
                   <div key={booking.id} className="flex items-center justify-between rounded-lg border p-4">
@@ -232,6 +243,7 @@ export function ScheduleView({ bookings, availability, exceptions, studentId }: 
               </p>
             </div>
           )}
+          {actionError && <p className="text-sm text-destructive">{actionError}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setRescheduleDialogOpen(false)}>
               Cancel
@@ -285,6 +297,7 @@ export function ScheduleView({ bookings, availability, exceptions, studentId }: 
             Per our cancellation policy, lessons cancelled with at least 24 hours notice can be rescheduled at no
             charge.
           </p>
+          {actionError && <p className="text-sm text-destructive">{actionError}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
               Keep Lesson

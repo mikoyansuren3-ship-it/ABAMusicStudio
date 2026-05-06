@@ -14,9 +14,9 @@ export async function updateProfile(formData: FormData) {
   const fullName = formData.get("full_name") as string
   const phone = formData.get("phone") as string
   const timezone = formData.get("timezone") as string
-  const parentName = formData.get("parent_name") as string
-  const parentEmail = formData.get("parent_email") as string
-  const parentPhone = formData.get("parent_phone") as string
+  const studentName = formData.get("student_name") as string
+  const experienceLevel = (formData.get("experience_level") as string) || null
+  const preferredLessonDuration = Number.parseInt(formData.get("preferred_lesson_duration") as string) || 30
 
   // Update profile
   const { error: profileError } = await supabase
@@ -32,23 +32,21 @@ export async function updateProfile(formData: FormData) {
     return { error: profileError.message }
   }
 
-  // Check if student record exists
-  const { data: existingStudent } = await supabase.from("students").select("id").eq("profile_id", user.id).single()
-
-  if (existingStudent) {
-    // Update existing student record
-    const { error: studentError } = await supabase
-      .from("students")
-      .update({
-        parent_name: parentName || null,
-        parent_email: parentEmail || null,
-        parent_phone: parentPhone || null,
-      })
-      .eq("profile_id", user.id)
-
-    if (studentError) {
-      return { error: studentError.message }
+  if (studentName) {
+    const studentPayload = {
+      parent_id: user.id,
+      name: studentName,
+      experience_level: experienceLevel,
+      preferred_lesson_duration: preferredLessonDuration,
+      is_active: true,
     }
+
+    const { data: existingStudent } = await supabase.from("students").select("id").eq("parent_id", user.id).maybeSingle()
+    const { error: studentError } = existingStudent
+      ? await supabase.from("students").update(studentPayload).eq("id", existingStudent.id)
+      : await supabase.from("students").insert(studentPayload)
+
+    if (studentError) return { error: studentError.message }
   }
 
   revalidatePath("/portal/profile")

@@ -6,13 +6,15 @@ import { ScheduleView } from "@/components/schedule-view"
 
 export default async function SchedulePage() {
   const supabase = await createClient()
+  const bookingCutoff = new Date()
+  bookingCutoff.setDate(bookingCutoff.getDate() - 30)
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 
-  const { data: student } = await supabase.from("students").select("*").eq("profile_id", user.id).single()
+  const { data: student } = await supabase.from("students").select("*").eq("parent_id", user.id).maybeSingle()
 
   // Fetch bookings for this student
   const { data: bookings } = student
@@ -20,7 +22,7 @@ export default async function SchedulePage() {
         .from("bookings")
         .select("*")
         .eq("student_id", student.id)
-        .gte("start_time", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) // Last 30 days
+        .gte("start_time", bookingCutoff.toISOString())
         .order("start_time")
     : { data: [] }
 
@@ -47,7 +49,6 @@ export default async function SchedulePage() {
           bookings={bookings || []}
           availability={availability || []}
           exceptions={exceptions || []}
-          studentId={student?.id}
         />
       </div>
     </>

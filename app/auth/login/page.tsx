@@ -10,12 +10,15 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Music } from "lucide-react"
+import { CheckCircle, Music } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [message] = useState(() =>
+    typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("message"),
+  )
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -32,8 +35,13 @@ export default function LoginPage() {
       })
       if (error) throw error
 
-      // Check user role to redirect appropriately
-      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single()
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle()
+
+      if (profileError) throw profileError
 
       if (profile?.role === "admin") {
         router.push("/admin")
@@ -91,15 +99,25 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+                {message && !error && (
+                  <p className="flex items-center gap-2 text-sm text-green-600">
+                    <CheckCircle className="h-4 w-4" />
+                    {message}
+                  </p>
+                )}
                 {error && <p className="text-sm text-destructive">{error}</p>}
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
               </div>
               <div className="mt-6 text-center text-sm">
-                <span className="text-muted-foreground">New student? </span>
+                <span className="text-muted-foreground">Need an account? </span>
+                <Link href="/auth/sign-up" className="text-foreground underline underline-offset-4">
+                  Create one
+                </Link>
+                <span className="text-muted-foreground"> or </span>
                 <Link href="/inquire" className="text-foreground underline underline-offset-4">
-                  Inquire about lessons
+                  inquire about lessons
                 </Link>
               </div>
             </form>

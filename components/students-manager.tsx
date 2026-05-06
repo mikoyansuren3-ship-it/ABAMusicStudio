@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Users, Search, Mail, Phone, User, Loader2 } from "lucide-react"
+import { Users, Search, Phone, User, Loader2 } from "lucide-react"
 import type { Student, Profile } from "@/lib/types"
 import { updateStudentNotes, toggleStudentActive } from "@/app/admin/students/actions"
 import { useRouter } from "next/navigation"
@@ -36,9 +36,9 @@ export function StudentsManager({ students }: StudentsManagerProps) {
   const filteredStudents = students.filter((student) => {
     const query = searchQuery.toLowerCase()
     return (
+      student.name.toLowerCase().includes(query) ||
       student.profile?.full_name?.toLowerCase().includes(query) ||
-      student.parent_name?.toLowerCase().includes(query) ||
-      student.parent_email?.toLowerCase().includes(query)
+      student.profile?.phone?.toLowerCase().includes(query)
     )
   })
 
@@ -76,7 +76,7 @@ export function StudentsManager({ students }: StudentsManagerProps) {
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-medium">{student.profile?.full_name || "Unknown"}</p>
+            <p className="font-medium">{student.name}</p>
             <p className="text-sm text-muted-foreground">{student.experience_level || "Not specified"}</p>
           </div>
           <Badge variant={student.is_active ? "default" : "secondary"}>
@@ -84,7 +84,7 @@ export function StudentsManager({ students }: StudentsManagerProps) {
           </Badge>
         </div>
         <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-          {student.parent_name && <p>Parent: {student.parent_name}</p>}
+          {student.profile?.full_name && <p>Parent/Guardian: {student.profile.full_name}</p>}
           {student.preferred_lesson_duration && <p>Duration: {student.preferred_lesson_duration} min</p>}
         </div>
       </div>
@@ -163,7 +163,7 @@ export function StudentsManager({ students }: StudentsManagerProps) {
                     <User className="h-6 w-6 text-accent" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">{selectedStudent.profile?.full_name || "Unknown"}</h3>
+                    <h3 className="text-lg font-semibold">{selectedStudent.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {selectedStudent.experience_level || "Not specified"}
                     </p>
@@ -187,17 +187,11 @@ export function StudentsManager({ students }: StudentsManagerProps) {
 
                 <div className="space-y-3">
                   <h4 className="font-medium">Parent/Guardian</h4>
-                  {selectedStudent.parent_name && <p className="text-sm">{selectedStudent.parent_name}</p>}
-                  {selectedStudent.parent_email && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span>{selectedStudent.parent_email}</span>
-                    </div>
-                  )}
-                  {selectedStudent.parent_phone && (
+                  {selectedStudent.profile?.full_name && <p className="text-sm">{selectedStudent.profile.full_name}</p>}
+                  {selectedStudent.profile?.phone && (
                     <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{selectedStudent.parent_phone}</span>
+                      <span>{selectedStudent.profile.phone}</span>
                     </div>
                   )}
                 </div>

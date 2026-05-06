@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { isSlotBookable } from "@/lib/schedule"
 
 export async function submitInquiry(formData: FormData) {
   const supabase = await createClient()
@@ -19,6 +20,33 @@ export async function submitInquiry(formData: FormData) {
 
   if (!name || !email) {
     return { error: "Name and email are required." }
+  }
+
+  if (requestedSlotStart && requestedSlotEnd) {
+    const [availabilityRes, exceptionsRes, bookingsRes] = await Promise.all([
+      supabase.from("availability").select("*").eq("is_active", true),
+      supabase
+        .from("availability_exceptions")
+        .select("*")
+        .gte("exception_date", new Date().toISOString().split("T")[0]),
+      supabase
+        .from("bookings")
+        .select("start_time,end_time,status")
+        .gte("start_time", new Date().toISOString())
+        .in("status", ["confirmed", "pending"]),
+    ])
+
+    const isAvailable = isSlotBookable({
+      start: new Date(requestedSlotStart),
+      end: new Date(requestedSlotEnd),
+      availability: availabilityRes.data || [],
+      exceptions: exceptionsRes.data || [],
+      existingBookings: bookingsRes.data || [],
+    })
+
+    if (!isAvailable) {
+      return { error: "That time is no longer available. Please choose another slot." }
+    }
   }
 
   const { error } = await supabase.from("inquiries").insert({

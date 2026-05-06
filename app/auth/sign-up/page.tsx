@@ -8,54 +8,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Music, CheckCircle, AlertCircle } from "lucide-react"
+import { useState } from "react"
+import { ArrowLeft, CheckCircle, Music } from "lucide-react"
 
-export default function UpdatePasswordPage() {
+export default function SignUpPage() {
+  const [fullName, setFullName] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
-  const [hasSession, setHasSession] = useState(false)
-  const [updated, setUpdated] = useState(false)
-  const router = useRouter()
+  const [sent, setSent] = useState(false)
 
-  useEffect(() => {
-    const supabase = createClient()
-
-    supabase.auth.getSession().then(({ data }) => {
-      setHasSession(Boolean(data.session))
-      setIsCheckingSession(false)
-    })
-  }, [])
-
-  const handleUpdate = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
-    setIsLoading(true)
     setError(null)
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")
-      setIsLoading(false)
       return
     }
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters")
-      setIsLoading(false)
       return
     }
 
+    const supabase = createClient()
+    setIsLoading(true)
+
     try {
-      const { error } = await supabase.auth.updateUser({ password })
+      const origin = window.location.origin
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${origin}/auth/confirm?next=/portal/profile`,
+          data: {
+            full_name: fullName,
+            role: "student",
+          },
+        },
+      })
+
       if (error) throw error
-      setUpdated(true)
-      setTimeout(() => router.push("/auth/login"), 2000)
+      setSent(true)
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred")
+      setError(error instanceof Error ? error.message : "Unable to create account")
     } finally {
       setIsLoading(false)
     }
@@ -73,34 +72,44 @@ export default function UpdatePasswordPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Update Password</CardTitle>
-            <CardDescription>Enter your new password</CardDescription>
+            <CardTitle className="text-2xl">Create Account</CardTitle>
+            <CardDescription>Sign up for student portal access</CardDescription>
           </CardHeader>
           <CardContent>
-            {isCheckingSession ? (
-              <div className="py-4 text-center text-sm text-muted-foreground">Checking reset link...</div>
-            ) : !hasSession ? (
-              <div className="flex flex-col items-center py-4 text-center">
-                <AlertCircle className="h-12 w-12 text-destructive" />
-                <h3 className="mt-4 font-semibold">Reset Link Required</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Please open the password reset link from your email, or request a new one.
-                </p>
-                <Button className="mt-6" asChild>
-                  <Link href="/auth/reset-password">Request New Link</Link>
-                </Button>
-              </div>
-            ) : updated ? (
+            {sent ? (
               <div className="flex flex-col items-center py-4 text-center">
                 <CheckCircle className="h-12 w-12 text-accent" />
-                <h3 className="mt-4 font-semibold">Password Updated!</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Redirecting you to login...</p>
+                <h3 className="mt-4 font-semibold">Confirm Your Email</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  We sent a confirmation link to {email}. Open it to finish setting up your account.
+                </p>
+                <Button variant="outline" className="mt-6 bg-transparent" asChild>
+                  <Link href="/auth/login">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Login
+                  </Link>
+                </Button>
               </div>
             ) : (
-              <form onSubmit={handleUpdate}>
+              <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="password">New Password</Label>
+                    <Label htmlFor="full_name">Full Name</Label>
+                    <Input id="full_name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
                       type="password"
@@ -121,8 +130,14 @@ export default function UpdatePasswordPage() {
                   </div>
                   {error && <p className="text-sm text-destructive">{error}</p>}
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Updating..." : "Update Password"}
+                    {isLoading ? "Creating account..." : "Create Account"}
                   </Button>
+                </div>
+                <div className="mt-6 text-center text-sm">
+                  <span className="text-muted-foreground">Already have an account? </span>
+                  <Link href="/auth/login" className="text-foreground underline underline-offset-4">
+                    Sign in
+                  </Link>
                 </div>
               </form>
             )}

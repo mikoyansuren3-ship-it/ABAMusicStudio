@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { isSlotBookable } from "@/lib/schedule"
 import { revalidatePath } from "next/cache"
 
 export async function createBooking(formData: FormData) {
@@ -13,6 +14,35 @@ export async function createBooking(formData: FormData) {
 
   const startDateTime = new Date(`${date}T${startTime}`)
   const endDateTime = new Date(startDateTime.getTime() + duration * 60000)
+
+  if (!studentId || Number.isNaN(startDateTime.getTime()) || Number.isNaN(endDateTime.getTime())) {
+    return { error: "Please choose a student, date, and time." }
+  }
+
+  const [availabilityRes, exceptionsRes, bookingsRes] = await Promise.all([
+    supabase.from("availability").select("*").eq("is_active", true),
+    supabase
+      .from("availability_exceptions")
+      .select("*")
+      .gte("exception_date", new Date().toISOString().split("T")[0]),
+    supabase
+      .from("bookings")
+      .select("start_time,end_time,status")
+      .gte("start_time", new Date().toISOString())
+      .in("status", ["confirmed", "pending"]),
+  ])
+
+  const isAvailable = isSlotBookable({
+    start: startDateTime,
+    end: endDateTime,
+    availability: availabilityRes.data || [],
+    exceptions: exceptionsRes.data || [],
+    existingBookings: bookingsRes.data || [],
+  })
+
+  if (!isAvailable) {
+    return { error: "That time is outside availability or already booked." }
+  }
 
   const { error } = await supabase.from("bookings").insert({
     student_id: studentId,

@@ -1,13 +1,18 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
 import type { Availability, AvailabilityException, Booking } from "@/lib/types"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { isSlotBookable } from "@/lib/schedule"
+
+type BookingSlot = Pick<Booking, "start_time" | "end_time" | "status">
 
 interface WeeklyAvailabilityCalendarProps {
   availability: Availability[]
   exceptions: AvailabilityException[]
-  existingBookings: Booking[]
+  existingBookings: BookingSlot[]
   onSelectSlot?: (start: Date, end: Date) => void
   selectedSlot?: { start: Date; end: Date } | null
   lessonDuration?: number
@@ -24,54 +29,37 @@ export function WeeklyAvailabilityCalendar({
   selectedSlot,
   lessonDuration = 30,
 }: WeeklyAvailabilityCalendarProps) {
+  const [weekOffset, setWeekOffset] = useState(0)
+
   // Get the current week's dates
   const weekDates = useMemo(() => {
     const today = new Date()
     const startOfWeek = new Date(today)
     startOfWeek.setDate(today.getDate() - today.getDay() + 1) // Start from Monday
+    startOfWeek.setDate(startOfWeek.getDate() + weekOffset * 7)
 
     return Array.from({ length: 6 }, (_, i) => {
       const date = new Date(startOfWeek)
       date.setDate(startOfWeek.getDate() + i)
       return date
     })
-  }, [])
+  }, [weekOffset])
 
   // Check if a time slot is available
   function isSlotAvailable(date: Date, hour: number, minute: number): boolean {
     const dayOfWeek = date.getDay()
-    const timeString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
-
-    // Check for exceptions on this date
-    const dateString = date.toISOString().split("T")[0]
-    const exception = exceptions.find((e) => e.exception_date === dateString)
-
-    if (exception) {
-      if (!exception.is_available) return false
-      if (exception.start_time && exception.end_time) {
-        return timeString >= exception.start_time && timeString < exception.end_time
-      }
-    }
-
-    // Check regular availability
-    const dayAvailability = availability.find((a) => a.day_of_week === dayOfWeek && a.is_active)
-    if (!dayAvailability) return false
-
-    const isWithinHours = timeString >= dayAvailability.start_time && timeString < dayAvailability.end_time
-
-    // Check for existing bookings
     const slotStart = new Date(date)
     slotStart.setHours(hour, minute, 0, 0)
     const slotEnd = new Date(slotStart)
     slotEnd.setMinutes(slotEnd.getMinutes() + lessonDuration)
 
-    const hasConflict = existingBookings.some((booking) => {
-      const bookingStart = new Date(booking.start_time)
-      const bookingEnd = new Date(booking.end_time)
-      return slotStart < bookingEnd && slotEnd > bookingStart && booking.status !== "cancelled"
+    return isSlotBookable({
+      start: slotStart,
+      end: slotEnd,
+      availability: availability.filter((item) => item.day_of_week === dayOfWeek),
+      exceptions,
+      existingBookings,
     })
-
-    return isWithinHours && !hasConflict
   }
 
   function handleSlotClick(date: Date, hour: number, minute: number) {
@@ -94,8 +82,29 @@ export function WeeklyAvailabilityCalendar({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <div className="min-w-[600px]">
+    <div className="rounded-lg border">
+      <div className="flex items-center justify-between border-b p-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setWeekOffset((current) => Math.max(0, current - 1))}
+          disabled={weekOffset === 0}
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Previous
+        </Button>
+        <p className="text-sm font-medium">
+          {weekDates[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} -{" "}
+          {weekDates[5].toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+        </p>
+        <Button type="button" variant="outline" size="sm" onClick={() => setWeekOffset((current) => current + 1)}>
+          Next
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </Button>
+      </div>
+      <div className="overflow-x-auto">
+        <div className="min-w-[600px]">
         {/* Header */}
         <div className="grid grid-cols-[60px_repeat(6,1fr)] border-b bg-muted/30">
           <div className="p-2" />
@@ -173,6 +182,7 @@ export function WeeklyAvailabilityCalendar({
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }

@@ -16,8 +16,6 @@ export default async function PortalLayout({ children }: { children: React.React
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
-  const { data: student } = await supabase.from("students").select("*").eq("profile_id", user.id).single()
-
   return (
     <SidebarProvider>
       <PortalSidebar user={user} profile={profile} />

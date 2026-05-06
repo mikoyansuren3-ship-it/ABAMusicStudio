@@ -18,7 +18,7 @@ export default async function PortalDashboard() {
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
-  const { data: student } = await supabase.from("students").select("*").eq("profile_id", user.id).single()
+  const { data: student } = await supabase.from("students").select("*").eq("parent_id", user.id).maybeSingle()
 
   // Fetch upcoming bookings
   const { data: bookings } = student

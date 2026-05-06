@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <SidebarProvider>
-      <AdminSidebar user={user} profile={profile} />
+      <AdminSidebar profile={profile} />
       <SidebarInset>
         <main className="flex-1 overflow-auto">{children}</main>
       </SidebarInset>

@@ -34,6 +34,9 @@ CREATE POLICY "Parents can view their children" ON students
 CREATE POLICY "Parents can update their children" ON students
   FOR UPDATE USING (parent_id = auth.uid());
 
+CREATE POLICY "Parents can insert their own student record" ON students
+  FOR INSERT WITH CHECK (parent_id = auth.uid());
+
 CREATE POLICY "Admins can view all students" ON students
   FOR SELECT USING (is_admin());
 
@@ -73,6 +76,9 @@ CREATE POLICY "Admins can delete exceptions" ON availability_exceptions
   FOR DELETE USING (is_admin());
 
 -- Bookings policies
+CREATE POLICY "Anyone can view booked lesson times" ON bookings
+  FOR SELECT USING (status IN ('pending', 'confirmed'));
+
 CREATE POLICY "Parents can view their children bookings" ON bookings
   FOR SELECT USING (
     EXISTS (

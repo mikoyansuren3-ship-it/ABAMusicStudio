@@ -34,6 +34,7 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
   const router = useRouter()
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   // Group bookings by date
   const today = new Date()
@@ -53,8 +54,14 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
   async function handleAddBooking(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
+    setActionError(null)
     const formData = new FormData(e.currentTarget)
-    await createBooking(formData)
+    const result = await createBooking(formData)
+    if (result?.error) {
+      setActionError(result.error)
+      setIsLoading(false)
+      return
+    }
     router.refresh()
     setIsLoading(false)
     setAddDialogOpen(false)
@@ -62,14 +69,18 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
 
   async function handleApprove(bookingId: string) {
     setIsLoading(true)
-    await updateBookingStatus(bookingId, "confirmed")
+    setActionError(null)
+    const result = await updateBookingStatus(bookingId, "confirmed")
+    if (result?.error) setActionError(result.error)
     router.refresh()
     setIsLoading(false)
   }
 
   async function handleCancel(bookingId: string) {
     setIsLoading(true)
-    await updateBookingStatus(bookingId, "cancelled")
+    setActionError(null)
+    const result = await updateBookingStatus(bookingId, "cancelled")
+    if (result?.error) setActionError(result.error)
     router.refresh()
     setIsLoading(false)
   }
@@ -120,7 +131,8 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
                     <SelectContent>
                       {students.map((student) => (
                         <SelectItem key={student.id} value={student.id}>
-                          {student.profile?.full_name || "Unknown"}
+                          {student.name}
+                          {student.profile?.full_name ? ` (${student.profile.full_name})` : ""}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -150,6 +162,7 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
                   </div>
                 </div>
               </div>
+              {actionError && <p className="text-sm text-destructive">{actionError}</p>}
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setAddDialogOpen(false)}>
                   Cancel
@@ -185,7 +198,7 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
                       <span className="text-lg font-bold">{new Date(booking.start_time).getDate()}</span>
                     </div>
                     <div>
-                      <p className="font-medium">{booking.student?.profile?.full_name || "Student"}</p>
+                      <p className="font-medium">{booking.student?.name || "Student"}</p>
                       <p className="text-sm text-muted-foreground">
                         {new Date(booking.start_time).toLocaleTimeString("en-US", {
                           hour: "numeric",
@@ -212,6 +225,8 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
           </CardContent>
         </Card>
       )}
+
+      {actionError && !addDialogOpen && <p className="text-sm text-destructive">{actionError}</p>}
 
       {/* Weekly Schedule */}
       <Card>
@@ -251,7 +266,7 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
                               <Clock className="h-5 w-5 text-accent" />
                             </div>
                             <div>
-                              <p className="font-medium">{booking.student?.profile?.full_name || "Student"}</p>
+                              <p className="font-medium">{booking.student?.name || "Student"}</p>
                               <p className="text-sm text-muted-foreground">
                                 {new Date(booking.start_time).toLocaleTimeString("en-US", {
                                   hour: "numeric",
