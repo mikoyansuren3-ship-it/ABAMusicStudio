@@ -28,11 +28,11 @@ CREATE POLICY "New users can insert their profile" ON profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Students policies
-CREATE POLICY "Students can view own student record" ON students
-  FOR SELECT USING (profile_id = auth.uid());
+CREATE POLICY "Parents can view their children" ON students
+  FOR SELECT USING (parent_id = auth.uid());
 
-CREATE POLICY "Students can update own student record" ON students
-  FOR UPDATE USING (profile_id = auth.uid());
+CREATE POLICY "Parents can update their children" ON students
+  FOR UPDATE USING (parent_id = auth.uid());
 
 CREATE POLICY "Admins can view all students" ON students
   FOR SELECT USING (is_admin());
@@ -73,12 +73,12 @@ CREATE POLICY "Admins can delete exceptions" ON availability_exceptions
   FOR DELETE USING (is_admin());
 
 -- Bookings policies
-CREATE POLICY "Students can view own bookings" ON bookings
+CREATE POLICY "Parents can view their children bookings" ON bookings
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM students 
       WHERE students.id = bookings.student_id 
-      AND students.profile_id = auth.uid()
+      AND students.parent_id = auth.uid()
     )
   );
 
@@ -94,12 +94,12 @@ CREATE POLICY "Admins can update bookings" ON bookings
 CREATE POLICY "Admins can delete bookings" ON bookings
   FOR DELETE USING (is_admin());
 
-CREATE POLICY "Students can update own bookings" ON bookings
+CREATE POLICY "Parents can update their children bookings" ON bookings
   FOR UPDATE USING (
     EXISTS (
       SELECT 1 FROM students 
       WHERE students.id = bookings.student_id 
-      AND students.profile_id = auth.uid()
+      AND students.parent_id = auth.uid()
     )
   );
 
@@ -117,12 +117,12 @@ CREATE POLICY "Admins can delete inquiries" ON inquiries
   FOR DELETE USING (is_admin());
 
 -- Invoices policies
-CREATE POLICY "Students can view own invoices" ON invoices
+CREATE POLICY "Parents can view their children invoices" ON invoices
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM students 
       WHERE students.id = invoices.student_id 
-      AND students.profile_id = auth.uid()
+      AND students.parent_id = auth.uid()
     )
   );
 
@@ -135,12 +135,12 @@ CREATE POLICY "Admins can insert invoices" ON invoices
 CREATE POLICY "Admins can update invoices" ON invoices
   FOR UPDATE USING (is_admin());
 
-CREATE POLICY "Students can update own invoices for payment" ON invoices
+CREATE POLICY "Parents can update their children invoices for payment" ON invoices
   FOR UPDATE USING (
     EXISTS (
       SELECT 1 FROM students 
       WHERE students.id = invoices.student_id 
-      AND students.profile_id = auth.uid()
+      AND students.parent_id = auth.uid()
     )
   );
 

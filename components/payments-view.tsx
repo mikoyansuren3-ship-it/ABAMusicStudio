@@ -65,7 +65,7 @@ export function PaymentsView({ invoices, studentId }: PaymentsViewProps) {
           </CardHeader>
           <CardContent>
             <p className={`text-3xl font-bold ${totalUnpaid > 0 ? "text-destructive" : "text-green-600"}`}>
-              ${(totalUnpaid / 100).toFixed(2)}
+              ${totalUnpaid.toFixed(2)}
             </p>
             <p className="text-sm text-muted-foreground">
               {unpaidInvoices.length} unpaid invoice{unpaidInvoices.length !== 1 ? "s" : ""}
@@ -80,7 +80,7 @@ export function PaymentsView({ invoices, studentId }: PaymentsViewProps) {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">
-              ${(paidInvoices.reduce((sum, inv) => sum + inv.amount, 0) / 100).toFixed(2)}
+              ${paidInvoices.reduce((sum, inv) => sum + inv.amount, 0).toFixed(2)}
             </p>
             <p className="text-sm text-muted-foreground">Lifetime payments</p>
           </CardContent>
@@ -119,9 +119,9 @@ export function PaymentsView({ invoices, studentId }: PaymentsViewProps) {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <p className="text-lg font-bold">${(invoice.amount / 100).toFixed(2)}</p>
+                    <p className="text-lg font-bold">${invoice.amount.toFixed(2)}</p>
                     <Button asChild>
-                      <Link href={`/portal/payments/${invoice.id}`}>Pay Now</Link>
+                      <Link href={`/portal/pay/${invoice.id}`}>Pay Now</Link>
                     </Button>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export function PaymentsView({ invoices, studentId }: PaymentsViewProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <p className="font-medium">${(invoice.amount / 100).toFixed(2)}</p>
+                    <p className="font-medium">${invoice.amount.toFixed(2)}</p>
                     {getStatusBadge(invoice.status)}
                   </div>
                 </div>

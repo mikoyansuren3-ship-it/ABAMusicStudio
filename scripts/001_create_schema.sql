@@ -17,17 +17,14 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- Students table (additional student info)
 CREATE TABLE IF NOT EXISTS students (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  parent_name TEXT,
-  parent_email TEXT,
-  parent_phone TEXT,
+  parent_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
   experience_level TEXT CHECK (experience_level IN ('beginner', 'intermediate', 'advanced')),
   preferred_lesson_duration INTEGER DEFAULT 30 CHECK (preferred_lesson_duration IN (30, 45, 60)),
   notes TEXT,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(profile_id)
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Weekly availability (recurring schedule for admin)
