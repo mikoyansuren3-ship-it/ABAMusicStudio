@@ -12,9 +12,13 @@ export async function updateSession(request: NextRequest) {
   // If Supabase is not configured, allow public routes only
   if (!supabaseUrl || !supabaseKey) {
     // Block protected routes if Supabase isn't configured
-    if (request.nextUrl.pathname.startsWith("/portal") || request.nextUrl.pathname.startsWith("/admin")) {
+    if (
+      request.nextUrl.pathname.startsWith("/portal") ||
+      request.nextUrl.pathname.startsWith("/admin") ||
+      request.nextUrl.pathname.startsWith("/dashboard")
+    ) {
       const url = request.nextUrl.clone()
-      url.pathname = "/auth/login"
+      url.pathname = request.nextUrl.pathname.startsWith("/dashboard") ? "/login" : "/auth/login"
       return NextResponse.redirect(url)
     }
     return supabaseResponse
@@ -68,6 +72,19 @@ export async function updateSession(request: NextRequest) {
     if (userRole !== "admin") {
       const url = request.nextUrl.clone()
       url.pathname = "/portal"
+      return NextResponse.redirect(url)
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/login"
+      return NextResponse.redirect(url)
+    }
+    if (userRole !== "teacher") {
+      const url = request.nextUrl.clone()
+      url.pathname = userRole === "admin" ? "/admin" : "/portal"
       return NextResponse.redirect(url)
     }
   }

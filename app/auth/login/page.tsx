@@ -43,7 +43,9 @@ export default function LoginPage() {
 
       if (profileError) throw profileError
 
-      if (profile?.role === "admin") {
+      if (profile?.role === "teacher") {
+        router.push("/dashboard")
+      } else if (profile?.role === "admin") {
         router.push("/admin")
       } else {
         router.push("/portal")

@@ -38,6 +38,9 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_teacher_availability_updated_at BEFORE UPDATE ON teacher_availability
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 CREATE TRIGGER update_students_updated_at BEFORE UPDATE ON students
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

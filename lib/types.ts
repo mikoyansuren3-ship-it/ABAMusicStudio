@@ -1,9 +1,19 @@
 export interface Profile {
   id: string
-  role: "admin" | "student"
+  role: "admin" | "student" | "teacher"
   full_name: string | null
   phone: string | null
   timezone: string
+  created_at: string
+  updated_at: string
+}
+
+export interface TeacherAvailability {
+  id: string
+  teacher_id: string
+  day_of_week: number
+  start_time: string
+  end_time: string
   created_at: string
   updated_at: string
 }

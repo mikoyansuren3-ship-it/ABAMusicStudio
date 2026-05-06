@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 import { GraduationCap, Heart, Award } from "lucide-react"
 
 export const metadata = {
@@ -24,25 +25,27 @@ export default function AboutPage() {
         <div className="mt-16 grid items-center gap-12 md:grid-cols-2">
           <div className="relative">
             <div className="aspect-[3/4] overflow-hidden rounded-lg bg-muted">
-              <img src="/professional-piano-teacher-portrait-warm-lighting.jpg" alt="Piano teacher" className="h-full w-full object-cover" />
+              <Image
+                src="/arpine-portrait.png"
+                alt="Arpine, ABA Music Studio piano teacher"
+                width={768}
+                height={1024}
+                className="h-full w-full object-cover"
+                priority
+              />
             </div>
           </div>
 
           <div>
             <h2 className="font-serif text-3xl font-bold">Meet Your Teacher</h2>
             <p className="mt-6 text-muted-foreground leading-relaxed">
-              With over 20 years of teaching experience, I have had the privilege of guiding hundreds of students on
-              their musical journeys. My approach combines classical training with modern pedagogical methods, ensuring
-              each student develops both technical proficiency and genuine musical expression.
-            </p>
-            <p className="mt-4 text-muted-foreground leading-relaxed">
-              I hold a Master&apos;s degree in Piano Performance and have studied under renowned pedagogues. My students
-              have gone on to win competitions, earn music scholarships, and most importantly, develop a lasting
-              appreciation for music.
-            </p>
-            <p className="mt-4 text-muted-foreground leading-relaxed">
-              Whether you&apos;re a young beginner or an adult returning to the piano, I believe every student deserves
-              patient, personalized instruction that meets them where they are.
+              With over 10 years of teaching experience, I&apos;ve had the joy of guiding students of all ages through
+              their musical journeys. I hold a PhD in Music and bring a deep foundation in classical training to every
+              lesson — shaped in part by my time on faculty at the Aram Khachaturian Conservatory in Armenia, one of the
+              region&apos;s most prestigious music institutions. I currently serve as Recording Secretary for MTAC Santa
+              Clarita Valley, staying actively involved in the local music education community. Whether you&apos;re just
+              starting out or looking to refine your technique, I&apos;m committed to patient, personalized instruction that
+              helps every student grow.
             </p>
           </div>
         </div>
