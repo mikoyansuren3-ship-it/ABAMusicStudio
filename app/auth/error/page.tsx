@@ -1,0 +1,44 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Music, AlertCircle } from "lucide-react"
+
+export default async function AuthErrorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error: string }>
+}) {
+  const params = await searchParams
+
+  return (
+    <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Music className="h-6 w-6 text-accent" />
+            <span className="font-serif text-xl font-semibold">ABA Music Studio</span>
+          </Link>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <AlertCircle className="h-6 w-6 text-destructive" />
+              Authentication Error
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {params?.error ? (
+              <p className="text-sm text-muted-foreground">Error: {params.error}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">An unspecified error occurred.</p>
+            )}
+            <Button className="mt-6 w-full" asChild>
+              <Link href="/auth/login">Back to Login</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
