@@ -116,12 +116,13 @@ export function AdminNotificationsView({ notifications, students }: AdminNotific
                       {students.map((student) => (
                         <div key={student.id} className="flex items-center space-x-2">
                           <Checkbox
-                            id={student.profile_id}
-                            checked={selectedStudents.includes(student.profile_id)}
-                            onCheckedChange={() => toggleStudent(student.profile_id)}
+                            id={student.parent_id}
+                            checked={selectedStudents.includes(student.parent_id)}
+                            onCheckedChange={() => toggleStudent(student.parent_id)}
                           />
-                          <Label htmlFor={student.profile_id} className="font-normal">
-                            {student.profile?.full_name || "Unknown"}
+                          <Label htmlFor={student.parent_id} className="font-normal">
+                            {student.name}
+                            {student.profile?.full_name ? ` (${student.profile.full_name})` : ""}
                           </Label>
                         </div>
                       ))}

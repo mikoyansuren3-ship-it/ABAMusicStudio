@@ -16,8 +16,7 @@ export async function createCheckoutSession(invoiceId: string) {
       student:students(
         id,
         name,
-        parent_id,
-        profiles:parent_id(email)
+        parent_id
       )
     `
     )
@@ -36,7 +35,6 @@ export async function createCheckoutSession(invoiceId: string) {
   const session = await stripe.checkout.sessions.create({
     ui_mode: "embedded",
     redirect_on_completion: "never",
-    customer_email: invoice.student?.profiles?.email,
     line_items: [
       {
         price_data: {
@@ -45,7 +43,7 @@ export async function createCheckoutSession(invoiceId: string) {
             name: invoice.description || `Piano Lesson Invoice`,
             description: `Invoice for ${invoice.student?.name || "Student"}`,
           },
-          unit_amount: Math.round(invoice.amount * 100), // Convert to cents
+          unit_amount: invoice.amount,
         },
         quantity: 1,
       },
@@ -56,6 +54,10 @@ export async function createCheckoutSession(invoiceId: string) {
       student_id: invoice.student_id,
     },
   })
+
+  if (!session.client_secret) {
+    throw new Error("Stripe did not return a checkout client secret")
+  }
 
   return session.client_secret
 }

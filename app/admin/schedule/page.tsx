@@ -5,11 +5,13 @@ import { AdminScheduleView } from "@/components/admin-schedule-view"
 
 export default async function AdminSchedulePage() {
   const supabase = await createClient()
+  const bookingCutoff = new Date()
+  bookingCutoff.setDate(bookingCutoff.getDate() - 7)
 
   const { data: bookings } = await supabase
     .from("bookings")
     .select("*, student:students(*, profile:profiles(*))")
-    .gte("start_time", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+    .gte("start_time", bookingCutoff.toISOString())
     .order("start_time")
 
   const { data: students } = await supabase

@@ -13,7 +13,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle, Loader2 } from "lucide-react"
 import { submitInquiry } from "./actions"
 import { WeeklyAvailabilityCalendar } from "@/components/weekly-availability-calendar"
-import type { Availability, AvailabilityException } from "@/lib/types"
+import type { Availability, AvailabilityException, Booking } from "@/lib/types"
+
+type BookingSlot = Pick<Booking, "start_time" | "end_time" | "status">
 
 const daysOfWeek = [
   { id: "monday", label: "Monday" },
@@ -31,6 +33,7 @@ export default function InquirePage() {
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [availability, setAvailability] = useState<Availability[]>([])
   const [exceptions, setExceptions] = useState<AvailabilityException[]>([])
+  const [bookings, setBookings] = useState<BookingSlot[]>([])
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null)
 
   useEffect(() => {
@@ -42,6 +45,7 @@ export default function InquirePage() {
           const data = await res.json()
           setAvailability(data.availability || [])
           setExceptions(data.exceptions || [])
+          setBookings(data.bookings || [])
         }
       } catch (err) {
         console.error("Failed to fetch availability:", err)
@@ -119,7 +123,7 @@ export default function InquirePage() {
             <WeeklyAvailabilityCalendar
               availability={availability}
               exceptions={exceptions}
-              existingBookings={[]}
+              existingBookings={bookings}
               onSelectSlot={(start, end) => setSelectedSlot({ start, end })}
               selectedSlot={selectedSlot}
             />

@@ -9,16 +9,27 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { Music, CheckCircle } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Music, CheckCircle, AlertCircle } from "lucide-react"
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+  const [hasSession, setHasSession] = useState(false)
   const [updated, setUpdated] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    supabase.auth.getSession().then(({ data }) => {
+      setHasSession(Boolean(data.session))
+      setIsCheckingSession(false)
+    })
+  }, [])
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,7 +77,20 @@ export default function UpdatePasswordPage() {
             <CardDescription>Enter your new password</CardDescription>
           </CardHeader>
           <CardContent>
-            {updated ? (
+            {isCheckingSession ? (
+              <div className="py-4 text-center text-sm text-muted-foreground">Checking reset link...</div>
+            ) : !hasSession ? (
+              <div className="flex flex-col items-center py-4 text-center">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+                <h3 className="mt-4 font-semibold">Reset Link Required</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Please open the password reset link from your email, or request a new one.
+                </p>
+                <Button className="mt-6" asChild>
+                  <Link href="/auth/reset-password">Request New Link</Link>
+                </Button>
+              </div>
+            ) : updated ? (
               <div className="flex flex-col items-center py-4 text-center">
                 <CheckCircle className="h-12 w-12 text-accent" />
                 <h3 className="mt-4 font-semibold">Password Updated!</h3>

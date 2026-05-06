@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-import { createCheckoutSession, verifyPaymentAndUpdateInvoice } from "@/app/actions/stripe"
+import { createCheckoutSession } from "@/app/actions/stripe"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"

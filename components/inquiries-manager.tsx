@@ -328,7 +328,7 @@ export function InquiriesManager({ inquiries }: InquiriesManagerProps) {
                 </Button>
                 <Button onClick={handleApprove} disabled={isLoading}>
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                  Approve & Create Account
+                  Approve Inquiry
                 </Button>
               </>
             )}

@@ -106,37 +106,43 @@ export function ProfileForm({ user, profile, student }: ProfileFormProps) {
             </div>
 
             <div className="border-t pt-4 mt-6">
-              <h3 className="font-medium mb-4">Parent/Guardian Information</h3>
+              <h3 className="font-medium mb-4">Student Information</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="parent_name">Parent/Guardian Name</Label>
+                  <Label htmlFor="student_name">Student Name</Label>
                   <Input
-                    id="parent_name"
-                    name="parent_name"
-                    defaultValue={student?.parent_name || ""}
-                    placeholder="Parent name"
+                    id="student_name"
+                    name="student_name"
+                    defaultValue={student?.name || ""}
+                    placeholder="Student name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="parent_email">Parent/Guardian Email</Label>
-                  <Input
-                    id="parent_email"
-                    name="parent_email"
-                    type="email"
-                    defaultValue={student?.parent_email || ""}
-                    placeholder="parent@example.com"
-                  />
+                  <Label htmlFor="experience_level">Experience Level</Label>
+                  <Select name="experience_level" defaultValue={student?.experience_level || "beginner"}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="mt-4 space-y-2">
-                <Label htmlFor="parent_phone">Parent/Guardian Phone</Label>
-                <Input
-                  id="parent_phone"
-                  name="parent_phone"
-                  type="tel"
-                  defaultValue={student?.parent_phone || ""}
-                  placeholder="(555) 123-4567"
-                />
+                <Label htmlFor="preferred_lesson_duration">Preferred Lesson Length</Label>
+                <Select name="preferred_lesson_duration" defaultValue={(student?.preferred_lesson_duration || 30).toString()}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30">30 minutes</SelectItem>
+                    <SelectItem value="45">45 minutes</SelectItem>
+                    <SelectItem value="60">60 minutes</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

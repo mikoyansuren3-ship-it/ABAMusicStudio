@@ -1,6 +1,5 @@
 "use client"
 
-import type { User } from "@supabase/supabase-js"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -34,7 +33,6 @@ import {
 import type { Profile } from "@/lib/types"
 
 interface AdminSidebarProps {
-  user: User
   profile: Profile | null
 }
 
@@ -48,7 +46,7 @@ const menuItems = [
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ]
 
-export function AdminSidebar({ user, profile }: AdminSidebarProps) {
+export function AdminSidebar({ profile }: AdminSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 

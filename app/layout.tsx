@@ -4,8 +4,8 @@ import { Playfair_Display, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const _playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
-const _inter = Inter({ subsets: ["latin"] })
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "ABA Music Studio | Piano Lessons",
@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <body className={`${playfair.variable} ${inter.className} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
