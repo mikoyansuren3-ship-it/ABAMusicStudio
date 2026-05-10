@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { BrandLink } from "@/components/brand-link"
 import { createClient } from "@/lib/supabase/client"
 import {
   Sidebar,
@@ -18,7 +19,6 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
-  Music,
   LayoutDashboard,
   Calendar,
   Users,
@@ -67,10 +67,7 @@ export function AdminSidebar({ profile }: AdminSidebarProps) {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link href="/" className="flex items-center gap-2 px-2 py-4">
-          <Music className="h-6 w-6 text-accent" />
-          <span className="font-serif text-lg font-semibold">ABA Music Studio</span>
-        </Link>
+        <BrandLink className="px-2 py-4" imageClassName="w-40" />
       </SidebarHeader>
 
       <SidebarContent>

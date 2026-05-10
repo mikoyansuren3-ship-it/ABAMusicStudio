@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { createClient } from "@/lib/supabase/client"
+import { BrandLink } from "@/components/brand-link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Music, CheckCircle, AlertCircle } from "lucide-react"
+import { CheckCircle, AlertCircle } from "lucide-react"
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("")
@@ -65,10 +66,7 @@ export default function UpdatePasswordPage() {
     <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Music className="h-6 w-6 text-accent" />
-            <span className="font-serif text-xl font-semibold">ABA Music Studio</span>
-          </Link>
+          <BrandLink imageClassName="w-44" />
         </div>
 
         <Card>

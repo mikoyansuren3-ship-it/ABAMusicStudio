@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Music } from "lucide-react"
+import { BrandLink } from "@/components/brand-link"
 
 export function PublicFooter() {
   return (
@@ -7,10 +7,7 @@ export function PublicFooter() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Music className="h-5 w-5 text-accent" />
-              <span className="font-serif text-lg font-semibold">ABA Music Studio</span>
-            </Link>
+            <BrandLink imageClassName="w-40" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Professional piano instruction for students of all ages and skill levels.
             </p>
@@ -59,7 +56,7 @@ export function PublicFooter() {
         </div>
 
         <div className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} ABA Music Studio. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} ABA Music Academy. All rights reserved.</p>
         </div>
       </div>
     </footer>

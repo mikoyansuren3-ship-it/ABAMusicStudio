@@ -154,8 +154,7 @@ export function PricingSection() {
       </div>
 
       <p className="mx-auto mt-8 max-w-3xl text-center text-sm text-muted-foreground">
-        Pricing based on 4 lessons per month. A registration fee may apply. Months with a 5th lesson week are billed
-        accordingly.
+        A registration fee may apply. Months with a 5th lesson week are billed accordingly.
       </p>
     </section>
   )
