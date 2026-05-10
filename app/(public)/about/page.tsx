@@ -41,11 +41,10 @@ export default function AboutPage() {
             <p className="mt-6 text-muted-foreground leading-relaxed">
               With over 10 years of teaching experience, I&apos;ve had the joy of guiding students of all ages through
               their musical journeys. I hold a PhD in Music and bring a deep foundation in classical training to every
-              lesson — shaped in part by my time on faculty at the Aram Khachaturian Conservatory in Armenia, one of the
-              region&apos;s most prestigious music institutions. I currently serve as Recording Secretary for MTAC Santa
-              Clarita Valley, staying actively involved in the local music education community. Whether you&apos;re just
-              starting out or looking to refine your technique, I&apos;m committed to patient, personalized instruction that
-              helps every student grow.
+              lesson — shaped in part by my time at the Aram Khachaturian Museum and Komitas State Conservatory in
+              Armenia, two of the region&apos;s respected music institutions. I am an MTAC member, staying actively
+              involved in the local music education community. Whether you&apos;re just starting out or looking to refine
+              your technique, I&apos;m committed to patient, personalized instruction that helps every student grow.
             </p>
           </div>
         </div>
