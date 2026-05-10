@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertCircle, Clock, CreditCard, Calendar } from "lucide-react"
 
 export const metadata = {
-  title: "Studio Policies | ABA Music Studio",
-  description: "View cancellation, payment, and studio policies at ABA Music Studio.",
+  title: "Studio Policies | ABA Music Academy",
+  description: "View cancellation, payment, and studio policies at ABA Music Academy.",
 }
 
 export default function PoliciesPage() {

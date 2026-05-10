@@ -1,4 +1,4 @@
--- ABA Music Studio Database Schema
+-- ABA Music Academy Database Schema
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

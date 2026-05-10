@@ -4,8 +4,8 @@ import { Check } from "lucide-react"
 import { PricingSection } from "@/components/pricing-section"
 
 export const metadata = {
-  title: "Lessons & Pricing | ABA Music Studio",
-  description: "View lesson types, durations, and pricing at ABA Music Studio.",
+  title: "Lessons & Pricing | ABA Music Academy",
+  description: "View lesson types, durations, and pricing at ABA Music Academy.",
 }
 
 export default function LessonsPage() {

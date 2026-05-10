@@ -9,7 +9,7 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ABA Music Studio | Piano Lessons",
+  title: "ABA Music Academy | Piano Lessons",
   description:
     "Professional piano instruction for students of all ages and skill levels. Begin your musical journey today.",
   generator: "v0.app",

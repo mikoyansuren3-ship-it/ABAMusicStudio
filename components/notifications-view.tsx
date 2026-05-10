@@ -54,7 +54,7 @@ export function NotificationsView({ notifications, userId }: NotificationsViewPr
                   </Badge>
                 )}
               </CardTitle>
-              <CardDescription>Messages from ABA Music Studio</CardDescription>
+              <CardDescription>Messages from ABA Music Academy</CardDescription>
             </div>
             {unreadNotifications.length > 0 && (
               <Button variant="outline" size="sm" onClick={handleMarkAllAsRead} disabled={loadingId === "all"}>

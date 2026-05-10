@@ -5,8 +5,8 @@ import Image from "next/image"
 import { GraduationCap, Heart, Award } from "lucide-react"
 
 export const metadata = {
-  title: "About | ABA Music Studio",
-  description: "Learn about our teaching philosophy and experience at ABA Music Studio.",
+  title: "About | ABA Music Academy",
+  description: "Learn about our teaching philosophy and experience at ABA Music Academy.",
 }
 
 export default function AboutPage() {
@@ -15,7 +15,7 @@ export default function AboutPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="font-serif text-4xl font-bold">About ABA Music Studio</h1>
+          <h1 className="font-serif text-4xl font-bold">About ABA Music Academy</h1>
           <p className="mt-4 text-lg text-muted-foreground">
             Dedicated to nurturing musical talent and fostering a lifelong love of music.
           </p>
@@ -27,7 +27,7 @@ export default function AboutPage() {
             <div className="aspect-[3/4] overflow-hidden rounded-lg bg-muted">
               <Image
                 src="/arpine-portrait.png"
-                alt="Arpine, ABA Music Studio piano teacher"
+                alt="Arpine, ABA Music Academy piano teacher"
                 width={768}
                 height={1024}
                 className="h-full w-full object-cover"
@@ -53,7 +53,7 @@ export default function AboutPage() {
         <div className="mt-24">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-bold">Teaching Philosophy</h2>
-            <p className="mt-4 text-muted-foreground">Three pillars guide every lesson at ABA Music Studio.</p>
+            <p className="mt-4 text-muted-foreground">Three pillars guide every lesson at ABA Music Academy.</p>
           </div>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">

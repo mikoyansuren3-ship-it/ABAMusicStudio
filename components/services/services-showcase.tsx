@@ -103,7 +103,7 @@ export function ServicesShowcase() {
           <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Coming Soon</p>
           <h1 className="mt-4 font-serif text-5xl font-bold tracking-tight md:text-6xl">Upcoming Services</h1>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            ABA Music Studio is preparing a wider set of learning options. Teacher details and schedules will be updated
+            ABA Music Academy is preparing a wider set of learning options. Teacher details and schedules will be updated
             here as each service is confirmed.
           </p>
         </header>

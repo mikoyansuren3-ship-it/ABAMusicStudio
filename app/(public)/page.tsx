@@ -36,7 +36,7 @@ export default function HomePage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-3xl font-bold">Why Choose ABA Music Studio?</h2>
+            <h2 className="font-serif text-3xl font-bold">Why Choose ABA Music Academy?</h2>
             <p className="mt-4 text-muted-foreground">
               A personalized approach to piano education with modern tools and traditional excellence.
             </p>

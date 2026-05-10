@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "ABA Music Studio <noreply@abamusic.com>",
+      from: "ABA Music Academy <noreply@abamusic.com>",
       to: email,
       subject,
       html,
