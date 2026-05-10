@@ -46,7 +46,6 @@ export default function SignUpPage() {
           emailRedirectTo: `${origin}/auth/confirm?next=/portal/profile`,
           data: {
             full_name: fullName,
-            role: "student",
           },
         },
       })
@@ -84,9 +83,9 @@ export default function SignUpPage() {
                   We sent a confirmation link to {email}. Open it to finish setting up your account.
                 </p>
                 <Button variant="outline" className="mt-6 bg-transparent" asChild>
-                  <Link href="/auth/login">
+                  <Link href="/auth/student/login">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Login
+                    Back to Student Login
                   </Link>
                 </Button>
               </div>
@@ -135,7 +134,7 @@ export default function SignUpPage() {
                 </div>
                 <div className="mt-6 text-center text-sm">
                   <span className="text-muted-foreground">Already have an account? </span>
-                  <Link href="/auth/login" className="text-foreground underline underline-offset-4">
+                  <Link href="/auth/student/login" className="text-foreground underline underline-offset-4">
                     Sign in
                   </Link>
                 </div>

@@ -14,7 +14,7 @@ export default async function PortalDashboard() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login")
+  if (!user) redirect("/auth/student/login")
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 

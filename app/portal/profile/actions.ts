@@ -13,7 +13,6 @@ export async function updateProfile(formData: FormData) {
 
   const fullName = formData.get("full_name") as string
   const phone = formData.get("phone") as string
-  const timezone = formData.get("timezone") as string
   const studentName = formData.get("student_name") as string
   const experienceLevel = (formData.get("experience_level") as string) || null
   const preferredLessonDuration = Number.parseInt(formData.get("preferred_lesson_duration") as string) || 30
@@ -24,7 +23,6 @@ export async function updateProfile(formData: FormData) {
     .update({
       full_name: fullName,
       phone,
-      timezone,
     })
     .eq("id", user.id)
 

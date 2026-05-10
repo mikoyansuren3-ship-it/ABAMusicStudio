@@ -12,7 +12,7 @@ export default async function SchedulePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login")
+  if (!user) redirect("/auth/student/login")
 
   const { data: student } = await supabase.from("students").select("*").eq("parent_id", user.id).maybeSingle()
 

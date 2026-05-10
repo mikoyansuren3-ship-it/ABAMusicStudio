@@ -14,7 +14,7 @@ export default async function PayInvoicePage({ params }: { params: Promise<{ inv
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/auth/login")
+    redirect("/auth/student/login")
   }
 
   // Get the invoice

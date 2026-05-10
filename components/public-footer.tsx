@@ -25,6 +25,9 @@ export function PublicFooter() {
               <Link href="/lessons" className="text-sm text-muted-foreground hover:text-foreground">
                 Lessons & Pricing
               </Link>
+              <Link href="/services" className="text-sm text-muted-foreground hover:text-foreground">
+                Services
+              </Link>
               <Link href="/policies" className="text-sm text-muted-foreground hover:text-foreground">
                 Policies
               </Link>
@@ -38,7 +41,7 @@ export function PublicFooter() {
                 Inquire About Lessons
               </Link>
               <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground">
-                Student Login
+                Login
               </Link>
               <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground">
                 Contact Us

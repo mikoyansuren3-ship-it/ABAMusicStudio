@@ -20,13 +20,6 @@ interface ProfileFormProps {
   student: Student | null
 }
 
-const timezones = [
-  { value: "America/New_York", label: "Eastern Time" },
-  { value: "America/Chicago", label: "Central Time" },
-  { value: "America/Denver", label: "Mountain Time" },
-  { value: "America/Los_Angeles", label: "Pacific Time" },
-]
-
 export function ProfileForm({ user, profile, student }: ProfileFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -77,32 +70,15 @@ export function ProfileForm({ user, profile, student }: ProfileFormProps) {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  defaultValue={profile?.phone || ""}
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="timezone">Timezone</Label>
-                <Select name="timezone" defaultValue={profile?.timezone || "America/New_York"}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {timezones.map((tz) => (
-                      <SelectItem key={tz.value} value={tz.value}>
-                        {tz.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                defaultValue={profile?.phone || ""}
+                placeholder="(555) 123-4567"
+              />
             </div>
 
             <div className="border-t pt-4 mt-6">

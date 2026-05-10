@@ -149,7 +149,7 @@ export function TeacherDashboard() {
       } = await supabase.auth.getUser()
 
       if (userError || !user) {
-        router.replace("/login")
+        router.replace("/auth/teacher/login")
         return
       }
 
@@ -243,7 +243,7 @@ export function TeacherDashboard() {
 
   async function handleSignOut() {
     await supabase.auth.signOut()
-    router.push("/login")
+    router.push("/auth/login")
   }
 
   async function handleInquiryDecision(inquiry: InquiryRow, approved: boolean) {

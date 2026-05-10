@@ -11,7 +11,7 @@ BEGIN
   INSERT INTO public.profiles (id, role, full_name)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data ->> 'role', 'student'),
+    'student',
     COALESCE(NEW.raw_user_meta_data ->> 'full_name', NULL)
   )
   ON CONFLICT (id) DO NOTHING;

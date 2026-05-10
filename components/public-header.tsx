@@ -9,6 +9,7 @@ import { Menu, Music } from "lucide-react"
 const navLinks = [
   { href: "/about", label: "About" },
   { href: "/lessons", label: "Lessons & Pricing" },
+  { href: "/services", label: "Services" },
   { href: "/policies", label: "Policies" },
   { href: "/contact", label: "Contact" },
 ]
@@ -25,7 +26,7 @@ export function PublicHeader() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-6 min-[901px]:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -37,9 +38,9 @@ export function PublicHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 min-[901px]:flex">
           <Button variant="outline" asChild>
-            <Link href="/auth/login">Student Login</Link>
+            <Link href="/auth/login">Login</Link>
           </Button>
           <Button asChild>
             <Link href="/inquire">Inquire About Lessons</Link>
@@ -48,7 +49,7 @@ export function PublicHeader() {
 
         {/* Mobile Navigation */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
+          <SheetTrigger asChild className="min-[901px]:hidden">
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle menu</span>
@@ -75,7 +76,7 @@ export function PublicHeader() {
               <div className="flex flex-col gap-3 pt-4">
                 <Button variant="outline" asChild>
                   <Link href="/auth/login" onClick={() => setOpen(false)}>
-                    Student Login
+                    Login
                   </Link>
                 </Button>
                 <Button asChild>

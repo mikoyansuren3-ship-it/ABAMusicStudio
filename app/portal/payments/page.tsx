@@ -10,7 +10,7 @@ export default async function PaymentsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login")
+  if (!user) redirect("/auth/student/login")
 
   const { data: student } = await supabase.from("students").select("*").eq("profile_id", user.id).single()
 

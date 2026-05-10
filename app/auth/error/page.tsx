@@ -6,9 +6,10 @@ import { Music, AlertCircle } from "lucide-react"
 export default async function AuthErrorPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error: string }>
+  searchParams: Promise<{ error?: string; message?: string }>
 }) {
   const params = await searchParams
+  const errorMessage = params?.message || params?.error
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
@@ -28,8 +29,8 @@ export default async function AuthErrorPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {params?.error ? (
-              <p className="text-sm text-muted-foreground">Error: {params.error}</p>
+            {errorMessage ? (
+              <p className="text-sm text-muted-foreground">Error: {errorMessage}</p>
             ) : (
               <p className="text-sm text-muted-foreground">An unspecified error occurred.</p>
             )}

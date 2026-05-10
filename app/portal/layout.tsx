@@ -11,7 +11,7 @@ export default async function PortalLayout({ children }: { children: React.React
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) {
-    redirect("/auth/login")
+    redirect("/auth/student/login")
   }
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
