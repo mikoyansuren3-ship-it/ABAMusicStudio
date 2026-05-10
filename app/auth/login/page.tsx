@@ -1,131 +1,44 @@
-"use client"
-
-import type React from "react"
-
-import { createClient } from "@/lib/supabase/client"
+import { AuthShell } from "@/components/auth/auth-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { CheckCircle, Music } from "lucide-react"
+import { GraduationCap, ShieldCheck, UserRoundCog } from "lucide-react"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [message] = useState(() =>
-    typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("message"),
-  )
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      if (error) throw error
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .maybeSingle()
-
-      if (profileError) throw profileError
-
-      if (profile?.role === "teacher") {
-        router.push("/dashboard")
-      } else if (profile?.role === "admin") {
-        router.push("/admin")
-      } else {
-        router.push("/portal")
-      }
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Music className="h-6 w-6 text-accent" />
-            <span className="font-serif text-xl font-semibold">ABA Music Studio</span>
-          </Link>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <CardDescription>Sign in to access your student portal</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin}>
-              <div className="flex flex-col gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="/auth/reset-password" className="text-xs text-muted-foreground hover:text-foreground">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                {message && !error && (
-                  <p className="flex items-center gap-2 text-sm text-green-600">
-                    <CheckCircle className="h-4 w-4" />
-                    {message}
-                  </p>
-                )}
-                {error && <p className="text-sm text-destructive">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
-                </Button>
-              </div>
-              <div className="mt-6 text-center text-sm">
-                <span className="text-muted-foreground">Need an account? </span>
-                <Link href="/auth/sign-up" className="text-foreground underline underline-offset-4">
-                  Create one
-                </Link>
-                <span className="text-muted-foreground"> or </span>
-                <Link href="/inquire" className="text-foreground underline underline-offset-4">
-                  inquire about lessons
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <AuthShell>
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Choose Login</CardTitle>
+          <CardDescription>Select the portal that matches your account.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button asChild variant="outline" className="h-auto w-full justify-start p-5 text-left">
+            <Link href="/auth/student/login">
+              <GraduationCap className="h-8 w-8 text-accent" />
+              <span>
+                <span className="block font-semibold">Student Login</span>
+                <span className="block text-sm font-normal text-muted-foreground">Access schedules, payments, and profile details.</span>
+              </span>
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-auto w-full justify-start p-5 text-left">
+            <Link href="/auth/teacher/login">
+              <UserRoundCog className="h-8 w-8 text-accent" />
+              <span>
+                <span className="block font-semibold">Teacher Login</span>
+                <span className="block text-sm font-normal text-muted-foreground">Manage lessons, students, and your dashboard.</span>
+              </span>
+            </Link>
+          </Button>
+          <div className="pt-2 text-center text-sm">
+            <Link href="/auth/admin/login" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
+              <ShieldCheck className="h-4 w-4" />
+              Administrator Login
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </AuthShell>
   )
 }

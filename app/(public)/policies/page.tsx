@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertCircle, Clock, CreditCard, Calendar } from "lucide-react"
 
 export const metadata = {
-  title: "Studio Policies | ABA Music Studio",
-  description: "View cancellation, payment, and studio policies at ABA Music Studio.",
+  title: "Studio Policies | ABA Music Academy",
+  description: "View cancellation, payment, and studio policies at ABA Music Academy.",
 }
 
 export default function PoliciesPage() {
@@ -34,7 +34,7 @@ export default function PoliciesPage() {
               </p>
               <p>
                 <strong className="text-foreground">Late Cancellations:</strong> Lessons cancelled with less than 24
-                hours notice will be charged in full. This includes no-shows.
+                hours notice will be charged 30% of the lesson cost. This includes no-shows.
               </p>
               <p>
                 <strong className="text-foreground">Emergencies:</strong> In case of genuine emergencies (illness,
@@ -80,16 +80,16 @@ export default function PoliciesPage() {
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
-                <strong className="text-foreground">Payment Timing:</strong> For pay-as-you-go lessons, payment is due
-                at the time of the lesson. For monthly tuition, payment is due on the 1st of each month.
+                <strong className="text-foreground">Payment Timing:</strong> Lesson payments are billed monthly and are
+                due on the 1st of each month.
               </p>
               <p>
                 <strong className="text-foreground">Accepted Methods:</strong> Credit/debit cards (processed securely
                 through Stripe), cash, or check.
               </p>
               <p>
-                <strong className="text-foreground">Late Payments:</strong> A $10 late fee may be applied to payments
-                more than 7 days overdue. Lessons may be suspended until the balance is cleared.
+                <strong className="text-foreground">Late Payments:</strong> Payments made 10 days into the month or
+                later will incur a 10% fee. Lessons may be suspended until the balance is cleared.
               </p>
               <p>
                 <strong className="text-foreground">Refunds:</strong> Prepaid lessons are non-refundable but may be

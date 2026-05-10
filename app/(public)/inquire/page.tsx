@@ -91,7 +91,7 @@ export default function InquirePage() {
               <CheckCircle className="h-16 w-16 text-accent" />
               <h1 className="mt-6 font-serif text-2xl font-bold">Inquiry Submitted!</h1>
               <p className="mt-4 text-muted-foreground">
-                Thank you for your interest in ABA Music Studio. We&apos;ll review your inquiry and get back to you
+                Thank you for your interest in ABA Music Academy. We&apos;ll review your inquiry and get back to you
                 within 1-2 business days.
               </p>
               <p className="mt-2 text-sm text-muted-foreground">Check your email for a confirmation message.</p>
@@ -263,7 +263,7 @@ export default function InquirePage() {
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">
-                  By submitting this form, you agree to be contacted regarding lessons at ABA Music Studio.
+                  By submitting this form, you agree to be contacted regarding lessons at ABA Music Academy.
                 </p>
               </form>
             </CardContent>

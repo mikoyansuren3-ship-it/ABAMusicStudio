@@ -202,9 +202,6 @@ export function StudentsManager({ students }: StudentsManagerProps) {
                   <p>
                     <strong>Preferred Duration:</strong> {selectedStudent.preferred_lesson_duration} minutes
                   </p>
-                  <p>
-                    <strong>Timezone:</strong> {selectedStudent.profile?.timezone || "Not set"}
-                  </p>
                 </div>
               </div>
 

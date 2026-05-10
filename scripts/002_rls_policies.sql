@@ -1,4 +1,4 @@
--- RLS Policies for ABA Music Studio
+-- RLS Policies for ABA Music Academy
 
 -- Helper function to check if user is admin
 CREATE OR REPLACE FUNCTION is_admin()

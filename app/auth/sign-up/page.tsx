@@ -3,13 +3,14 @@
 import type React from "react"
 
 import { createClient } from "@/lib/supabase/client"
+import { BrandLink } from "@/components/brand-link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState } from "react"
-import { ArrowLeft, CheckCircle, Music } from "lucide-react"
+import { ArrowLeft, CheckCircle } from "lucide-react"
 
 export default function SignUpPage() {
   const [fullName, setFullName] = useState("")
@@ -46,7 +47,6 @@ export default function SignUpPage() {
           emailRedirectTo: `${origin}/auth/confirm?next=/portal/profile`,
           data: {
             full_name: fullName,
-            role: "student",
           },
         },
       })
@@ -64,10 +64,7 @@ export default function SignUpPage() {
     <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Music className="h-6 w-6 text-accent" />
-            <span className="font-serif text-xl font-semibold">ABA Music Studio</span>
-          </Link>
+          <BrandLink imageClassName="w-44" />
         </div>
 
         <Card>
@@ -84,9 +81,9 @@ export default function SignUpPage() {
                   We sent a confirmation link to {email}. Open it to finish setting up your account.
                 </p>
                 <Button variant="outline" className="mt-6 bg-transparent" asChild>
-                  <Link href="/auth/login">
+                  <Link href="/auth/student/login">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Login
+                    Back to Student Login
                   </Link>
                 </Button>
               </div>
@@ -135,7 +132,7 @@ export default function SignUpPage() {
                 </div>
                 <div className="mt-6 text-center text-sm">
                   <span className="text-muted-foreground">Already have an account? </span>
-                  <Link href="/auth/login" className="text-foreground underline underline-offset-4">
+                  <Link href="/auth/student/login" className="text-foreground underline underline-offset-4">
                     Sign in
                   </Link>
                 </div>
