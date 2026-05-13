@@ -12,13 +12,16 @@ export interface AuthActionState {
   message?: string
 }
 
+const defaultOwnerAdminEmail = "arpine@abamusicacademy.org"
+const defaultTeacherSignupCode = "#1024"
+
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key)
   return typeof value === "string" ? value.trim() : ""
 }
 
 function getOwnerAdminEmail() {
-  return process.env.OWNER_ADMIN_EMAIL?.trim().toLowerCase()
+  return defaultOwnerAdminEmail
 }
 
 async function promoteOwnerIfNeeded(userId: string, email?: string | null) {
@@ -103,13 +106,8 @@ export async function signUpTeacher(_prevState: AuthActionState, formData: FormD
   const password = getStringValue(formData, "password")
   const confirmPassword = getStringValue(formData, "confirm_password")
   const teacherCode = getStringValue(formData, "teacher_code")
-  const configuredTeacherCode = process.env.TEACHER_SIGNUP_CODE
 
-  if (!configuredTeacherCode) {
-    return { error: "Teacher signup is not configured yet." }
-  }
-
-  if (teacherCode !== configuredTeacherCode) {
+  if (teacherCode !== defaultTeacherSignupCode) {
     return { error: "The teacher access code is incorrect." }
   }
 

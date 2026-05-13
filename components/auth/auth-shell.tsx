@@ -1,12 +1,22 @@
-import { BrandLink } from "@/components/brand-link"
+import { cn } from "@/lib/utils"
 
-export function AuthShell({ children }: { children: React.ReactNode }) {
+interface AuthShellProps {
+  children: React.ReactNode
+  className?: string
+  showBrandLogo?: boolean
+}
+
+export function AuthShell({ children, className, showBrandLogo = true }: AuthShellProps) {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <BrandLink imageClassName="w-44" />
-        </div>
+      <div className={cn("w-full max-w-sm", className)}>
+        {showBrandLogo ? (
+          <div className="mb-8 text-center">
+            <p className="bg-gradient-to-r from-[#4a251c] via-accent to-[#9a3f78] bg-clip-text font-serif text-3xl font-bold tracking-tight text-transparent italic sm:text-4xl">
+              ABA Music Academy
+            </p>
+          </div>
+        ) : null}
 
         {children}
       </div>

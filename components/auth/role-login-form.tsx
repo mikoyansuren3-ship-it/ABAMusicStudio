@@ -63,6 +63,9 @@ export function RoleLoginForm({ role, title, description, accountLink, message }
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Signing in..." : "Sign In"}
             </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/auth/login">Back to login options</Link>
+            </Button>
           </div>
           {accountLink && <div className="mt-6 text-center text-sm">{accountLink}</div>}
         </form>
