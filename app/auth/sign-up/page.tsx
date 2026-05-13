@@ -64,7 +64,7 @@ export default function SignUpPage() {
     <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <BrandLink imageClassName="w-44" />
+          <BrandLink imageClassName="h-24 w-24" />
         </div>
 
         <Card>

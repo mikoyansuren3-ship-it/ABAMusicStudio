@@ -60,7 +60,7 @@ CREATE TRIGGER update_invoices_updated_at BEFORE UPDATE ON invoices
 INSERT INTO studio_settings (key, value) VALUES
   ('pricing', '{"30min": 4500, "45min": 6000, "60min": 7500, "trial": 2500}'::jsonb),
   ('buffer_time', '{"minutes": 10}'::jsonb),
-  ('policies', '{"cancellation": "24 hours notice required for cancellations. Late cancellations may be charged.", "late": "Students arriving more than 15 minutes late may have their lesson shortened.", "payment": "Payment is due at the time of the lesson unless on a monthly subscription plan."}'::jsonb)
+  ('policies', '{"cancellation": "24 hours notice required for cancellations. Late cancellations may be charged.", "late": "Students arriving more than 15 minutes late may have their lesson shortened.", "payment": "Monthly payment must be paid by the end of the first week. Each additional week after the first week is charged an extra 10%."}'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
 -- Seed default availability (Mon-Fri 3pm-7pm, Sat 10am-2pm)

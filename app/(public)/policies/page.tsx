@@ -80,16 +80,16 @@ export default function PoliciesPage() {
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
-                <strong className="text-foreground">Payment Timing:</strong> Lesson payments are billed monthly and are
-                due on the 1st of each month.
+                <strong className="text-foreground">Payment Timing:</strong> Lesson payments are billed monthly and must
+                be paid by the end of the first week of each month.
               </p>
               <p>
                 <strong className="text-foreground">Accepted Methods:</strong> Credit/debit cards (processed securely
                 through Stripe), cash, or check.
               </p>
               <p>
-                <strong className="text-foreground">Late Payments:</strong> Payments made 10 days into the month or
-                later will incur a 10% fee. Lessons may be suspended until the balance is cleared.
+                <strong className="text-foreground">Late Payments:</strong> Each additional week after the first week
+                will be charged an extra 10%. Lessons may be suspended until the balance is cleared.
               </p>
               <p>
                 <strong className="text-foreground">Refunds:</strong> Prepaid lessons are non-refundable but may be

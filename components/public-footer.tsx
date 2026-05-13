@@ -7,7 +7,7 @@ export function PublicFooter() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="space-y-4">
-            <BrandLink imageClassName="w-40" />
+            <BrandLink imageClassName="h-20 w-20" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Professional piano instruction for students of all ages and skill levels.
             </p>
@@ -49,8 +49,9 @@ export function PublicFooter() {
           <div className="space-y-4">
             <h4 className="font-semibold">Contact</h4>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Email: hello@abamusicstudio.com</p>
-              <p>Phone: (555) 123-4567</p>
+              <p>Email: arpine@abamusicacademy.org</p>
+              <p>Phone: 818-836-2322</p>
+              <p>24668 Ebelden Avenue, Santa Clarita, CA 91321</p>
             </div>
           </div>
         </div>
