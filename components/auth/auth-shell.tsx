@@ -1,3 +1,6 @@
+import Link from "next/link"
+
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface AuthShellProps {
@@ -19,6 +22,14 @@ export function AuthShell({ children, className, showBrandLogo = true }: AuthShe
         ) : null}
 
         {children}
+
+        <div className="mt-6 text-center">
+          <Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground">
+            <Link href="/" prefetch={false}>
+              Back to home
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   )
