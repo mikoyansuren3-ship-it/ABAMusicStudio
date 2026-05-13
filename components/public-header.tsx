@@ -21,7 +21,7 @@ export function PublicHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <BrandLink priority imageClassName="w-36 sm:w-44" />
+        <BrandLink priority imageClassName="h-14 w-14" />
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 min-[901px]:flex">
@@ -55,7 +55,7 @@ export function PublicHeader() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[280px]">
             <div className="flex flex-col gap-6 pt-6">
-              <BrandLink imageClassName="w-40" onClick={() => setOpen(false)} />
+              <BrandLink imageClassName="h-20 w-20" onClick={() => setOpen(false)} />
               <nav className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <Link

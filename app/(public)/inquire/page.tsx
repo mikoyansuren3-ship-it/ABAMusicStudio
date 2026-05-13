@@ -150,7 +150,7 @@ export default function InquirePage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone</Label>
-                      <Input id="phone" name="phone" type="tel" placeholder="(555) 123-4567" />
+                      <Input id="phone" name="phone" type="tel" placeholder="818-836-2322" />
                     </div>
                   </div>
 
@@ -181,9 +181,9 @@ export default function InquirePage() {
                         <SelectValue placeholder="Select duration" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="30">30 minutes ($45)</SelectItem>
-                        <SelectItem value="45">45 minutes ($60)</SelectItem>
-                        <SelectItem value="60">60 minutes ($75)</SelectItem>
+                        <SelectItem value="30">30 minutes</SelectItem>
+                        <SelectItem value="45">45 minutes</SelectItem>
+                        <SelectItem value="60">60 minutes</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

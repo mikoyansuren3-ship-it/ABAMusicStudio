@@ -49,7 +49,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">Email</h3>
-                  <p className="text-muted-foreground">hello@abamusicstudio.com</p>
+                  <p className="text-muted-foreground">arpine@abamusicacademy.org</p>
                 </div>
               </div>
 
@@ -59,7 +59,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">Phone</h3>
-                  <p className="text-muted-foreground">(555) 123-4567</p>
+                  <p className="text-muted-foreground">818-836-2322</p>
                   <p className="text-sm text-muted-foreground">Available during business hours</p>
                 </div>
               </div>
@@ -71,9 +71,9 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-medium">Studio Location</h3>
                   <p className="text-muted-foreground">
-                    123 Music Lane
+                    24668 Ebelden Avenue
                     <br />
-                    Harmony City, ST 12345
+                    Santa Clarita, CA 91321
                   </p>
                 </div>
               </div>

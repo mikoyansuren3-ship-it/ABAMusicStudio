@@ -12,13 +12,16 @@ export interface AuthActionState {
   message?: string
 }
 
+const defaultOwnerAdminEmail = "arpine@abamusicacademy.org"
+const defaultTeacherSignupCode = "#1024"
+
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key)
   return typeof value === "string" ? value.trim() : ""
 }
 
 function getOwnerAdminEmail() {
-  return process.env.OWNER_ADMIN_EMAIL?.trim().toLowerCase()
+  return defaultOwnerAdminEmail
 }
 
 async function promoteOwnerIfNeeded(userId: string, email?: string | null) {
@@ -67,13 +70,6 @@ export async function loginWithRole(
     return { error: error.message }
   }
 
-  try {
-    await promoteOwnerIfNeeded(data.user.id, data.user.email)
-  } catch (error) {
-    await supabase.auth.signOut()
-    return { error: error instanceof Error ? error.message : "Unable to verify administrator access." }
-  }
-
   const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle()
 
   if (profileError) {
@@ -81,12 +77,18 @@ export async function loginWithRole(
     return { error: profileError.message }
   }
 
-  const actualRole = profile?.role || "student"
+  let actualRole = profile?.role || "student"
   const ownerEmail = getOwnerAdminEmail()
   const isOwner = Boolean(ownerEmail && data.user.email?.toLowerCase() === ownerEmail)
 
   if (expectedRole === "admin" && isOwner && actualRole !== "admin") {
-    return { error: "Administrator access is still being prepared. Please try again." }
+    try {
+      await promoteOwnerIfNeeded(data.user.id, data.user.email)
+      actualRole = "admin"
+    } catch (error) {
+      await supabase.auth.signOut()
+      return { error: error instanceof Error ? error.message : "Unable to verify administrator access." }
+    }
   }
 
   if (actualRole !== expectedRole) {
@@ -103,13 +105,8 @@ export async function signUpTeacher(_prevState: AuthActionState, formData: FormD
   const password = getStringValue(formData, "password")
   const confirmPassword = getStringValue(formData, "confirm_password")
   const teacherCode = getStringValue(formData, "teacher_code")
-  const configuredTeacherCode = process.env.TEACHER_SIGNUP_CODE
 
-  if (!configuredTeacherCode) {
-    return { error: "Teacher signup is not configured yet." }
-  }
-
-  if (teacherCode !== configuredTeacherCode) {
+  if (teacherCode !== defaultTeacherSignupCode) {
     return { error: "The teacher access code is incorrect." }
   }
 

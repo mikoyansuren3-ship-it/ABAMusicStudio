@@ -12,14 +12,14 @@ interface BrandLinkProps {
 
 export function BrandLink({ className, imageClassName, priority = false, onClick }: BrandLinkProps) {
   return (
-    <Link href="/" className={cn("inline-flex items-center", className)} onClick={onClick}>
+    <Link href="/" className={cn("inline-flex items-center rounded-md p-1", className)} onClick={onClick}>
       <Image
         src="/aba-music-academy-logo.png"
         alt="ABA Music Academy"
-        width={280}
-        height={140}
+        width={512}
+        height={512}
         priority={priority}
-        className={cn("h-auto w-40", imageClassName)}
+        className={cn("h-14 w-14 object-contain mix-blend-screen", imageClassName)}
       />
     </Link>
   )

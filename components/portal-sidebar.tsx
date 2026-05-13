@@ -62,7 +62,7 @@ export function PortalSidebar({ user, profile }: PortalSidebarProps) {
   return (
     <Sidebar>
       <SidebarHeader>
-        <BrandLink className="px-2 py-4" imageClassName="w-40" />
+        <BrandLink className="mx-2 my-4" imageClassName="h-20 w-20" />
       </SidebarHeader>
 
       <SidebarContent>

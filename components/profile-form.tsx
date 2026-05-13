@@ -77,7 +77,7 @@ export function ProfileForm({ user, profile, student }: ProfileFormProps) {
                 name="phone"
                 type="tel"
                 defaultValue={profile?.phone || ""}
-                placeholder="(555) 123-4567"
+                placeholder="818-836-2322"
               />
             </div>
 

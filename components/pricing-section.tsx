@@ -6,12 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-const BASE_MONTHLY = { 30: 180, 45: 270, 60: 360 } as const
+const BASE_MONTHLY = { 30: 160, 45: 230, 60: 300 } as const
 const FREQUENCY_MULTIPLIER = { 1: 1.0, 2: 0.95, 3: 0.9 } as const
 const ROUNDED_MONTHLY = {
-  30: { 1: 180, 2: 340, 3: 480 },
-  45: { 1: 270, 2: 510, 3: 730 },
-  60: { 1: 360, 2: 670, 3: 960 },
+  30: { 1: 160, 2: 305, 3: 430 },
+  45: { 1: 230, 2: 440, 3: 625 },
+  60: { 1: 300, 2: 570, 3: 810 },
 } as const
 
 type Duration = keyof typeof BASE_MONTHLY
@@ -52,8 +52,7 @@ function formatCurrency(value: number) {
 }
 
 function getSavingsLabel(frequency: Frequency) {
-  if (frequency === 2) return "Save 5%"
-  if (frequency === 3) return "Save 10%"
+  if (frequency > 1) return "Discount applied"
   return null
 }
 
@@ -145,7 +144,7 @@ export function PricingSection() {
                 </div>
 
                 <Button className="w-full" asChild>
-                  <Link href="/inquire">Book a Free Trial</Link>
+                  <Link href="/enroll">Enroll Now</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -154,7 +153,7 @@ export function PricingSection() {
       </div>
 
       <p className="mx-auto mt-8 max-w-3xl text-center text-sm text-muted-foreground">
-        A registration fee may apply. Months with a 5th lesson week are billed accordingly.
+        Monthly price = base rate x lessons per week x discount multiplier. A registration fee may apply.
       </p>
     </section>
   )
