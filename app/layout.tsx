@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Playfair_Display, Inter } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
 import "./globals.css"
 
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
   title: "ABA Music Academy | Piano Lessons",
   description:
     "Professional piano instruction for students of all ages and skill levels. Begin your musical journey today.",
-  generator: "v0.app",
   icons: {
     icon: [
       {
@@ -42,7 +40,6 @@ export default function RootLayout({
       <body className={`${playfair.variable} ${inter.className} font-sans antialiased`}>
         {children}
         <Toaster richColors />
-        <Analytics />
       </body>
     </html>
   )
