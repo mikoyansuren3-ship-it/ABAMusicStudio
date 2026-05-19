@@ -2,8 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import { InvoiceCheckout } from "@/components/invoice-checkout"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
+import { PortalCard, PortalPageBody, PortalPageHeader } from "@/components/portal/studio/portal-ui"
+import { formatCurrency } from "@/lib/portal/format"
 
 export default async function PayInvoicePage({ params }: { params: Promise<{ invoiceId: string }> }) {
   const { invoiceId } = await params
@@ -17,7 +18,6 @@ export default async function PayInvoicePage({ params }: { params: Promise<{ inv
     redirect("/auth/student/login")
   }
 
-  // Get the invoice
   const { data: invoice, error } = await supabase
     .from("invoices")
     .select(
@@ -28,7 +28,7 @@ export default async function PayInvoicePage({ params }: { params: Promise<{ inv
         name,
         parent_id
       )
-    `
+    `,
     )
     .eq("id", invoiceId)
     .single()
@@ -37,50 +37,58 @@ export default async function PayInvoicePage({ params }: { params: Promise<{ inv
     notFound()
   }
 
-  // Verify the user owns this invoice (is the parent of the student)
   if (invoice.student?.parent_id !== user.id) {
     redirect("/portal/payments")
   }
 
-  // If already paid, show success message
   if (invoice.status === "paid") {
     return (
-      <div className="container mx-auto max-w-lg px-4 py-12">
-        <div className="text-center">
-          <CheckCircle2 className="mx-auto h-16 w-16 text-green-500" />
-          <h1 className="mt-4 text-2xl font-bold">Invoice Already Paid</h1>
-          <p className="mt-2 text-muted-foreground">This invoice has already been paid. Thank you!</p>
-          <Button asChild className="mt-6">
-            <Link href="/portal/payments">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+      <div className="flex min-h-full flex-col">
+        <PortalPageHeader title="Payment Complete" subtitle="This invoice has already been settled." />
+        <PortalPageBody className="max-w-lg">
+          <PortalCard className="p-10 text-center">
+            <CheckCircle2 className="mx-auto h-16 w-16 text-[#4A7A4A]" />
+            <h2 className="mt-4 font-serif text-xl font-bold text-[#2b1b14]">Thank you!</h2>
+            <p className="mt-2 text-sm text-[#8B7355]">This invoice has already been paid.</p>
+            <Link
+              href="/portal/payments"
+              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#3B2518] px-4 py-2 text-xs font-semibold text-[#F5EBD9] hover:bg-[#4E3425]"
+            >
+              <ArrowLeft className="h-4 w-4" />
               Back to Payments
             </Link>
-          </Button>
-        </div>
+          </PortalCard>
+        </PortalPageBody>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto max-w-lg px-4 py-12">
-      <Button variant="ghost" asChild className="mb-6">
-        <Link href="/portal/payments">
-          <ArrowLeft className="mr-2 h-4 w-4" />
+    <div className="flex min-h-full flex-col">
+      <PortalPageHeader title="Pay Invoice" subtitle="Complete your payment securely with Stripe." />
+      <PortalPageBody className="max-w-lg">
+        <Link
+          href="/portal/payments"
+          className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-[#C9A96E] hover:text-[#B8963E]"
+        >
+          <ArrowLeft className="h-4 w-4" />
           Back to Payments
         </Link>
-      </Button>
 
-      <h1 className="text-2xl font-bold">Pay Invoice</h1>
-      <p className="mt-2 text-muted-foreground">Complete your payment securely with Stripe.</p>
+        <PortalCard className="mb-6 p-5">
+          <p className="text-sm text-[#8B7355]">Amount due</p>
+          <p className="mt-1 font-serif text-3xl font-bold text-[#C47A2C]">{formatCurrency(invoice.amount)}</p>
+          <p className="mt-2 text-sm font-medium text-[#2b1b14]">{invoice.description || "Piano Lessons"}</p>
+          <p className="text-xs text-[#8B7355]">Student: {invoice.student?.name || "Student"}</p>
+        </PortalCard>
 
-      <div className="mt-8">
         <InvoiceCheckout
           invoiceId={invoice.id}
           amount={invoice.amount}
           description={invoice.description || "Piano Lessons"}
           studentName={invoice.student?.name || "Student"}
         />
-      </div>
+      </PortalPageBody>
     </div>
   )
 }

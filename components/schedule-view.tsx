@@ -1,9 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Loader2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -12,7 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Calendar, Clock, X, RefreshCw, Loader2 } from "lucide-react"
+import { LessonRow } from "@/components/portal/studio/lesson-row"
+import {
+  PortalButton,
+  PortalCard,
+  PortalEmptyState,
+  PortalPageBody,
+  PortalPageHeader,
+  SectionDivider,
+} from "@/components/portal/studio/portal-ui"
 import type { Booking, Availability, AvailabilityException } from "@/lib/types"
 import { WeeklyAvailabilityCalendar } from "./weekly-availability-calendar"
 import { cancelBooking, rescheduleBooking } from "@/app/portal/schedule/actions"
@@ -56,7 +62,11 @@ export function ScheduleView({ bookings, availability, exceptions }: ScheduleVie
     if (!selectedBooking || !selectedSlot) return
     setIsLoading(true)
     setActionError(null)
-    const result = await rescheduleBooking(selectedBooking.id, selectedSlot.start.toISOString(), selectedSlot.end.toISOString())
+    const result = await rescheduleBooking(
+      selectedBooking.id,
+      selectedSlot.start.toISOString(),
+      selectedSlot.end.toISOString(),
+    )
     setIsLoading(false)
     if (result?.error) {
       setActionError(result.error)
@@ -68,148 +78,63 @@ export function ScheduleView({ bookings, availability, exceptions }: ScheduleVie
     router.refresh()
   }
 
-  function getStatusBadge(status: string) {
-    switch (status) {
-      case "confirmed":
-        return <Badge>Confirmed</Badge>
-      case "pending":
-        return <Badge variant="secondary">Pending</Badge>
-      case "cancelled":
-        return <Badge variant="destructive">Cancelled</Badge>
-      case "completed":
-        return <Badge variant="outline">Completed</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
-    }
-  }
-
   return (
-    <div className="space-y-8">
-      {/* Upcoming Lessons */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Upcoming Lessons
-          </CardTitle>
-          <CardDescription>Your scheduled lessons. Click on a lesson to manage it.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {upcomingBookings.length > 0 ? (
-            <div className="space-y-3">
-              {upcomingBookings.map((booking) => {
-                const startDate = new Date(booking.start_time)
-                const endDate = new Date(booking.end_time)
-                const canModify = startDate.getTime() - now > 24 * 60 * 60 * 1000
+    <div className="flex min-h-full flex-col">
+      <PortalPageHeader title="Schedule" subtitle="Your upcoming and past lessons" />
 
+      <PortalPageBody>
+        <SectionDivider clef="treble" label="Upcoming Lessons" />
+
+        <PortalCard className="mb-7 overflow-hidden">
+          {upcomingBookings.length > 0 ? (
+            <div className="px-2 py-1.5">
+              {upcomingBookings.map((booking, i) => {
+                const canModify = new Date(booking.start_time).getTime() - now > 24 * 60 * 60 * 1000
                 return (
-                  <div key={booking.id} className="flex items-center justify-between rounded-lg border p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-accent/10 text-accent">
-                        <span className="text-xs font-medium">
-                          {startDate.toLocaleDateString("en-US", { month: "short" })}
-                        </span>
-                        <span className="text-lg font-bold">{startDate.getDate()}</span>
-                      </div>
-                      <div>
-                        <p className="font-medium">{startDate.toLocaleDateString("en-US", { weekday: "long" })}</p>
-                        <p className="text-sm text-muted-foreground">
-                          <Clock className="mr-1 inline h-3 w-3" />
-                          {startDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })} -{" "}
-                          {endDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {getStatusBadge(booking.status)}
-                      {canModify && booking.status === "confirmed" && (
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedBooking(booking)
-                              setRescheduleDialogOpen(true)
-                            }}
-                          >
-                            <RefreshCw className="mr-1 h-3 w-3" />
-                            Reschedule
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedBooking(booking)
-                              setCancelDialogOpen(true)
-                            }}
-                          >
-                            <X className="mr-1 h-3 w-3" />
-                            Cancel
-                          </Button>
-                        </div>
-                      )}
-                      {!canModify && booking.status === "confirmed" && (
-                        <span className="text-xs text-muted-foreground">Cannot modify within 24h</span>
-                      )}
-                    </div>
-                  </div>
+                  <LessonRow
+                    key={booking.id}
+                    booking={booking}
+                    isFirst={i === 0}
+                    showActions
+                    canModify={canModify}
+                    onReschedule={() => {
+                      setSelectedBooking(booking)
+                      setRescheduleDialogOpen(true)
+                    }}
+                    onCancel={() => {
+                      setSelectedBooking(booking)
+                      setCancelDialogOpen(true)
+                    }}
+                  />
                 )
               })}
             </div>
           ) : (
-            <div className="py-12 text-center">
-              <Calendar className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <p className="mt-4 text-muted-foreground">No upcoming lessons scheduled</p>
-            </div>
+            <PortalEmptyState message="No upcoming lessons scheduled." />
           )}
-        </CardContent>
-      </Card>
+        </PortalCard>
 
-      {/* Past Lessons */}
-      {pastBookings.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Lesson History</CardTitle>
-            <CardDescription>Your past lessons</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {pastBookings.slice(0, 10).map((booking) => {
-                const startDate = new Date(booking.start_time)
-                const endDate = new Date(booking.end_time)
+        {pastBookings.length > 0 ? (
+          <>
+            <SectionDivider clef="bass" label="Lesson History" />
+            <PortalCard className="overflow-hidden">
+              <div className="px-2 py-1.5">
+                {pastBookings.slice(0, 15).map((booking) => (
+                  <LessonRow key={booking.id} booking={booking} faded />
+                ))}
+              </div>
+            </PortalCard>
+          </>
+        ) : null}
+      </PortalPageBody>
 
-                return (
-                  <div key={booking.id} className="flex items-center justify-between rounded-lg border p-3 opacity-75">
-                    <div className="flex items-center gap-3">
-                      <div className="text-sm">
-                        <p className="font-medium">
-                          {startDate.toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </p>
-                        <p className="text-muted-foreground">
-                          {startDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })} -{" "}
-                          {endDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                        </p>
-                      </div>
-                    </div>
-                    {getStatusBadge(booking.status)}
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Reschedule Dialog */}
       <Dialog open={rescheduleDialogOpen} onOpenChange={setRescheduleDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl border-[rgba(78,52,37,0.08)] bg-[#F5EFE3]">
           <DialogHeader>
-            <DialogTitle>Reschedule Lesson</DialogTitle>
-            <DialogDescription>Select a new time for your lesson from the available slots below.</DialogDescription>
+            <DialogTitle className="font-serif text-[#2b1b14]">Reschedule Lesson</DialogTitle>
+            <DialogDescription className="text-[#8B7355]">
+              Select a new time for your lesson from the available slots below.
+            </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <WeeklyAvailabilityCalendar
@@ -226,10 +151,10 @@ export function ScheduleView({ bookings, availability, exceptions }: ScheduleVie
               }
             />
           </div>
-          {selectedSlot && (
-            <div className="rounded-lg border bg-muted/50 p-3">
-              <p className="text-sm font-medium">New Time:</p>
-              <p className="text-sm text-muted-foreground">
+          {selectedSlot ? (
+            <div className="rounded-lg border border-[rgba(78,52,37,0.08)] bg-white/80 p-3">
+              <p className="text-sm font-medium text-[#2b1b14]">New Time:</p>
+              <p className="text-sm text-[#8B7355]">
                 {selectedSlot.start.toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
@@ -242,76 +167,75 @@ export function ScheduleView({ bookings, availability, exceptions }: ScheduleVie
                 })}
               </p>
             </div>
-          )}
-          {actionError && <p className="text-sm text-destructive">{actionError}</p>}
+          ) : null}
+          {actionError ? <p className="text-sm text-destructive">{actionError}</p> : null}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRescheduleDialogOpen(false)}>
+            <PortalButton variant="outline" onClick={() => setRescheduleDialogOpen(false)}>
               Cancel
-            </Button>
-            <Button onClick={handleReschedule} disabled={!selectedSlot || isLoading}>
+            </PortalButton>
+            <PortalButton variant="primary" onClick={handleReschedule} disabled={!selectedSlot || isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Rescheduling...
                 </>
               ) : (
                 "Confirm Reschedule"
               )}
-            </Button>
+            </PortalButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Cancel Dialog */}
       <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <DialogContent>
+        <DialogContent className="border-[rgba(78,52,37,0.08)] bg-[#F5EFE3]">
           <DialogHeader>
-            <DialogTitle>Cancel Lesson</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="font-serif text-[#2b1b14]">Cancel Lesson</DialogTitle>
+            <DialogDescription className="text-[#8B7355]">
               Are you sure you want to cancel this lesson? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          {selectedBooking && (
-            <div className="rounded-lg border bg-muted/50 p-3">
-              <p className="font-medium">
+          {selectedBooking ? (
+            <div className="rounded-lg border border-[rgba(78,52,37,0.08)] bg-white/80 p-3">
+              <p className="font-medium text-[#2b1b14]">
                 {new Date(selectedBooking.start_time).toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",
                 })}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[#8B7355]">
                 {new Date(selectedBooking.start_time).toLocaleTimeString("en-US", {
                   hour: "numeric",
                   minute: "2-digit",
                 })}{" "}
-                -{" "}
+                –{" "}
                 {new Date(selectedBooking.end_time).toLocaleTimeString("en-US", {
                   hour: "numeric",
                   minute: "2-digit",
                 })}
               </p>
             </div>
-          )}
-          <p className="text-sm text-muted-foreground">
+          ) : null}
+          <p className="text-sm text-[#8B7355]">
             Per our cancellation policy, lessons cancelled with at least 24 hours notice can be rescheduled at no
             charge.
           </p>
-          {actionError && <p className="text-sm text-destructive">{actionError}</p>}
+          {actionError ? <p className="text-sm text-destructive">{actionError}</p> : null}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
+            <PortalButton variant="outline" onClick={() => setCancelDialogOpen(false)}>
               Keep Lesson
-            </Button>
-            <Button variant="destructive" onClick={handleCancel} disabled={isLoading}>
+            </PortalButton>
+            <PortalButton variant="danger" onClick={handleCancel} disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Cancelling...
                 </>
               ) : (
                 "Cancel Lesson"
               )}
-            </Button>
+            </PortalButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

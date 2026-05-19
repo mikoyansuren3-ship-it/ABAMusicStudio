@@ -3,6 +3,7 @@ export interface Profile {
   role: "admin" | "student" | "teacher"
   full_name: string | null
   phone: string | null
+  avatar_path: string | null
   timezone: string
   created_at: string
   updated_at: string

@@ -1,0 +1,15 @@
+.pageHeader {
+  background: linear-gradient(180deg, rgba(201, 169, 110, 0.02) 0%, transparent 100%);
+}
+
+.sidebar {
+  background:
+    repeating-linear-gradient(
+      176deg,
+      transparent,
+      transparent 7px,
+      rgba(0, 0, 0, 0.035) 7px,
+      rgba(0, 0, 0, 0.035) 8px
+    ),
+    linear-gradient(180deg, #4e3828 0%, #3b2518 100%);
+}

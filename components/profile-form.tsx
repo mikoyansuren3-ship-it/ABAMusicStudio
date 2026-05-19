@@ -1,24 +1,48 @@
 "use client"
 
 import type React from "react"
-
 import type { User } from "@supabase/supabase-js"
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, CheckCircle } from "lucide-react"
 import type { Profile, Student } from "@/lib/types"
 import { updateProfile } from "@/app/portal/profile/actions"
 import { useRouter } from "next/navigation"
+import { ProfileAvatarUpload } from "@/components/portal/profile-avatar-upload"
+import { durationLabel, experienceLabel } from "@/lib/portal/format"
+import {
+  PortalButton,
+  PortalCard,
+  PortalPageBody,
+  PortalPageHeader,
+  SectionDivider,
+} from "@/components/portal/studio/portal-ui"
+import { cn } from "@/lib/utils"
 
 interface ProfileFormProps {
   user: User
   profile: Profile | null
   student: Student | null
 }
+
+function StudioField({
+  label,
+  children,
+  span,
+}: {
+  label: string
+  children: React.ReactNode
+  span?: 2
+}) {
+  return (
+    <div className={cn(span === 2 && "sm:col-span-2")}>
+      <label className="mb-1.5 block text-xs font-semibold tracking-wide text-[#8B7355]">{label}</label>
+      {children}
+    </div>
+  )
+}
+
+const fieldClass =
+  "w-full rounded-lg border-[1.5px] border-[rgba(78,52,37,0.08)] bg-white px-3.5 py-2.5 text-sm text-[#2b1b14] outline-none transition-colors focus:border-[#C9A96E] disabled:bg-[rgba(78,52,37,0.03)] disabled:text-[#B8A89A]"
 
 export function ProfileForm({ user, profile, student }: ProfileFormProps) {
   const router = useRouter()
@@ -46,104 +70,110 @@ export function ProfileForm({ user, profile, student }: ProfileFormProps) {
   }
 
   return (
-    <div className="max-w-2xl space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>Update your personal details</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex min-h-full flex-col">
+      <PortalPageHeader title="Profile" subtitle="Manage your personal information" />
+
+      <PortalPageBody className="max-w-2xl">
+        <PortalCard className="mb-6 p-7">
+          <ProfileAvatarUpload user={user} profile={profile} />
+          <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-[rgba(78,52,37,0.06)] pt-4 sm:justify-start">
+            <span className="rounded-full bg-[rgba(201,169,110,0.1)] px-3 py-0.5 text-[11px] font-semibold text-[#C9A96E]">
+              {experienceLabel(student?.experience_level)}
+            </span>
+            <span className="rounded-full bg-[rgba(59,37,24,0.06)] px-3 py-0.5 text-[11px] font-semibold text-[#8B7355]">
+              Piano · {durationLabel(student?.preferred_lesson_duration)}
+            </span>
+          </div>
+        </PortalCard>
+
+        <form onSubmit={handleSubmit}>
+          <SectionDivider label="Personal Information" />
+          <PortalCard className="mb-6 p-6">
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
+              <StudioField label="Full Name">
+                <input
                   id="full_name"
                   name="full_name"
                   defaultValue={profile?.full_name || ""}
                   placeholder="Your name"
+                  className={fieldClass}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={user.email || ""} disabled className="bg-muted" />
-              </div>
+              </StudioField>
+              <StudioField label="Email">
+                <input id="email" type="email" value={user.email || ""} disabled className={fieldClass} />
+              </StudioField>
+              <StudioField label="Phone" span={2}>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  defaultValue={profile?.phone || ""}
+                  placeholder="818-836-2322"
+                  className={fieldClass}
+                />
+              </StudioField>
             </div>
+          </PortalCard>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                defaultValue={profile?.phone || ""}
-                placeholder="818-836-2322"
-              />
+          <SectionDivider clef="bass" label="Student Information" />
+          <PortalCard className="mb-6 p-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <StudioField label="Student Name">
+                <input
+                  id="student_name"
+                  name="student_name"
+                  defaultValue={student?.name || ""}
+                  placeholder="Student name"
+                  className={fieldClass}
+                />
+              </StudioField>
+              <StudioField label="Experience Level">
+                <select
+                  name="experience_level"
+                  defaultValue={student?.experience_level || "beginner"}
+                  className={cn(fieldClass, "appearance-none")}
+                >
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </StudioField>
+              <StudioField label="Preferred Lesson Length" span={2}>
+                <select
+                  name="preferred_lesson_duration"
+                  defaultValue={(student?.preferred_lesson_duration || 30).toString()}
+                  className={cn(fieldClass, "appearance-none")}
+                >
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60">60 minutes</option>
+                </select>
+              </StudioField>
             </div>
+          </PortalCard>
 
-            <div className="border-t pt-4 mt-6">
-              <h3 className="font-medium mb-4">Student Information</h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="student_name">Student Name</Label>
-                  <Input
-                    id="student_name"
-                    name="student_name"
-                    defaultValue={student?.name || ""}
-                    placeholder="Student name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="experience_level">Experience Level</Label>
-                  <Select name="experience_level" defaultValue={student?.experience_level || "beginner"}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="mt-4 space-y-2">
-                <Label htmlFor="preferred_lesson_duration">Preferred Lesson Length</Label>
-                <Select name="preferred_lesson_duration" defaultValue={(student?.preferred_lesson_duration || 30).toString()}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select duration" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 minutes</SelectItem>
-                    <SelectItem value="45">45 minutes</SelectItem>
-                    <SelectItem value="60">60 minutes</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          {error ? <p className="mb-4 text-sm text-destructive">{error}</p> : null}
 
-            {error && <p className="text-sm text-destructive">{error}</p>}
-
-            {success && (
-              <div className="flex items-center gap-2 text-sm text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                Profile updated successfully
-              </div>
-            )}
-
-            <Button type="submit" disabled={isLoading}>
+          <div className="flex flex-wrap items-center gap-3 pb-10">
+            <PortalButton variant="primary" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
                 "Save Changes"
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            </PortalButton>
+            {success ? (
+              <span className="flex items-center gap-1.5 text-sm font-medium text-[#4A7A4A]">
+                <CheckCircle className="h-4 w-4" />
+                Profile updated
+              </span>
+            ) : null}
+          </div>
+        </form>
+      </PortalPageBody>
     </div>
   )
 }
