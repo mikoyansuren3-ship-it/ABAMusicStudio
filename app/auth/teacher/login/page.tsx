@@ -1,14 +1,19 @@
 import Link from "next/link"
 import { AuthShell } from "@/components/auth/auth-shell"
 import { RoleLoginForm } from "@/components/auth/role-login-form"
+import { getRememberedLoginEmail } from "@/lib/auth/remember-login"
 
-export default function TeacherLoginPage() {
+export default async function TeacherLoginPage() {
+  const rememberedEmail = await getRememberedLoginEmail()
+
   return (
     <AuthShell>
       <RoleLoginForm
         role="teacher"
         title="Teacher Login"
         description="Sign in to manage lessons and students."
+        defaultEmail={rememberedEmail}
+        defaultRememberMe={Boolean(rememberedEmail)}
         accountLink={
           <>
             <span className="text-muted-foreground">Need a teacher account? </span>

@@ -1,14 +1,14 @@
 "use client"
 
-import { useActionState, useEffect, type ReactNode } from "react"
+import { useActionState, type ReactNode } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { CheckCircle } from "lucide-react"
 import { loginWithRole, type AuthActionState } from "@/app/auth/actions"
 import { type AuthRole } from "@/lib/auth/roles"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 
 interface RoleLoginFormProps {
   role: AuthRole
@@ -16,19 +16,22 @@ interface RoleLoginFormProps {
   description: string
   accountLink?: ReactNode
   message?: string | null
+  defaultEmail?: string
+  defaultRememberMe?: boolean
 }
 
 const initialState: AuthActionState = {}
 
-export function RoleLoginForm({ role, title, description, accountLink, message }: RoleLoginFormProps) {
-  const router = useRouter()
+export function RoleLoginForm({
+  role,
+  title,
+  description,
+  accountLink,
+  message,
+  defaultEmail = "",
+  defaultRememberMe = true,
+}: RoleLoginFormProps) {
   const [state, formAction, isPending] = useActionState(loginWithRole.bind(null, role), initialState)
-
-  useEffect(() => {
-    if (state.redirectTo) {
-      router.push(state.redirectTo)
-    }
-  }, [router, state.redirectTo])
 
   return (
     <>
@@ -49,6 +52,8 @@ export function RoleLoginForm({ role, title, description, accountLink, message }
               type="email"
               placeholder="you@example.com"
               required
+              defaultValue={defaultEmail}
+              autoComplete="email"
               className="border-[rgba(78,52,37,0.15)] bg-white/80"
             />
           </div>
@@ -69,9 +74,26 @@ export function RoleLoginForm({ role, title, description, accountLink, message }
               name="password"
               type="password"
               required
+              autoComplete="current-password"
               className="border-[rgba(78,52,37,0.15)] bg-white/80"
             />
           </div>
+          <label
+            htmlFor="remember_me"
+            className="flex cursor-pointer items-start gap-2.5 rounded-md py-0.5"
+          >
+            <input
+              type="checkbox"
+              id="remember_me"
+              name="remember_me"
+              defaultChecked={defaultRememberMe}
+              className={cn(
+                "mt-0.5 size-4 shrink-0 rounded border border-[rgba(78,52,37,0.35)]",
+                "accent-[#5e4e3c] focus-visible:ring-2 focus-visible:ring-[#5e4e3c]/40 focus-visible:outline-none",
+              )}
+            />
+            <span className="text-sm leading-snug text-[#6b5344]">Remember me on this device</span>
+          </label>
           {message && !state.error && (
             <p className="flex items-center gap-2 text-sm text-green-700">
               <CheckCircle className="h-4 w-4" />

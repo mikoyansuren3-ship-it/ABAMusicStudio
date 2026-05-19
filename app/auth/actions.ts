@@ -1,7 +1,10 @@
 "use server"
 
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { REMEMBER_EMAIL_COOKIE, rememberEmailCookieOptions } from "@/lib/supabase/auth-cookies"
 import { type AuthRole, roleDestinations, roleLabels } from "@/lib/auth/roles"
 import { headers } from "next/headers"
 
@@ -60,7 +63,8 @@ export async function loginWithRole(
     return { error: "Email and password are required." }
   }
 
-  const supabase = await createClient()
+  const rememberMe = formData.get("remember_me") === "on"
+  const supabase = await createClient({ persistLogin: rememberMe })
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -96,7 +100,14 @@ export async function loginWithRole(
     return { error: `This is a ${roleLabels[actualRole as AuthRole] || actualRole} account. Please use the correct login option.` }
   }
 
-  return { success: true, redirectTo: roleDestinations[expectedRole] }
+  const cookieStore = await cookies()
+  if (rememberMe) {
+    cookieStore.set(REMEMBER_EMAIL_COOKIE, email, rememberEmailCookieOptions())
+  } else {
+    cookieStore.delete(REMEMBER_EMAIL_COOKIE)
+  }
+
+  redirect(roleDestinations[expectedRole])
 }
 
 export async function signUpTeacher(_prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
