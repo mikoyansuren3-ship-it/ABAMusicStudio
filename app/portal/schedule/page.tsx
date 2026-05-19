@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
 import { ScheduleView } from "@/components/schedule-view"
 
 export default async function SchedulePage() {
@@ -16,7 +14,6 @@ export default async function SchedulePage() {
 
   const { data: student } = await supabase.from("students").select("*").eq("parent_id", user.id).maybeSingle()
 
-  // Fetch bookings for this student
   const { data: bookings } = student
     ? await supabase
         .from("bookings")
@@ -26,7 +23,6 @@ export default async function SchedulePage() {
         .order("start_time")
     : { data: [] }
 
-  // Fetch availability for rescheduling
   const { data: availability } = await supabase.from("availability").select("*").eq("is_active", true)
 
   const { data: exceptions } = await supabase
@@ -35,22 +31,6 @@ export default async function SchedulePage() {
     .gte("exception_date", new Date().toISOString().split("T")[0])
 
   return (
-    <>
-      <header className="flex h-14 items-center gap-4 border-b bg-background px-6">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-6" />
-        <div>
-          <h1 className="text-lg font-semibold">Schedule</h1>
-        </div>
-      </header>
-
-      <div className="p-6">
-        <ScheduleView
-          bookings={bookings || []}
-          availability={availability || []}
-          exceptions={exceptions || []}
-        />
-      </div>
-    </>
+    <ScheduleView bookings={bookings || []} availability={availability || []} exceptions={exceptions || []} />
   )
 }

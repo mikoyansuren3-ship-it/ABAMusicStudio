@@ -1,13 +1,18 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Bell, Check } from "lucide-react"
+import { Check, Loader2 } from "lucide-react"
 import type { Notification } from "@/lib/types"
 import { markNotificationAsRead, markAllAsRead } from "@/app/portal/notifications/actions"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import {
+  PortalButton,
+  PortalCard,
+  PortalEmptyState,
+  PortalPageBody,
+  PortalPageHeader,
+  SectionDivider,
+} from "@/components/portal/studio/portal-ui"
 
 interface NotificationsViewProps {
   notifications: Notification[]
@@ -39,92 +44,94 @@ export function NotificationsView({ notifications, userId }: NotificationsViewPr
   }
 
   return (
-    <div className="space-y-8">
-      {/* Unread Notifications */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                New Notifications
-                {unreadNotifications.length > 0 && (
-                  <Badge variant="destructive" className="ml-2">
-                    {unreadNotifications.length}
-                  </Badge>
-                )}
-              </CardTitle>
-              <CardDescription>Messages from ABA Music Academy</CardDescription>
-            </div>
-            {unreadNotifications.length > 0 && (
-              <Button variant="outline" size="sm" onClick={handleMarkAllAsRead} disabled={loadingId === "all"}>
-                <Check className="mr-1 h-4 w-4" />
-                Mark All Read
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {unreadNotifications.length > 0 ? (
-            <div className="space-y-3">
+    <div className="flex min-h-full flex-col">
+      <PortalPageHeader
+        title="Notifications"
+        subtitle="Messages from ABA Music Academy"
+        right={
+          unreadNotifications.length > 0 ? (
+            <PortalButton variant="outline" onClick={handleMarkAllAsRead} disabled={loadingId === "all"}>
+              {loadingId === "all" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              Mark All Read
+            </PortalButton>
+          ) : null
+        }
+      />
+
+      <PortalPageBody>
+        {unreadNotifications.length > 0 ? (
+          <>
+            <SectionDivider clef="treble" label={`New (${unreadNotifications.length})`} />
+            <PortalCard className="mb-6 overflow-hidden">
               {unreadNotifications.map((notification) => (
-                <div key={notification.id} className="rounded-lg border bg-accent/5 p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <p className="font-medium">{notification.title}</p>
-                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{notification.body}</p>
-                      <p className="mt-2 text-xs text-muted-foreground">
+                <div
+                  key={notification.id}
+                  className="group border-b border-[rgba(78,52,37,0.08)] bg-[rgba(201,169,110,0.015)] px-5 py-4 transition-colors last:border-b-0 hover:bg-[rgba(201,169,110,0.03)]"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#C9A96E]" />
+                        <span className="text-sm font-semibold text-[#2b1b14]">{notification.title}</span>
+                      </div>
+                      <p className="ml-3.5 text-[13px] leading-relaxed whitespace-pre-wrap text-[#8B7355]">
+                        {notification.body}
+                      </p>
+                      <span className="mt-1.5 ml-3.5 block text-[11px] text-[#B8A89A]">
                         {new Date(notification.created_at).toLocaleDateString("en-US", {
                           weekday: "short",
                           month: "short",
                           day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
                         })}
-                      </p>
+                      </span>
                     </div>
-                    <Button
+                    <PortalButton
                       variant="ghost"
-                      size="sm"
+                      className="hidden shrink-0 px-2.5 py-1 group-hover:inline-flex"
                       onClick={() => handleMarkAsRead(notification.id)}
                       disabled={loadingId === notification.id}
                     >
-                      <Check className="h-4 w-4" />
-                    </Button>
+                      {loadingId === notification.id ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Check className="h-3 w-3" />
+                      )}
+                      Read
+                    </PortalButton>
                   </div>
                 </div>
               ))}
-            </div>
-          ) : (
-            <div className="py-12 text-center">
-              <Bell className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <p className="mt-4 text-muted-foreground">No new notifications</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </PortalCard>
+          </>
+        ) : (
+          <PortalEmptyState message="All caught up — no new notifications." />
+        )}
 
-      {/* Read Notifications */}
-      {readNotifications.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Previous Notifications</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+        {readNotifications.length > 0 ? (
+          <>
+            <SectionDivider clef="bass" label="Previous" />
+            <PortalCard className="overflow-hidden">
               {readNotifications.map((notification) => (
-                <div key={notification.id} className="rounded-lg border p-3 opacity-75">
-                  <p className="font-medium">{notification.title}</p>
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{notification.body}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {new Date(notification.created_at).toLocaleDateString()}
-                  </p>
+                <div
+                  key={notification.id}
+                  className="border-b border-[rgba(78,52,37,0.08)] px-5 py-3.5 opacity-65 last:border-b-0"
+                >
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <span className="text-[13px] font-semibold text-[#2b1b14]">{notification.title}</span>
+                    <span className="text-[11px] text-[#B8A89A]">
+                      {new Date(notification.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#8B7355]">{notification.body}</p>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </PortalCard>
+          </>
+        ) : null}
+      </PortalPageBody>
     </div>
   )
 }

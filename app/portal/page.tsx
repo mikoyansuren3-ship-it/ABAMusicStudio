@@ -1,12 +1,16 @@
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { Calendar, CreditCard, Clock, Bell, ArrowRight } from "lucide-react"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+import { LessonRow } from "@/components/portal/studio/lesson-row"
+import {
+  PortalCard,
+  PortalCardFooterLink,
+  PortalEmptyState,
+  PortalPageBody,
+  PortalPageHeader,
+  SectionDivider,
+} from "@/components/portal/studio/portal-ui"
+import { formatCurrency, formatTime } from "@/lib/portal/format"
 
 export default async function PortalDashboard() {
   const supabase = await createClient()
@@ -17,10 +21,8 @@ export default async function PortalDashboard() {
   if (!user) redirect("/auth/student/login")
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
   const { data: student } = await supabase.from("students").select("*").eq("parent_id", user.id).maybeSingle()
 
-  // Fetch upcoming bookings
   const { data: bookings } = student
     ? await supabase
         .from("bookings")
@@ -29,10 +31,9 @@ export default async function PortalDashboard() {
         .gte("start_time", new Date().toISOString())
         .in("status", ["confirmed", "pending"])
         .order("start_time")
-        .limit(3)
+        .limit(4)
     : { data: [] }
 
-  // Fetch unpaid invoices
   const { data: invoices } = student
     ? await supabase
         .from("invoices")
@@ -40,10 +41,8 @@ export default async function PortalDashboard() {
         .eq("student_id", student.id)
         .eq("status", "unpaid")
         .order("due_date")
-        .limit(3)
     : { data: [] }
 
-  // Fetch unread notifications
   const { data: notifications } = await supabase
     .from("notifications")
     .select("*")
@@ -52,185 +51,156 @@ export default async function PortalDashboard() {
     .order("created_at", { ascending: false })
     .limit(3)
 
+  const firstName = profile?.full_name?.split(" ")[0] || "Student"
   const nextLesson = bookings?.[0]
   const unpaidBalance = invoices?.reduce((sum, inv) => sum + inv.amount, 0) || 0
+  const unreadCount = notifications?.length || 0
+  const today = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
 
   return (
-    <>
-      <header className="flex h-14 items-center gap-4 border-b bg-background px-6">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-6" />
-        <div>
-          <h1 className="text-lg font-semibold">Dashboard</h1>
-        </div>
-      </header>
+    <div className="flex min-h-full flex-col">
+      <PortalPageHeader
+        title={`Welcome back, ${firstName}`}
+        subtitle="Here's your week at a glance."
+        right={
+          <span className="rounded-full bg-[rgba(201,169,110,0.08)] px-3.5 py-1.5 text-xs font-medium text-[#8B7355]">
+            {today}
+          </span>
+        }
+      />
 
-      <div className="p-6">
-        <div className="mb-8">
-          <h2 className="font-serif text-2xl font-bold">
-            Welcome back, {profile?.full_name?.split(" ")[0] || "Student"}!
-          </h2>
-          <p className="mt-1 text-muted-foreground">Here&apos;s an overview of your lessons and account.</p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="mb-8 grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Next Lesson</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {nextLesson ? (
-                <>
-                  <p className="text-2xl font-bold">
+      <PortalPageBody>
+        <div className="relative mb-6 grid gap-4 md:grid-cols-3">
+          {nextLesson ? (
+            <Link href="/portal/schedule" className="block">
+              <PortalCard
+                hover
+                className="relative overflow-hidden border-0 bg-[repeating-linear-gradient(176deg,transparent,transparent_6px,rgba(0,0,0,0.025)_6px,rgba(0,0,0,0.025)_7px),linear-gradient(135deg,#4E3828,#3B2518)] p-6 text-[#F5EBD9]"
+              >
+                <span className="pointer-events-none absolute top-1.5 right-3.5 font-[family-name:var(--font-noto-music)] text-[90px] leading-none opacity-[0.06]">
+                  {"\u{1D11E}"}
+                </span>
+                <div className="relative z-1">
+                  <p className="text-[11px] font-semibold tracking-[0.08em] uppercase opacity-55">Next Lesson</p>
+                  <p className="mt-3 font-serif text-[28px] font-bold">
                     {new Date(nextLesson.start_time).toLocaleDateString("en-US", {
                       weekday: "short",
                       month: "short",
                       day: "numeric",
                     })}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(nextLesson.start_time).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+                  <p className="mt-1 text-sm opacity-65">
+                    {formatTime(nextLesson.start_time)} ·{" "}
+                    {Math.round(
+                      (new Date(nextLesson.end_time).getTime() - new Date(nextLesson.start_time).getTime()) / 60000,
+                    )}{" "}
+                    minutes
                   </p>
-                </>
-              ) : (
-                <p className="text-muted-foreground">No upcoming lessons</p>
-              )}
-            </CardContent>
-          </Card>
+                </div>
+              </PortalCard>
+            </Link>
+          ) : (
+            <PortalCard className="p-6">
+              <p className="text-[11px] font-semibold tracking-[0.08em] text-[#8B7355] uppercase">Next Lesson</p>
+              <p className="mt-3 font-serif text-xl font-bold text-[#2b1b14]">None scheduled</p>
+              <p className="mt-1 text-sm text-[#8B7355]">Check back soon or contact the studio.</p>
+            </PortalCard>
+          )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Balance Due</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <p className={`text-2xl font-bold ${unpaidBalance > 0 ? "text-destructive" : ""}`}>
-                ${(unpaidBalance / 100).toFixed(2)}
+          <Link href="/portal/payments" className="block">
+            <PortalCard hover className="p-6">
+              <p className="text-[11px] font-semibold tracking-[0.08em] text-[#8B7355] uppercase">Balance Due</p>
+              <p
+                className={`mt-3 font-serif text-[28px] font-bold ${unpaidBalance > 0 ? "text-[#C47A2C]" : "text-[#4A7A4A]"}`}
+              >
+                {formatCurrency(unpaidBalance)}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {invoices?.length || 0} unpaid invoice{invoices?.length !== 1 ? "s" : ""}
+              <p className="mt-1 text-sm text-[#8B7355]">
+                {invoices?.length || 0} unpaid invoice{(invoices?.length || 0) !== 1 ? "s" : ""}
               </p>
-            </CardContent>
-          </Card>
+            </PortalCard>
+          </Link>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Notifications</CardTitle>
-              <Bell className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{notifications?.length || 0}</p>
-              <p className="text-sm text-muted-foreground">Unread messages</p>
-            </CardContent>
-          </Card>
+          <Link href="/portal/notifications" className="block">
+            <PortalCard hover className="p-6">
+              <p className="text-[11px] font-semibold tracking-[0.08em] text-[#8B7355] uppercase">Notifications</p>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="font-serif text-[28px] font-bold text-[#2b1b14]">{unreadCount}</span>
+                <span className="text-sm text-[#8B7355]">unread</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-[#C9A96E]">View all →</p>
+            </PortalCard>
+          </Link>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mb-8 grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upcoming Lessons</CardTitle>
-              <CardDescription>Your next scheduled lessons</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {bookings && bookings.length > 0 ? (
-                <div className="space-y-4">
-                  {bookings.map((booking) => (
-                    <div key={booking.id} className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                          <Clock className="h-5 w-5 text-accent" />
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            {new Date(booking.start_time).toLocaleDateString("en-US", {
-                              weekday: "long",
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(booking.start_time).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            })}{" "}
-                            -{" "}
-                            {new Date(booking.end_time).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant={booking.status === "confirmed" ? "default" : "secondary"}>{booking.status}</Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">No upcoming lessons scheduled</p>
-              )}
-              <Button variant="outline" className="mt-4 w-full bg-transparent" asChild>
-                <Link href="/portal/schedule">
-                  View Full Schedule
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+        <SectionDivider clef="treble" label="Upcoming Lessons" />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Notifications</CardTitle>
-              <CardDescription>Messages from your studio</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {notifications && notifications.length > 0 ? (
-                <div className="space-y-4">
-                  {notifications.map((notification) => (
-                    <div key={notification.id} className="rounded-lg border p-3">
-                      <p className="font-medium">{notification.title}</p>
-                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{notification.body}</p>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        {new Date(notification.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">No new notifications</p>
-              )}
-              <Button variant="outline" className="mt-4 w-full bg-transparent" asChild>
-                <Link href="/portal/notifications">
-                  View All Notifications
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        <PortalCard className="mb-6 overflow-hidden">
+          {bookings && bookings.length > 0 ? (
+            <>
+              <div className="px-2 py-1.5">
+                {bookings.map((booking, i) => (
+                  <LessonRow key={booking.id} booking={booking} isFirst={i === 0} />
+                ))}
+              </div>
+              <PortalCardFooterLink href="/portal/schedule">View Full Schedule →</PortalCardFooterLink>
+            </>
+          ) : (
+            <PortalEmptyState message="No upcoming lessons scheduled." />
+          )}
+        </PortalCard>
 
-        {/* Setup prompt for new students */}
-        {!student && (
-          <Card className="border-accent">
-            <CardHeader>
-              <CardTitle>Complete Your Profile</CardTitle>
-              <CardDescription>
-                Your account is set up, but we need a few more details to get you started.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild>
-                <Link href="/portal/profile">Complete Profile</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </>
+        <SectionDivider clef="bass" label="Recent Notifications" />
+
+        <PortalCard className="overflow-hidden">
+          {notifications && notifications.length > 0 ? (
+            <>
+              <div className="space-y-1 p-2">
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className="rounded-[10px] bg-[rgba(201,169,110,0.03)] px-3.5 py-3.5"
+                  >
+                    <div className="mb-1.5 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#C9A96E]" />
+                      <span className="text-[13.5px] font-semibold text-[#2b1b14]">{notification.title}</span>
+                      <span className="ml-auto text-[11px] text-[#B8A89A]">
+                        {new Date(notification.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <p className="ml-3.5 text-xs leading-relaxed text-[#8B7355] line-clamp-2">{notification.body}</p>
+                  </div>
+                ))}
+              </div>
+              <PortalCardFooterLink href="/portal/notifications">View All Notifications →</PortalCardFooterLink>
+            </>
+          ) : (
+            <PortalEmptyState message="No new notifications." />
+          )}
+        </PortalCard>
+
+        {!student ? (
+          <PortalCard className="mt-6 border-[rgba(201,169,110,0.25)] p-6">
+            <h3 className="font-serif text-lg font-bold text-[#2b1b14]">Complete Your Profile</h3>
+            <p className="mt-2 text-sm text-[#8B7355]">
+              Your account is set up, but we need a few more details to get you started.
+            </p>
+            <Link
+              href="/portal/profile"
+              className="mt-4 inline-flex rounded-lg bg-[#3B2518] px-4 py-2 text-xs font-semibold text-[#F5EBD9] hover:bg-[#4E3425]"
+            >
+              Complete Profile
+            </Link>
+          </PortalCard>
+        ) : null}
+      </PortalPageBody>
+    </div>
   )
 }

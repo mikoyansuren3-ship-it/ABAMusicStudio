@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('admin', 'student', 'teacher')),
   full_name TEXT,
   phone TEXT,
+  avatar_path TEXT,
   timezone TEXT DEFAULT 'America/New_York',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
