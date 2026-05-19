@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone, MapPin, CheckCircle } from "lucide-react"
+import { Mail, Phone, CheckCircle } from "lucide-react"
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
@@ -61,20 +61,6 @@ export default function ContactPage() {
                   <h3 className="font-medium">Phone</h3>
                   <p className="text-muted-foreground">818-836-2322</p>
                   <p className="text-sm text-muted-foreground">Available during business hours</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                  <MapPin className="h-5 w-5 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Studio Location</h3>
-                  <p className="text-muted-foreground">
-                    24668 Ebelden Avenue
-                    <br />
-                    Santa Clarita, CA 91321
-                  </p>
                 </div>
               </div>
             </div>

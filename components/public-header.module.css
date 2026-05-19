@@ -1,0 +1,251 @@
+.headerRoot {
+  --wood-darkest: #1e1008;
+  --wood-dark: #2a1810;
+  --wood-main: #3b2518;
+  --wood-mid: #4e3425;
+  --wood-gradient: linear-gradient(
+    135deg,
+    var(--wood-dark) 0%,
+    var(--wood-main) 25%,
+    var(--wood-mid) 55%,
+    var(--wood-main) 80%,
+    var(--wood-dark) 100%
+  );
+  --gold: #c9a96e;
+  --cream: #f5ebd9;
+  --shape-color: #f5ebd9;
+  --nav-bg: var(--wood-dark);
+  width: 100%;
+}
+
+.infoBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 7px 24px;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  color: var(--cream);
+  background: var(--wood-darkest);
+  flex-wrap: wrap;
+}
+
+.infoBar a {
+  color: var(--gold);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.infoBar a:hover {
+  opacity: 0.8;
+}
+
+.infoBarSep {
+  opacity: 0.3;
+}
+
+.utilLinks {
+  display: flex;
+  gap: 18px;
+  margin-left: auto;
+}
+
+.utilLinks a {
+  color: var(--cream);
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.utilLinks a:hover {
+  opacity: 1;
+  color: var(--gold);
+}
+
+.headerBand {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 170px;
+  background:
+    repeating-linear-gradient(
+      176deg,
+      transparent,
+      transparent 6px,
+      rgba(0, 0, 0, 0.025) 6px,
+      rgba(0, 0, 0, 0.025) 7px
+    ),
+    repeating-linear-gradient(
+      172deg,
+      transparent,
+      transparent 28px,
+      rgba(255, 255, 255, 0.012) 28px,
+      rgba(255, 255, 255, 0.012) 30px
+    ),
+    var(--wood-gradient);
+}
+
+.headerBand::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.25) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.headerBandInner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.shapesLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.decoShape {
+  position: absolute;
+  color: var(--shape-color);
+  font-family: var(--font-serif), "Playfair Display", "Times New Roman", serif;
+  line-height: 1;
+  user-select: none;
+}
+
+.decoSvg {
+  position: absolute;
+  fill: var(--shape-color);
+  pointer-events: none;
+}
+
+.headerLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.headerLogo img {
+  height: 85px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.headerTagline {
+  font-family: var(--font-serif), "Playfair Display", serif;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+
+.navBar {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  background: var(--nav-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.navItem {
+  font-family: var(--font-sans), "Inter", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cream);
+  padding: 14px 24px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.navItem:hover {
+  color: var(--gold);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.navItemActive {
+  color: var(--gold);
+}
+
+.navItemActive::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 22%;
+  right: 22%;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+}
+
+.mobileMenuWrap {
+  display: none;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mobileMenuBtn {
+  color: var(--cream);
+}
+
+.mobileMenuBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--gold);
+}
+
+@media (max-width: 900px) {
+  .navBar {
+    display: none;
+  }
+
+  .mobileMenuWrap {
+    display: block;
+  }
+
+  .infoBar {
+    font-size: 10px;
+    gap: 12px;
+    padding: 6px 12px;
+  }
+
+  .utilLinks {
+    margin-left: 0;
+  }
+
+  .headerBand {
+    min-height: 140px;
+  }
+
+  .headerLogo img {
+    height: 70px;
+  }
+}
+
+@media (max-width: 700px) {
+  .infoBar {
+    justify-content: center;
+  }
+
+  .utilLinks {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+}
