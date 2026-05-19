@@ -51,7 +51,6 @@ export function PublicFooter() {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>Email: arpine@abamusicacademy.org</p>
               <p>Phone: 818-836-2322</p>
-              <p>24668 Ebelden Avenue, Santa Clarita, CA 91321</p>
             </div>
           </div>
         </div>
