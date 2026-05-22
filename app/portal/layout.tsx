@@ -34,7 +34,7 @@ export default async function PortalLayout({ children }: { children: React.React
   return (
     <div className={`${notoMusic.variable} flex h-screen overflow-hidden bg-[#F5EFE3]`}>
       <PortalSidebar user={user} profile={profile} unreadCount={unreadCount} />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden lg:pt-0 pt-14">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden pt-14 lg:pt-0">
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
