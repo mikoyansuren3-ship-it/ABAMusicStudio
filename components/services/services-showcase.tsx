@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 
 type Service = {
@@ -6,6 +7,8 @@ type Service = {
   name: string
   description: string
   bullets: string[]
+  /** Optional 3D render at /public/services/<id>.png. Falls back to a pattern when absent. */
+  image?: string
 }
 
 const services: Service[] = [
@@ -20,6 +23,7 @@ const services: Service[] = [
       "Repertoire across Baroque, Classical, and Romantic periods",
       "Ensemble preparation and recital performance",
     ],
+    image: "/services/violin.png",
   },
   {
     id: "vocal",
@@ -32,6 +36,7 @@ const services: Service[] = [
       "Song interpretation across classical and contemporary styles",
       "Audition, recital, and stage confidence preparation",
     ],
+    image: "/services/vocal.png",
   },
   {
     id: "guitar",
@@ -44,6 +49,7 @@ const services: Service[] = [
       "Reading, tablature, and ear-training foundations",
       "Repertoire for accompaniment, solo playing, and performance",
     ],
+    image: "/services/guitar.png",
   },
   {
     id: "chess",
@@ -56,6 +62,7 @@ const services: Service[] = [
       "Tournament preparation and competitive play",
       "Critical thinking and pattern recognition",
     ],
+    image: "/services/chess.png",
   },
   {
     id: "math",
@@ -68,6 +75,7 @@ const services: Service[] = [
       "Conceptual understanding, not just memorization",
       "Competition math and enrichment for advanced students",
     ],
+    image: "/services/math.png",
   },
   {
     id: "science",
@@ -80,6 +88,7 @@ const services: Service[] = [
       "Guided experiments with real lab materials",
       "Connecting classroom science to the real world",
     ],
+    image: "/services/science.png",
   },
   {
     id: "english",
@@ -92,6 +101,7 @@ const services: Service[] = [
       "Grammar, vocabulary, and essay structure",
       "Creative writing and public speaking foundations",
     ],
+    image: "/services/english.png",
   },
 ]
 
@@ -157,10 +167,25 @@ export function ServicesShowcase() {
               </div>
             </div>
 
-            <div
-              aria-label={`${service.name} 3D render placeholder`}
-              className="min-h-full border-l border-[var(--card-border)] bg-[var(--card-right-bg)] [background-image:repeating-linear-gradient(135deg,transparent_0,transparent_18px,color-mix(in_srgb,var(--card-accent)_18%,transparent)_18px,color-mix(in_srgb,var(--card-accent)_18%,transparent)_19px)] max-[900px]:min-h-[360px] max-[900px]:border-l-0 max-[900px]:border-t"
-            />
+            {service.image ? (
+              <div
+                aria-hidden
+                className="relative min-h-full overflow-hidden border-l border-[var(--card-border)] bg-[var(--card-render-bg)] max-[900px]:min-h-[360px] max-[900px]:border-l-0 max-[900px]:border-t"
+              >
+                <Image
+                  src={service.image}
+                  alt=""
+                  fill
+                  sizes="(max-width: 900px) 100vw, 50vw"
+                  className="object-contain p-10"
+                />
+              </div>
+            ) : (
+              <div
+                aria-hidden
+                className="min-h-full border-l border-[var(--card-border)] bg-[var(--card-right-bg)] [background-image:repeating-linear-gradient(135deg,transparent_0,transparent_18px,color-mix(in_srgb,var(--card-accent)_18%,transparent)_18px,color-mix(in_srgb,var(--card-accent)_18%,transparent)_19px)] max-[900px]:min-h-[360px] max-[900px]:border-l-0 max-[900px]:border-t"
+              />
+            )}
           </article>
         ))}
 

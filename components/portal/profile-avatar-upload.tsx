@@ -146,7 +146,7 @@ export function ProfileAvatarUpload({ user, profile }: ProfileAvatarUploadProps)
             </PortalButton>
           ) : null}
         </div>
-        <p className="mt-2 text-xs text-[#B8A89A]">JPEG, PNG, WebP, or GIF · max 2 MB</p>
+        <p className="mt-2 text-xs text-[#7d6b58]">JPEG, PNG, WebP, or GIF · max 2 MB</p>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
         {success ? <p className="mt-2 text-sm text-[#4A7A4A]">{success}</p> : null}
       </div>

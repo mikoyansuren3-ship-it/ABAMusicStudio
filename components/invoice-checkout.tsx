@@ -4,6 +4,7 @@ import { useCallback, useState } from "react"
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import { createCheckoutSession } from "@/app/actions/stripe"
+import { formatCurrency } from "@/lib/portal/format"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -66,7 +67,7 @@ export function InvoiceCheckout({ invoiceId, amount, description, studentName }:
             </div>
             <div className="flex justify-between border-t pt-2">
               <span className="text-muted-foreground">Amount Due</span>
-              <span className="text-xl font-bold">${amount.toFixed(2)}</span>
+              <span className="text-xl font-bold">{formatCurrency(amount)}</span>
             </div>
           </div>
         </div>

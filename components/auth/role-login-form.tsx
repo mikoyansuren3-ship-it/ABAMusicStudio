@@ -5,10 +5,11 @@ import Link from "next/link"
 import { CheckCircle } from "lucide-react"
 import { loginWithRole, type AuthActionState } from "@/app/auth/actions"
 import { type AuthRole } from "@/lib/auth/roles"
+import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
 
 interface RoleLoginFormProps {
   role: AuthRole
@@ -32,18 +33,19 @@ export function RoleLoginForm({
   defaultRememberMe = true,
 }: RoleLoginFormProps) {
   const [state, formAction, isPending] = useActionState(loginWithRole.bind(null, role), initialState)
+  const errorId = "login-error"
 
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="font-serif text-2xl font-semibold text-[#3d2817]">{title}</h1>
-        <p className="mt-1.5 text-sm text-[#6b5344]">{description}</p>
+        <h1 className="font-serif text-2xl font-semibold text-wood-card-fg">{title}</h1>
+        <p className="mt-1.5 text-sm text-wood-card-muted">{description}</p>
       </div>
 
       <form action={formAction}>
         <div className="flex flex-col gap-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-[#4a3528]">
+            <Label htmlFor="email" className="text-wood-card-fg">
               Email
             </Label>
             <Input
@@ -54,45 +56,44 @@ export function RoleLoginForm({
               required
               defaultValue={defaultEmail}
               autoComplete="email"
-              className="border-[rgba(78,52,37,0.15)] bg-white/80"
+              aria-invalid={state.error ? true : undefined}
+              aria-describedby={state.error ? errorId : undefined}
+              className="border-wood-mid/15 bg-white/80"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-[#4a3528]">
+              <Label htmlFor="password" className="text-wood-card-fg">
                 Password
               </Label>
               <Link
                 href="/auth/reset-password"
-                className="text-xs text-[#8b6f5c] hover:text-[#4a3528]"
+                className="text-xs text-wood-card-muted hover:text-wood-card-fg"
               >
                 Forgot password?
               </Link>
             </div>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               autoComplete="current-password"
-              className="border-[rgba(78,52,37,0.15)] bg-white/80"
+              aria-invalid={state.error ? true : undefined}
+              aria-describedby={state.error ? errorId : undefined}
+              className="border-wood-mid/15 bg-white/80"
             />
           </div>
           <label
             htmlFor="remember_me"
             className="flex cursor-pointer items-start gap-2.5 rounded-md py-0.5"
           >
-            <input
-              type="checkbox"
+            <Checkbox
               id="remember_me"
               name="remember_me"
               defaultChecked={defaultRememberMe}
-              className={cn(
-                "mt-0.5 size-4 shrink-0 rounded border border-[rgba(78,52,37,0.35)]",
-                "accent-[#5e4e3c] focus-visible:ring-2 focus-visible:ring-[#5e4e3c]/40 focus-visible:outline-none",
-              )}
+              className="mt-0.5 border-wood-mid/35 data-[state=checked]:border-[#5e4e3c] data-[state=checked]:bg-wood-btn data-[state=checked]:text-wood-card"
             />
-            <span className="text-sm leading-snug text-[#6b5344]">Remember me on this device</span>
+            <span className="text-sm leading-snug text-wood-card-muted">Remember me on this device</span>
           </label>
           {message && !state.error && (
             <p className="flex items-center gap-2 text-sm text-green-700">
@@ -100,10 +101,14 @@ export function RoleLoginForm({
               {message}
             </p>
           )}
-          {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+          {state.error && (
+            <p id={errorId} role="alert" aria-live="polite" className="text-sm text-destructive">
+              {state.error}
+            </p>
+          )}
           <Button
             type="submit"
-            className="w-full bg-[#5e4e3c] text-[#f5efe6] hover:bg-[#4a3d30]"
+            className="w-full bg-wood-btn text-wood-card hover:bg-wood-btn-hover"
             disabled={isPending}
           >
             {isPending ? "Signing in..." : "Sign In"}
@@ -111,13 +116,13 @@ export function RoleLoginForm({
           <Button
             asChild
             variant="outline"
-            className="w-full border-[rgba(78,52,37,0.2)] bg-transparent text-[#4a3528] hover:bg-[rgba(78,52,37,0.06)]"
+            className="w-full border-wood-mid/20 bg-transparent text-wood-card-fg hover:bg-wood-mid/6"
           >
             <Link href="/auth/login">Back to login options</Link>
           </Button>
         </div>
         {accountLink && (
-          <div className="mt-6 text-center text-sm text-[#6b5344] [&_a]:text-[#4a3528] [&_a]:underline [&_a]:underline-offset-4">
+          <div className="mt-6 text-center text-sm text-wood-card-muted [&_a]:text-wood-card-fg [&_a]:underline [&_a]:underline-offset-4">
             {accountLink}
           </div>
         )}

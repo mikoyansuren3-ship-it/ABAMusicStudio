@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const CLEF_FONT =
@@ -10,7 +11,7 @@ const CLEF_FONT =
 function TrebleClefSymbol({ size, color }: { size: number; color: string }) {
   return (
     <span
-      className="flex items-center justify-center select-none transition-colors duration-400"
+      className="flex items-center justify-center select-none transition-colors duration-300"
       style={{ fontFamily: CLEF_FONT, fontSize: size, color, lineHeight: 0.9 }}
     >
       {"\u{1D11E}"}
@@ -21,7 +22,7 @@ function TrebleClefSymbol({ size, color }: { size: number; color: string }) {
 function BassClefSymbol({ size, color }: { size: number; color: string }) {
   return (
     <span
-      className="flex items-center justify-center select-none transition-colors duration-400"
+      className="flex items-center justify-center select-none transition-colors duration-300"
       style={{ fontFamily: CLEF_FONT, fontSize: size, color, lineHeight: 0.9 }}
     >
       {"\u{1D122}"}
@@ -36,11 +37,11 @@ function StaffBrace({ height, color }: { height: number; color: string }) {
       <path
         d={`M20 4 C10 4, 8 ${mid * 0.35}, 8 ${mid * 0.65} Q8 ${mid * 0.82}, 4 ${mid} Q8 ${mid * 1.18}, 8 ${mid * 1.35} C8 ${mid * 1.65}, 10 ${height - 4}, 20 ${height - 4}`}
         fill="none"
-        stroke={color}
+        style={{ stroke: color }}
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <circle cx="3" cy={mid} r="2" fill={color} />
+      <circle cx="3" cy={mid} r="2" style={{ fill: color }} />
     </svg>
   )
 }
@@ -63,19 +64,26 @@ function StaffRow({ clef, title, desc, href, isHovered, onEnter, onLeave }: Staf
   const totalH = staffH + padY * 2
   const clefWidth = 80
 
-  const lineColor = isHovered ? "rgba(201,169,110,0.45)" : "rgba(245,235,217,0.18)"
-  const clefColor = isHovered ? "#C9A96E" : "rgba(245,235,217,0.65)"
-  const titleColor = isHovered ? "#F5EBD9" : "rgba(245,235,217,0.85)"
-  const descColor = isHovered ? "rgba(245,235,217,0.75)" : "rgba(245,235,217,0.45)"
+  const lineColor = isHovered
+    ? "color-mix(in srgb, var(--gold) 45%, transparent)"
+    : "color-mix(in srgb, var(--cream) 18%, transparent)"
+  const clefColor = isHovered ? "var(--gold)" : "color-mix(in srgb, var(--cream) 65%, transparent)"
+  const titleColor = isHovered ? "var(--cream)" : "color-mix(in srgb, var(--cream) 85%, transparent)"
+  const descColor = isHovered
+    ? "color-mix(in srgb, var(--cream) 90%, transparent)"
+    : "color-mix(in srgb, var(--cream) 80%, transparent)"
 
   return (
     <Link
       href={href}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
+      onFocus={onEnter}
+      onBlur={onLeave}
       className={cn(
-        "relative flex cursor-pointer items-center rounded-[10px] pr-6 transition-all duration-400",
-        isHovered ? "bg-[rgba(201,169,110,0.08)]" : "bg-transparent",
+        "relative flex cursor-pointer items-center rounded-lg pr-6 transition-all duration-300",
+        "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold",
+        isHovered ? "bg-gold/8" : "bg-transparent",
       )}
       style={{ height: totalH }}
     >
@@ -83,7 +91,7 @@ function StaffRow({ clef, title, desc, href, isHovered, onEnter, onLeave }: Staf
         {Array.from({ length: lineCount }, (_, i) => (
           <div
             key={i}
-            className="absolute right-4 h-px transition-colors duration-400"
+            className="absolute right-4 h-px transition-colors duration-300"
             style={{
               left: clefWidth - 4,
               top: padY + i * lineGap,
@@ -92,7 +100,7 @@ function StaffRow({ clef, title, desc, href, isHovered, onEnter, onLeave }: Staf
           />
         ))}
         <div
-          className="absolute w-[1.5px] transition-colors duration-400"
+          className="absolute w-[1.5px] transition-colors duration-300"
           style={{
             left: clefWidth - 4,
             top: padY,
@@ -129,13 +137,13 @@ function StaffRow({ clef, title, desc, href, isHovered, onEnter, onLeave }: Staf
           </div>
         </div>
         <div
-          className="ml-4 shrink-0 text-xl font-light transition-all duration-300"
+          className="ml-4 shrink-0 transition-all duration-300"
           style={{
-            color: isHovered ? "#C9A96E" : "rgba(245,235,217,0.25)",
+            color: isHovered ? "var(--gold)" : "color-mix(in srgb, var(--cream) 25%, transparent)",
             transform: isHovered ? "translateX(4px)" : "translateX(0)",
           }}
         >
-          →
+          <ArrowRight aria-hidden="true" className="size-4" />
         </div>
       </div>
     </Link>
@@ -148,12 +156,12 @@ export function GrandStaffLogin() {
   const staffHeight = 120
   const gap = 20
   const braceHeight = staffHeight * 2 + gap
-  const braceColor = hovered ? "#C9A96E" : "rgba(245,235,217,0.35)"
+  const braceColor = hovered ? "var(--gold)" : "color-mix(in srgb, var(--cream) 35%, transparent)"
 
   return (
     <div className="flex w-full max-w-[560px] flex-col items-center">
       <div className="flex w-full items-stretch">
-        <div className="flex shrink-0 items-center pr-0.5 transition-all duration-400">
+        <div className="flex shrink-0 items-center pr-0.5 transition-all duration-300">
           <StaffBrace height={braceHeight} color={braceColor} />
         </div>
 
@@ -182,9 +190,10 @@ export function GrandStaffLogin() {
       <div className="mt-8 text-center">
         <Link
           href="/auth/admin/login"
-          className="text-xs tracking-[0.03em] text-[rgba(201,169,110,0.55)] transition-colors hover:text-[rgba(201,169,110,0.85)]"
+          className="inline-flex items-center gap-1 rounded-sm text-xs tracking-[0.03em] text-gold-strong transition-colors hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
         >
-          Administrator Access →
+          Administrator Access
+          <ArrowRight aria-hidden="true" className="size-3.5" />
         </Link>
       </div>
 
@@ -192,9 +201,10 @@ export function GrandStaffLogin() {
         <Link
           href="/"
           prefetch={false}
-          className="border-b border-[rgba(245,235,217,0.15)] pb-px text-xs text-[rgba(245,235,217,0.35)] transition-colors hover:text-[rgba(245,235,217,0.6)]"
+          className="inline-flex items-center gap-1 rounded-sm border-b border-cream/15 pb-px text-xs text-cream/75 transition-colors hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
         >
-          ← Back to home
+          <ArrowLeft aria-hidden="true" className="size-3.5" />
+          Back to home
         </Link>
       </div>
     </div>

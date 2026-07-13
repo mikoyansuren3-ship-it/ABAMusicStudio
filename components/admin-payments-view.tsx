@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { CreditCard, Plus, Receipt, CheckCircle, Clock, DollarSign, Loader2 } from "lucide-react"
 import type { Invoice, Student, Profile } from "@/lib/types"
 import { createInvoice, markAsPaid } from "@/app/admin/payments/actions"
+import { formatCurrency, formatMediumDate } from "@/lib/portal/format"
 import { useRouter } from "next/navigation"
 
 interface AdminPaymentsViewProps {
@@ -93,8 +94,8 @@ export function AdminPaymentsView({ invoices, students }: AdminPaymentsViewProps
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className={`text-3xl font-bold ${totalUnpaid > 0 ? "text-destructive" : ""}`}>
-              ${(totalUnpaid / 100).toFixed(2)}
+            <p className={`text-3xl font-bold ${totalUnpaid > 0 ? "text-accent" : ""}`}>
+              {formatCurrency(totalUnpaid)}
             </p>
             <p className="text-sm text-muted-foreground">{unpaidInvoices.length} unpaid invoices</p>
           </CardContent>
@@ -106,7 +107,7 @@ export function AdminPaymentsView({ invoices, students }: AdminPaymentsViewProps
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-600">${(totalPaidThisMonth / 100).toFixed(2)}</p>
+            <p className="text-3xl font-bold text-green-600">{formatCurrency(totalPaidThisMonth)}</p>
             <p className="text-sm text-muted-foreground">Collected</p>
           </CardContent>
         </Card>
@@ -198,11 +199,11 @@ export function AdminPaymentsView({ invoices, students }: AdminPaymentsViewProps
                     <p className="font-medium">{invoice.student?.profile?.full_name || "Student"}</p>
                     <p className="text-sm text-muted-foreground">{invoice.description || "Invoice"}</p>
                     <p className="text-xs text-muted-foreground">
-                      Due: {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : "Upon receipt"}
+                      Due: {invoice.due_date ? formatMediumDate(invoice.due_date) : "Upon receipt"}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <p className="text-lg font-bold">${(invoice.amount / 100).toFixed(2)}</p>
+                    <p className="text-lg font-bold">{formatCurrency(invoice.amount)}</p>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => handleMarkPaid(invoice.id, "cash")}>
                         Cash
@@ -232,11 +233,11 @@ export function AdminPaymentsView({ invoices, students }: AdminPaymentsViewProps
                 <div>
                   <p className="font-medium">{invoice.student?.profile?.full_name || "Student"}</p>
                   <p className="text-sm text-muted-foreground">
-                    {invoice.description || "Invoice"} • {new Date(invoice.created_at).toLocaleDateString()}
+                    {invoice.description || "Invoice"} • {formatMediumDate(invoice.created_at)}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <p className="font-medium">${(invoice.amount / 100).toFixed(2)}</p>
+                  <p className="font-medium">{formatCurrency(invoice.amount)}</p>
                   {getStatusBadge(invoice.status)}
                 </div>
               </div>

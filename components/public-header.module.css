@@ -1,162 +1,134 @@
 .headerRoot {
-  --wood-darkest: #1e1008;
-  --wood-dark: #2a1810;
-  --wood-main: #3b2518;
-  --wood-mid: #4e3425;
+  --utility-h: 38px;
   --wood-gradient: linear-gradient(
     135deg,
     var(--wood-dark) 0%,
-    var(--wood-main) 25%,
+    var(--wood-main) 30%,
     var(--wood-mid) 55%,
     var(--wood-main) 80%,
     var(--wood-dark) 100%
   );
-  --gold: #c9a96e;
-  --cream: #f5ebd9;
-  --shape-color: #f5ebd9;
-  --nav-bg: var(--wood-dark);
+  position: sticky;
+  top: calc(var(--utility-h) * -1);
+  z-index: 40;
   width: 100%;
 }
 
-.infoBar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  padding: 7px 24px;
-  font-size: 11.5px;
-  letter-spacing: 0.03em;
-  color: var(--cream);
+/* ── Tier 1: utility strip ─────────────────────────────────────────── */
+
+.utilityBar {
+  height: var(--utility-h);
   background: var(--wood-darkest);
-  flex-wrap: wrap;
+  color: var(--cream);
+  font-size: 12.5px;
+  letter-spacing: 0.03em;
 }
 
-.infoBar a {
-  color: var(--gold);
+.utilityInner {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.utilityContact {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.utilityBar a {
+  color: var(--gold-strong);
   text-decoration: none;
+  padding: 6px 2px;
+  border-radius: 4px;
   transition: opacity 0.2s;
+  white-space: nowrap;
 }
 
-.infoBar a:hover {
-  opacity: 0.8;
+.utilityBar a:hover {
+  opacity: 0.85;
 }
 
-.infoBarSep {
+.utilityBar a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.utilitySep {
   opacity: 0.3;
 }
 
-.utilLinks {
-  display: flex;
-  gap: 18px;
-  margin-left: auto;
-}
-
-.utilLinks a {
+a.utilityLogin {
   color: var(--cream);
   font-weight: 500;
-  opacity: 0.7;
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 14px;
+  border: 1px solid color-mix(in srgb, var(--cream) 30%, transparent);
+  border-radius: 999px;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.utilLinks a:hover {
-  opacity: 1;
-  color: var(--gold);
+a.utilityLogin:hover {
+  color: var(--gold-strong);
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent);
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.headerBand {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 170px;
+/* ── Tier 2: main bar ──────────────────────────────────────────────── */
+
+.mainBar {
   background:
     repeating-linear-gradient(
       176deg,
       transparent,
       transparent 6px,
-      rgba(0, 0, 0, 0.025) 6px,
-      rgba(0, 0, 0, 0.025) 7px
-    ),
-    repeating-linear-gradient(
-      172deg,
-      transparent,
-      transparent 28px,
-      rgba(255, 255, 255, 0.012) 28px,
-      rgba(255, 255, 255, 0.012) 30px
+      rgba(0, 0, 0, 0.02) 6px,
+      rgba(0, 0, 0, 0.02) 7px
     ),
     var(--wood-gradient);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 18%, transparent);
 }
 
-.headerBand::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.25) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.headerBandInner {
-  position: relative;
-  z-index: 2;
+.mainInner {
   display: flex;
-  width: 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 68px;
+  padding: 10px 0;
 }
 
-.shapesLayer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.decoShape {
-  position: absolute;
-  color: var(--shape-color);
-  font-family: var(--font-serif), "Playfair Display", "Times New Roman", serif;
-  line-height: 1;
-  user-select: none;
-}
-
-.decoSvg {
-  position: absolute;
-  fill: var(--shape-color);
-  pointer-events: none;
-}
-
-.headerLogo {
-  display: flex;
-  flex-direction: column;
+.logoLink {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  text-decoration: none;
+  flex-shrink: 0;
+  border-radius: 6px;
 }
 
-.headerLogo img {
-  height: 85px;
+.logoLink img {
+  height: 46px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
-.headerTagline {
-  font-family: var(--font-serif), "Playfair Display", serif;
-  font-size: 13px;
-  font-style: italic;
-  color: var(--gold);
-  letter-spacing: 0.06em;
-  opacity: 0.9;
+.logoLink:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
 }
 
 .navBar {
   display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: wrap;
-  background: var(--nav-bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;
 }
 
 .navItem {
@@ -166,86 +138,122 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--cream);
-  padding: 14px 24px;
+  padding: 9px 12px;
+  border-radius: 8px;
   text-decoration: none;
-  transition: all 0.2s ease;
-  position: relative;
   white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .navItem:hover {
-  color: var(--gold);
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold-strong);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.navItem:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  color: var(--gold-strong);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .navItemActive {
-  color: var(--gold);
+  color: var(--gold-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--gold);
+  text-underline-offset: 7px;
 }
 
-.navItemActive::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 22%;
-  right: 22%;
-  height: 2px;
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+a.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 999px;
   background: var(--gold);
-  border-radius: 1px;
+  color: var(--wood-darkest);
+  font-family: var(--font-sans), "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 10px 20px;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
-.mobileMenuWrap {
-  display: none;
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+a.ctaButton:hover {
+  background: var(--gold-strong);
+}
+
+a.ctaButton:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 
 .mobileMenuBtn {
+  display: none;
   color: var(--cream);
 }
 
 .mobileMenuBtn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--gold);
+  color: var(--gold-strong);
 }
 
-@media (max-width: 900px) {
+.mobileMenuBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
   .navBar {
     display: none;
   }
 
-  .mobileMenuWrap {
-    display: block;
+  .mobileMenuBtn {
+    display: inline-flex;
   }
 
-  .infoBar {
-    font-size: 10px;
-    gap: 12px;
-    padding: 6px 12px;
+  .mainInner {
+    min-height: 60px;
   }
 
-  .utilLinks {
-    margin-left: 0;
-  }
-
-  .headerBand {
-    min-height: 140px;
-  }
-
-  .headerLogo img {
-    height: 70px;
+  .logoLink img {
+    height: 38px;
   }
 }
 
-@media (max-width: 700px) {
-  .infoBar {
-    justify-content: center;
+@media (max-width: 640px) {
+  .utilityEmail,
+  .utilitySep {
+    display: none;
   }
 
-  .utilLinks {
-    width: 100%;
-    justify-content: center;
-    margin-left: 0;
+  .utilityBar {
+    font-size: 12px;
+  }
+
+  a.ctaButton {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  a.ctaButton {
+    display: none;
   }
 }

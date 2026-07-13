@@ -59,6 +59,7 @@ export function SectionDivider({
     <div className="my-6 flex items-center gap-2.5">
       {clef ? (
         <span
+          aria-hidden
           className={cn(
             "font-[family-name:var(--font-noto-music)] leading-none text-[#C9A96E]",
             clef === "treble" ? "text-[22px]" : "text-lg",
@@ -93,7 +94,11 @@ export function PortalCard({
 
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className={baseClass}>
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(baseClass, "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34]")}
+      >
         {children}
       </button>
     )
@@ -142,7 +147,7 @@ export function PortalButton({
     <button
       type="button"
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34] disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
         className,
       )}
@@ -165,7 +170,10 @@ export function PortalLinkButton({
   return (
     <Link
       href={href}
-      className={cn("text-xs font-semibold text-[#C9A96E] transition-colors hover:text-[#B8963E]", className)}
+      className={cn(
+        "text-xs font-semibold text-[#8a6b3c] transition-colors hover:text-[#6f5630] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34]",
+        className,
+      )}
     >
       {children}
     </Link>
@@ -184,7 +192,7 @@ export function PortalEmptyState({ icon, message }: { icon?: React.ReactNode; me
   return (
     <div className="py-12 text-center">
       {icon ?? (
-        <span className="font-[family-name:var(--font-noto-music)] text-5xl text-[#B8A89A] opacity-40">
+        <span aria-hidden className="font-[family-name:var(--font-noto-music)] text-5xl text-[#B8A89A] opacity-40">
           {"\u{1D11E}"}
         </span>
       )}
@@ -219,7 +227,7 @@ export function PortalDateBadge({
       <span
         className={cn(
           "font-semibold uppercase",
-          highlight ? "text-[9px] opacity-60" : "text-[8px] text-[#B8A89A]",
+          highlight ? "text-[9px] opacity-60" : "text-[8px] text-[#7d6b58]",
           compact && "text-[8px]",
         )}
       >

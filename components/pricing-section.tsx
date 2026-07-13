@@ -72,7 +72,7 @@ export function PricingSection() {
   return (
     <section aria-labelledby="piano-pricing-heading">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 id="piano-pricing-heading" className="font-serif text-4xl font-bold">
+        <h2 id="piano-pricing-heading" className="font-serif text-3xl font-bold">
           Piano Lesson Pricing
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
@@ -80,7 +80,7 @@ export function PricingSection() {
         </p>
       </div>
 
-      <div className="mt-16 grid gap-8 md:grid-cols-3">
+      <div className="mt-12 grid gap-8 md:grid-cols-3">
         {durations.map((option) => {
           const frequency = selectedFrequency[option.duration]
           const monthlyPrice = getMonthlyPrice(option.duration, frequency)
@@ -99,8 +99,20 @@ export function PricingSection() {
               <CardContent className="space-y-6">
                 <div
                   role="radiogroup"
-                  aria-label={`${option.duration}-minute lesson frequency`}
+                  aria-label={`${option.duration}-minute lesson frequency (lessons per week)`}
                   className="grid grid-cols-3 rounded-lg bg-muted p-1"
+                  onKeyDown={(event) => {
+                    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return
+                    event.preventDefault()
+                    const direction = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1
+                    const currentIndex = frequencies.indexOf(frequency)
+                    const next = frequencies[(currentIndex + direction + frequencies.length) % frequencies.length]
+                    setSelectedFrequency((current) => ({ ...current, [option.duration]: next }))
+                    const group = event.currentTarget
+                    requestAnimationFrame(() => {
+                      group.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus()
+                    })
+                  }}
                 >
                   {frequencies.map((frequencyOption) => {
                     const isSelected = frequencyOption === frequency
@@ -111,13 +123,15 @@ export function PricingSection() {
                         type="button"
                         role="radio"
                         aria-checked={isSelected}
+                        aria-label={`${frequencyOption} ${frequencyOption === 1 ? "lesson" : "lessons"} per week`}
+                        tabIndex={isSelected ? 0 : -1}
                         onClick={() =>
                           setSelectedFrequency((current) => ({
                             ...current,
                             [option.duration]: frequencyOption,
                           }))
                         }
-                        className={`rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        className={`cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                           isSelected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                         }`}
                       >

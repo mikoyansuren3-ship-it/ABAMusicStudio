@@ -3,7 +3,7 @@ import { LoginWoodBackground } from "@/components/auth/login-wood-background"
 
 export default function LoginPage() {
   return (
-    <LoginWoodBackground className="max-w-none" logoSubtitle="Student & Teacher Portal">
+    <LoginWoodBackground logoSubtitle="Student & Teacher Portal">
       <GrandStaffLogin />
     </LoginWoodBackground>
   )

@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Calendar, Plus, Clock, Loader2, Check, X } from "lucide-react"
 import type { Booking, Student, Profile, Availability, AvailabilityException } from "@/lib/types"
 import { createBooking, updateBookingStatus } from "@/app/admin/schedule/actions"
+import { BookingStatusBadge } from "@/components/status-badge"
 import { useRouter } from "next/navigation"
 
 interface AdminScheduleViewProps {
@@ -83,21 +84,6 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
     if (result?.error) setActionError(result.error)
     router.refresh()
     setIsLoading(false)
-  }
-
-  function getStatusBadge(status: string) {
-    switch (status) {
-      case "confirmed":
-        return <Badge>Confirmed</Badge>
-      case "pending":
-        return <Badge variant="secondary">Pending</Badge>
-      case "cancelled":
-        return <Badge variant="destructive">Cancelled</Badge>
-      case "completed":
-        return <Badge variant="outline">Completed</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
-    }
   }
 
   return (
@@ -280,7 +266,7 @@ export function AdminScheduleView({ bookings, students }: AdminScheduleViewProps
                               </p>
                             </div>
                           </div>
-                          {getStatusBadge(booking.status)}
+                          <BookingStatusBadge status={booking.status} />
                         </div>
                       ))}
                     </div>

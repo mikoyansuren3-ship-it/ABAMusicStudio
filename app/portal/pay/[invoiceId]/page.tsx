@@ -69,7 +69,7 @@ export default async function PayInvoicePage({ params }: { params: Promise<{ inv
       <PortalPageBody className="max-w-lg">
         <Link
           href="/portal/payments"
-          className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-[#C9A96E] hover:text-[#B8963E]"
+          className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-[#8a6b3c] hover:text-[#6f5630] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34]"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Payments

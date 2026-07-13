@@ -3,10 +3,9 @@
 import type React from "react"
 
 import { createClient } from "@/lib/supabase/client"
-import { BrandLink } from "@/components/brand-link"
+import { AuthShell } from "@/components/auth/auth-shell"
+import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -22,6 +21,7 @@ export default function UpdatePasswordPage() {
   const [hasSession, setHasSession] = useState(false)
   const [updated, setUpdated] = useState(false)
   const router = useRouter()
+  const errorId = "update-password-error"
 
   useEffect(() => {
     const supabase = createClient()
@@ -63,70 +63,83 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <BrandLink imageClassName="h-24 w-24" />
+    <AuthShell>
+      {isCheckingSession ? (
+        <div className="py-4 text-center text-sm text-wood-card-muted">Checking reset link...</div>
+      ) : !hasSession ? (
+        <div className="flex flex-col items-center py-4 text-center">
+          <AlertCircle className="h-12 w-12 text-destructive" />
+          <h3 className="mt-4 font-serif text-lg font-semibold text-wood-card-fg">Reset Link Required</h3>
+          <p className="mt-2 text-sm text-wood-card-muted">
+            Please open the password reset link from your email, or request a new one.
+          </p>
+          <Button className="mt-6 bg-wood-btn text-wood-card hover:bg-wood-btn-hover" asChild>
+            <Link href="/auth/reset-password">Request New Link</Link>
+          </Button>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Update Password</CardTitle>
-            <CardDescription>Enter your new password</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isCheckingSession ? (
-              <div className="py-4 text-center text-sm text-muted-foreground">Checking reset link...</div>
-            ) : !hasSession ? (
-              <div className="flex flex-col items-center py-4 text-center">
-                <AlertCircle className="h-12 w-12 text-destructive" />
-                <h3 className="mt-4 font-semibold">Reset Link Required</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Please open the password reset link from your email, or request a new one.
+      ) : updated ? (
+        <div className="flex flex-col items-center py-4 text-center">
+          <CheckCircle className="h-12 w-12 text-accent" />
+          <h3 className="mt-4 font-serif text-lg font-semibold text-wood-card-fg">Password Updated!</h3>
+          <p className="mt-2 text-sm text-wood-card-muted">Redirecting you to login...</p>
+          <Button className="mt-6 bg-wood-btn text-wood-card hover:bg-wood-btn-hover" asChild>
+            <Link href="/auth/login">Continue to your portal now</Link>
+          </Button>
+        </div>
+      ) : (
+        <>
+          <div className="mb-6 text-center">
+            <h1 className="font-serif text-2xl font-semibold text-wood-card-fg">Update Password</h1>
+            <p className="mt-1.5 text-sm text-wood-card-muted">Enter your new password</p>
+          </div>
+          <form onSubmit={handleUpdate}>
+            <div className="flex flex-col gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-wood-card-fg">
+                  New Password
+                </Label>
+                <PasswordInput
+                  id="password"
+                  required
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  aria-invalid={error ? true : undefined}
+                  aria-describedby={error ? errorId : undefined}
+                  className="border-wood-mid/15 bg-white/80"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-wood-card-fg">
+                  Confirm Password
+                </Label>
+                <PasswordInput
+                  id="confirmPassword"
+                  required
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  aria-invalid={error ? true : undefined}
+                  aria-describedby={error ? errorId : undefined}
+                  className="border-wood-mid/15 bg-white/80"
+                />
+              </div>
+              {error && (
+                <p id={errorId} role="alert" aria-live="polite" className="text-sm text-destructive">
+                  {error}
                 </p>
-                <Button className="mt-6" asChild>
-                  <Link href="/auth/reset-password">Request New Link</Link>
-                </Button>
-              </div>
-            ) : updated ? (
-              <div className="flex flex-col items-center py-4 text-center">
-                <CheckCircle className="h-12 w-12 text-accent" />
-                <h3 className="mt-4 font-semibold">Password Updated!</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Redirecting you to login...</p>
-              </div>
-            ) : (
-              <form onSubmit={handleUpdate}>
-                <div className="flex flex-col gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password">New Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </div>
-                  {error && <p className="text-sm text-destructive">{error}</p>}
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Updating..." : "Update Password"}
-                  </Button>
-                </div>
-              </form>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+              )}
+              <Button
+                type="submit"
+                className="w-full bg-wood-btn text-wood-card hover:bg-wood-btn-hover"
+                disabled={isLoading}
+              >
+                {isLoading ? "Updating..." : "Update Password"}
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
+    </AuthShell>
   )
 }

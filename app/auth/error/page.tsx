@@ -1,6 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { AuthShell } from "@/components/auth/auth-shell"
 import { Button } from "@/components/ui/button"
-import { BrandLink } from "@/components/brand-link"
 import Link from "next/link"
 import { AlertCircle } from "lucide-react"
 
@@ -13,31 +12,21 @@ export default async function AuthErrorPage({
   const errorMessage = params?.message || params?.error
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted/30 p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <BrandLink imageClassName="h-24 w-24" />
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <AlertCircle className="h-6 w-6 text-destructive" />
-              Authentication Error
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {errorMessage ? (
-              <p className="text-sm text-muted-foreground">Error: {errorMessage}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">An unspecified error occurred.</p>
-            )}
-            <Button className="mt-6 w-full" asChild>
-              <Link href="/auth/login">Back to Login</Link>
-            </Button>
-          </CardContent>
-        </Card>
+    <AuthShell>
+      <div className="mb-6 text-center">
+        <h1 className="flex items-center justify-center gap-2 font-serif text-2xl font-semibold text-wood-card-fg">
+          <AlertCircle aria-hidden="true" className="h-6 w-6 text-destructive" />
+          Authentication Error
+        </h1>
       </div>
-    </div>
+      {errorMessage ? (
+        <p className="text-center text-sm text-wood-card-muted">Error: {errorMessage}</p>
+      ) : (
+        <p className="text-center text-sm text-wood-card-muted">An unspecified error occurred.</p>
+      )}
+      <Button className="mt-6 w-full bg-wood-btn text-wood-card hover:bg-wood-btn-hover" asChild>
+        <Link href="/auth/login">Back to Login</Link>
+      </Button>
+    </AuthShell>
   )
 }

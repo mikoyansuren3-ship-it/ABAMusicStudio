@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { PageHeader } from "@/components/public/page-header"
 import { AlertCircle, Clock, CreditCard, Calendar } from "lucide-react"
 
 export const metadata = {
@@ -10,22 +11,19 @@ export default function PoliciesPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="font-serif text-4xl font-bold">Studio Policies</h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Please review our policies to ensure a smooth experience for everyone.
-          </p>
-        </div>
+        <PageHeader
+          title="Studio Policies"
+          lede="Please review our policies to ensure a smooth experience for everyone."
+        />
 
         {/* Policies */}
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-accent" />
+              <h2 className="flex items-center gap-2 font-semibold leading-none">
+                <AlertCircle className="h-5 w-5 text-accent" aria-hidden />
                 Cancellation Policy
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
@@ -50,10 +48,10 @@ export default function PoliciesPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-accent" />
+              <h2 className="flex items-center gap-2 font-semibold leading-none">
+                <Clock className="h-5 w-5 text-accent" aria-hidden />
                 Late Arrival Policy
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
@@ -73,10 +71,10 @@ export default function PoliciesPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-accent" />
+              <h2 className="flex items-center gap-2 font-semibold leading-none">
+                <CreditCard className="h-5 w-5 text-accent" aria-hidden />
                 Payment Policy
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
@@ -100,10 +98,10 @@ export default function PoliciesPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-accent" />
+              <h2 className="flex items-center gap-2 font-semibold leading-none">
+                <Calendar className="h-5 w-5 text-accent" aria-hidden />
                 Scheduling & Holidays
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
@@ -128,23 +126,23 @@ export default function PoliciesPage() {
         </div>
 
         {/* Additional Notes */}
-        <div className="mt-16 rounded-lg border bg-muted/30 p-8">
-          <h2 className="font-serif text-xl font-bold">Additional Notes</h2>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+        <div className="mt-16 rounded-xl border bg-muted/30 p-8">
+          <h2 className="font-serif text-2xl font-bold">Additional Notes</h2>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-muted-foreground marker:text-accent">
             <li>
-              • <strong className="text-foreground">Practice:</strong> Regular practice between lessons is essential for
+              <strong className="text-foreground">Practice:</strong> Regular practice between lessons is essential for
               progress. Students are expected to practice the assigned material each week.
             </li>
             <li>
-              • <strong className="text-foreground">Materials:</strong> Students are responsible for purchasing their
+              <strong className="text-foreground">Materials:</strong> Students are responsible for purchasing their
               own music books and materials as needed. Recommendations will be provided.
             </li>
             <li>
-              • <strong className="text-foreground">Communication:</strong> Please use the student portal for scheduling
+              <strong className="text-foreground">Communication:</strong> Please use the student portal for scheduling
               changes. For urgent matters, call or text directly.
             </li>
             <li>
-              • <strong className="text-foreground">Parent Involvement:</strong> For young students, a parent or
+              <strong className="text-foreground">Parent Involvement:</strong> For young students, a parent or
               guardian should be available during lessons and assist with home practice.
             </li>
           </ul>
