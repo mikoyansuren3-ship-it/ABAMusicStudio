@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
+import { CtaSection } from "@/components/public/cta-section"
+import { PageHeader } from "@/components/public/page-header"
 import { GraduationCap, Heart, Award } from "lucide-react"
 
 export const metadata = {
@@ -13,13 +14,10 @@ export default function AboutPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="font-serif text-4xl font-bold">About ABA Music Academy</h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Dedicated to nurturing musical talent and fostering a lifelong love of music.
-          </p>
-        </div>
+        <PageHeader
+          title="About ABA Music Academy"
+          lede="Dedicated to nurturing musical talent and fostering a lifelong love of music."
+        />
 
         {/* Bio Section */}
         <div className="mt-16 grid items-center gap-12 md:grid-cols-2">
@@ -27,7 +25,7 @@ export default function AboutPage() {
             <div className="aspect-[3/4] overflow-hidden rounded-lg bg-muted">
               <Image
                 src="/arpine-portrait.png"
-                alt="Arpine, ABA Music Academy piano teacher"
+                alt="Arpine, founder of ABA Music Academy"
                 width={768}
                 height={1024}
                 className="h-full w-full object-cover"
@@ -37,14 +35,21 @@ export default function AboutPage() {
           </div>
 
           <div>
-            <h2 className="font-serif text-3xl font-bold">Meet Your Teacher</h2>
+            <h2 className="font-serif text-3xl font-bold">Meet Your Founder</h2>
             <p className="mt-6 text-muted-foreground leading-relaxed">
-              With over 10 years of teaching experience, I&apos;ve had the joy of guiding students of all ages through
-              their musical journeys. I hold a PhD in Music and bring a deep foundation in classical training to every
-              lesson — shaped in part by my time at the Aram Khachaturian Museum and Komitas State Conservatory in
-              Armenia, two of the region&apos;s respected music institutions. I am an MTAC member, staying actively
-              involved in the local music education community. Whether you&apos;re just starting out or looking to refine
-              your technique, I&apos;m committed to patient, personalized instruction that helps every student grow.
+              ABA Music Academy was founded by Arpine, who brings over 10 years of teaching experience and the joy of
+              guiding students of all ages through their musical journeys. She holds a PhD in Music and brings a deep
+              foundation in classical training to every lesson — shaped in part by her time at the Aram Khachaturian
+              Museum and Komitas State Conservatory in Armenia, two of the region&apos;s respected music institutions.
+              An MTAC member, she stays actively involved in the local music education community, and the academy she
+              built carries that same commitment to patient, personalized instruction across its growing faculty.
+            </p>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              ABA Music Academy is growing.{" "}
+              <Link href="/faculty" className="font-medium text-accent underline-offset-4 hover:underline">
+                Meet the full faculty
+              </Link>{" "}
+              of piano, voice, and violin instructors.
             </p>
           </div>
         </div>
@@ -57,7 +62,7 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
-            <Card className="border-0 bg-muted/30">
+            <Card>
               <CardContent className="pt-6 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
                   <GraduationCap className="h-6 w-6 text-accent" />
@@ -69,7 +74,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-muted/30">
+            <Card>
               <CardContent className="pt-6 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
                   <Heart className="h-6 w-6 text-accent" />
@@ -82,7 +87,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-muted/30">
+            <Card>
               <CardContent className="pt-6 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
                   <Award className="h-6 w-6 text-accent" />
@@ -98,11 +103,12 @@ export default function AboutPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-24 text-center">
-          <p className="text-lg text-muted-foreground">Ready to begin your musical journey?</p>
-          <Button size="lg" className="mt-6" asChild>
-            <Link href="/inquire">Inquire About Lessons</Link>
-          </Button>
+        <div className="mt-24">
+          <CtaSection
+            body="Ready to begin your musical journey?"
+            buttonLabel="Inquire About Lessons"
+            href="/inquire"
+          />
         </div>
       </div>
     </div>

@@ -77,7 +77,13 @@ export function EnrollmentForm() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="parentName">Parent Name</Label>
-              <Input id="parentName" required value={parentName} onChange={(event) => setParentName(event.target.value)} />
+              <Input
+                id="parentName"
+                required
+                autoComplete="name"
+                value={parentName}
+                onChange={(event) => setParentName(event.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="parentEmail">Parent Email</Label>
@@ -85,6 +91,7 @@ export function EnrollmentForm() {
                 id="parentEmail"
                 type="email"
                 required
+                autoComplete="email"
                 value={parentEmail}
                 onChange={(event) => setParentEmail(event.target.value)}
               />
@@ -93,7 +100,13 @@ export function EnrollmentForm() {
 
           <div className="space-y-2">
             <Label htmlFor="studentName">Student Name</Label>
-            <Input id="studentName" required value={studentName} onChange={(event) => setStudentName(event.target.value)} />
+            <Input
+              id="studentName"
+              required
+              autoComplete="off"
+              value={studentName}
+              onChange={(event) => setStudentName(event.target.value)}
+            />
           </div>
 
           <div className="space-y-4">
@@ -110,7 +123,7 @@ export function EnrollmentForm() {
                 <Label
                   key={option}
                   htmlFor={`duration-${option}`}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50 has-[[data-state=checked]]:border-accent has-[[data-state=checked]]:bg-accent/5"
                 >
                   <RadioGroupItem id={`duration-${option}`} value={String(option)} />
                   <span>{option} minutes</span>
@@ -133,7 +146,7 @@ export function EnrollmentForm() {
                 <Label
                   key={option}
                   htmlFor={`frequency-${option}`}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50 has-[[data-state=checked]]:border-accent has-[[data-state=checked]]:bg-accent/5"
                 >
                   <RadioGroupItem id={`frequency-${option}`} value={String(option)} />
                   <span>{option}x per week</span>
@@ -150,7 +163,7 @@ export function EnrollmentForm() {
           <CardDescription>Registration is included in the first checkout.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm" aria-live="polite">
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground">
                 {duration} min, {frequency}x/week
@@ -167,7 +180,11 @@ export function EnrollmentForm() {
             </div>
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p role="alert" aria-live="polite" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
 
           <Button type="submit" className="w-full" size="lg" disabled={isPending}>
             {isPending ? "Preparing Checkout..." : "Continue to Payment"}

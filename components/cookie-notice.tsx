@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -16,14 +16,18 @@ function acceptConsent() {
   document.cookie = `${CONSENT_COOKIE}=accepted; path=/; max-age=${ONE_YEAR_SECONDS}; samesite=lax${secure}`
 }
 
+const noSubscription = () => () => {}
+
 export function CookieNotice() {
-  const [visible, setVisible] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+  // Render nothing on the server / first paint, then reflect the cookie state.
+  const mounted = useSyncExternalStore(
+    noSubscription,
+    () => true,
+    () => false,
+  )
 
-  useEffect(() => {
-    setVisible(!hasConsent())
-  }, [])
-
-  if (!visible) {
+  if (!mounted || dismissed || hasConsent()) {
     return null
   }
 
@@ -47,7 +51,7 @@ export function CookieNotice() {
           className="shrink-0"
           onClick={() => {
             acceptConsent()
-            setVisible(false)
+            setDismissed(true)
           }}
         >
           Accept

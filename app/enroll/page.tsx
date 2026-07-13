@@ -16,6 +16,16 @@ export default function EnrollPage() {
           <p className="mt-4 text-lg text-muted-foreground">
             Choose your lesson plan, add the one-time registration fee, and continue to secure Stripe Checkout.
           </p>
+          <ol className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm text-muted-foreground">
+            <li aria-current="step" className="flex items-center gap-2 font-medium text-foreground">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+              Step 1 of 2 — Lesson details
+            </li>
+            <li className="flex items-center gap-2">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-muted-foreground/40" />
+              Step 2 — Secure payment via Stripe
+            </li>
+          </ol>
         </div>
 
         <div className="mt-12">

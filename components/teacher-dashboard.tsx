@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { CalendarDays, Clock, LogOut, MailQuestion, Users } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { sendInquiryDecision } from "@/lib/email"
-import { Badge } from "@/components/ui/badge"
+import { BookingStatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -373,7 +373,7 @@ export function TeacherDashboard() {
     <div className="space-y-8 p-6">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold">Welcome back, {profile?.full_name || "Teacher"}</h1>
+          <h1 className="font-serif text-2xl font-bold">Welcome back, {profile?.full_name || "Teacher"}</h1>
           <p className="text-sm text-muted-foreground">Manage today&apos;s lessons, inquiries, and availability.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -558,18 +558,18 @@ export function TeacherDashboard() {
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b text-left text-muted-foreground">
-                <th className="py-3 font-medium">Name</th>
-                <th className="py-3 font-medium">Level</th>
-                <th className="py-3 font-medium">Next Lesson</th>
-                <th className="py-3 font-medium">Status</th>
+                <th className="px-3 py-3 font-medium">Name</th>
+                <th className="px-3 py-3 font-medium">Level</th>
+                <th className="px-3 py-3 font-medium">Next Lesson</th>
+                <th className="px-3 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {rosterRows.map((student) => (
                 <tr key={student.id} className="border-b last:border-0">
-                  <td className="py-3 font-medium">{student.name}</td>
-                  <td className="py-3 capitalize">{student.experience_level || "Not set"}</td>
-                  <td className="py-3">
+                  <td className="px-3 py-3 font-medium">{student.name}</td>
+                  <td className="px-3 py-3 capitalize">{student.experience_level || "Not set"}</td>
+                  <td className="px-3 py-3">
                     {student.nextLesson
                       ? new Date(student.nextLesson.start_time).toLocaleString("en-US", {
                           month: "short",
@@ -579,13 +579,8 @@ export function TeacherDashboard() {
                         })
                       : "Not scheduled"}
                   </td>
-                  <td className="py-3">
-                    <Badge
-                      variant="outline"
-                      className={student.is_active ? "border-green-600 text-green-700" : "border-gray-400 text-gray-500"}
-                    >
-                      {student.is_active ? "Active" : "Inactive"}
-                    </Badge>
+                  <td className="px-3 py-3">
+                    <BookingStatusBadge status={student.is_active ? "active" : "inactive"} />
                   </td>
                 </tr>
               ))}

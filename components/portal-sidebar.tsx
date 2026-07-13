@@ -55,15 +55,17 @@ function SidebarNav({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3.5 py-2.5 transition-colors",
+              "flex items-center gap-3 rounded-lg px-3.5 py-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]",
               active ? "bg-[rgba(201,169,110,0.15)]" : "hover:bg-[rgba(201,169,110,0.06)]",
             )}
           >
-            <item.icon className={cn("h-[18px] w-[18px]", active ? "text-[#C9A96E]" : "text-[rgba(245,235,217,0.5)]")} />
+            <item.icon
+              className={cn("h-[18px] w-[18px]", active ? "text-[#C9A96E]" : "text-[rgba(245,235,217,0.75)]")}
+            />
             <span
               className={cn(
                 "flex-1 text-[13.5px]",
-                active ? "font-semibold text-[#C9A96E]" : "text-[rgba(245,235,217,0.65)]",
+                active ? "font-semibold text-[#C9A96E]" : "text-[rgba(245,235,217,0.9)]",
               )}
             >
               {item.label}
@@ -96,7 +98,11 @@ export function PortalSidebar({ user, profile, unreadCount = 0 }: PortalSidebarP
   const sidebarContent = (
     <>
       <div className="border-b border-[rgba(201,169,110,0.15)] px-5 pb-5">
-        <Link href="/portal" onClick={() => setMobileOpen(false)}>
+        <Link
+          href="/portal"
+          onClick={() => setMobileOpen(false)}
+          className="inline-block rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]"
+        >
           <Image
             src="/aba-logo-cropped.png"
             alt="ABA Music Academy"
@@ -107,7 +113,7 @@ export function PortalSidebar({ user, profile, unreadCount = 0 }: PortalSidebarP
         </Link>
       </div>
 
-      <div className="pointer-events-none relative px-5">
+      <div aria-hidden className="pointer-events-none relative px-5">
         <div className="absolute top-3 right-5 left-5">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="mb-[7px] h-px bg-[rgba(245,235,217,0.04)]" />
@@ -129,12 +135,12 @@ export function PortalSidebar({ user, profile, unreadCount = 0 }: PortalSidebarP
           />
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-semibold text-[#F5EBD9]">{displayName}</p>
-            <p className="text-[10.5px] text-[rgba(245,235,217,0.35)]">Student</p>
+            <p className="text-[10.5px] text-[rgba(245,235,217,0.7)]">Student</p>
           </div>
           <button
             type="button"
             onClick={handleSignOut}
-            className="rounded-md p-1.5 text-[rgba(245,235,217,0.25)] transition-colors hover:bg-[rgba(201,169,110,0.08)] hover:text-[rgba(245,235,217,0.6)]"
+            className="rounded-md p-1.5 text-[rgba(245,235,217,0.25)] transition-colors hover:bg-[rgba(201,169,110,0.08)] hover:text-[rgba(245,235,217,0.6)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]"
             aria-label="Sign out"
           >
             <LogOut className="h-4 w-4" />
@@ -148,7 +154,7 @@ export function PortalSidebar({ user, profile, unreadCount = 0 }: PortalSidebarP
     <>
       <button
         type="button"
-        className="fixed top-4 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-lg bg-[#3B2518] text-[#F5EBD9] shadow-lg lg:hidden"
+        className="fixed top-4 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-lg bg-[#3B2518] text-[#F5EBD9] shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34] lg:hidden"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
       >
@@ -158,7 +164,7 @@ export function PortalSidebar({ user, profile, unreadCount = 0 }: PortalSidebarP
       {mobileOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--gold)] lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close menu overlay"
         />
@@ -173,7 +179,7 @@ export function PortalSidebar({ user, profile, unreadCount = 0 }: PortalSidebarP
       >
         <button
           type="button"
-          className="absolute top-4 right-4 rounded-md p-1 text-[rgba(245,235,217,0.5)] lg:hidden"
+          className="absolute top-4 right-4 rounded-md p-1 text-[rgba(245,235,217,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)] lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close menu"
         >

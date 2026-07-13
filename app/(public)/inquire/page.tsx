@@ -4,8 +4,9 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { PageHeader } from "@/components/public/page-header"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -105,15 +106,12 @@ export default function InquirePage() {
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="font-serif text-4xl font-bold">Inquire About Lessons</h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Fill out the form below and we&apos;ll help you find the perfect lesson time.
-          </p>
-        </div>
+        <PageHeader
+          title="Inquire About Lessons"
+          lede="Fill out the form below and we'll help you find the perfect lesson time."
+        />
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-2">
+        <div className="mt-16 grid gap-12 lg:grid-cols-2">
           {/* Availability Calendar */}
           <div>
             <h2 className="mb-4 font-serif text-xl font-semibold">Available Times</h2>
@@ -132,7 +130,7 @@ export default function InquirePage() {
           {/* Inquiry Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Student Information</CardTitle>
+              <h2 className="font-semibold leading-none">Student Information</h2>
               <CardDescription>Tell us about the prospective student.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -140,17 +138,24 @@ export default function InquirePage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Student Name *</Label>
-                    <Input id="name" name="name" required placeholder="Full name" />
+                    <Input id="name" name="name" required autoComplete="name" placeholder="Full name" />
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email *</Label>
-                      <Input id="email" name="email" type="email" required placeholder="you@example.com" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone</Label>
-                      <Input id="phone" name="phone" type="tel" placeholder="818-836-2322" />
+                      <Input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="(818) 555-0123" />
                     </div>
                   </div>
 
@@ -249,7 +254,11 @@ export default function InquirePage() {
                   </div>
                 </div>
 
-                {error && <p className="text-sm text-destructive">{error}</p>}
+                {error && (
+                  <p role="alert" aria-live="polite" className="text-sm text-destructive">
+                    {error}
+                  </p>
+                )}
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (

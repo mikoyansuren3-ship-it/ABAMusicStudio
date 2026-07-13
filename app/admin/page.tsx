@@ -6,6 +6,8 @@ import Link from "next/link"
 import { Calendar, CreditCard, UserPlus, Users, Clock, ArrowRight } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
+import { BookingStatusBadge } from "@/components/status-badge"
+import { formatCurrency, formatShortDate } from "@/lib/portal/format"
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -94,8 +96,8 @@ export default async function AdminDashboard() {
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className={`text-3xl font-bold ${totalUnpaid > 0 ? "text-destructive" : ""}`}>
-                ${(totalUnpaid / 100).toFixed(2)}
+              <p className={`text-3xl font-bold ${totalUnpaid > 0 ? "text-accent" : ""}`}>
+                {formatCurrency(totalUnpaid)}
               </p>
               <p className="text-sm text-muted-foreground">{unpaidInvoices?.length || 0} invoices</p>
             </CardContent>
@@ -146,7 +148,7 @@ export default async function AdminDashboard() {
                           </p>
                         </div>
                       </div>
-                      <Badge variant={booking.status === "confirmed" ? "default" : "secondary"}>{booking.status}</Badge>
+                      <BookingStatusBadge status={booking.status} />
                     </div>
                   ))}
                 </div>
@@ -179,7 +181,7 @@ export default async function AdminDashboard() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{inquiry.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        Requested: {new Date(inquiry.created_at).toLocaleDateString()}
+                        Requested: {formatShortDate(inquiry.created_at)}
                       </p>
                     </div>
                   ))}

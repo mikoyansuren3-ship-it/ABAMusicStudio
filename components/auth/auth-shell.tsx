@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 import { AuthWoodCard } from "@/components/auth/auth-wood-card"
 import { LoginWoodBackground } from "@/components/auth/login-wood-background"
@@ -25,9 +26,10 @@ export function AuthShell({
         <Link
           href="/"
           prefetch={false}
-          className="border-b border-[rgba(245,235,217,0.15)] pb-px text-xs text-[rgba(245,235,217,0.35)] transition-colors hover:text-[rgba(245,235,217,0.6)]"
+          className="inline-flex items-center gap-1 rounded-sm border-b border-cream/15 pb-px text-xs text-cream/75 transition-colors hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
         >
-          ← Back to home
+          <ArrowLeft aria-hidden="true" className="size-3.5" />
+          Back to home
         </Link>
       </div>
     </LoginWoodBackground>

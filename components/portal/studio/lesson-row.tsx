@@ -25,7 +25,6 @@ export function LessonRow({
   faded,
 }: LessonRowProps) {
   const start = new Date(booking.start_time)
-  const end = new Date(booking.end_time)
   const weekday = start.toLocaleDateString("en-US", { weekday: "long" })
 
   return (
@@ -55,7 +54,7 @@ export function LessonRow({
       <div className="flex shrink-0 items-center gap-2">
         <PortalStatusBadge status={booking.status} />
         {showActions && canModify && booking.status === "confirmed" ? (
-          <div className="flex flex-wrap gap-1 max-lg:flex lg:hidden lg:group-hover:flex">
+          <div className="flex flex-wrap gap-1 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100">
             <PortalButton variant="ghost" className="px-2.5 py-1.5" onClick={onReschedule}>
               <RefreshCw className="h-3 w-3" />
               Reschedule

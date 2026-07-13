@@ -77,7 +77,7 @@ export function NotificationsView({ notifications, userId }: NotificationsViewPr
                       <p className="ml-3.5 text-[13px] leading-relaxed whitespace-pre-wrap text-[#8B7355]">
                         {notification.body}
                       </p>
-                      <span className="mt-1.5 ml-3.5 block text-[11px] text-[#B8A89A]">
+                      <span className="mt-1.5 ml-3.5 block text-[11px] text-[#7d6b58]">
                         {new Date(notification.created_at).toLocaleDateString("en-US", {
                           weekday: "short",
                           month: "short",
@@ -87,7 +87,7 @@ export function NotificationsView({ notifications, userId }: NotificationsViewPr
                     </div>
                     <PortalButton
                       variant="ghost"
-                      className="hidden shrink-0 px-2.5 py-1 group-hover:inline-flex"
+                      className="shrink-0 px-2.5 py-1 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100"
                       onClick={() => handleMarkAsRead(notification.id)}
                       disabled={loadingId === notification.id}
                     >
@@ -118,7 +118,7 @@ export function NotificationsView({ notifications, userId }: NotificationsViewPr
                 >
                   <div className="mb-1 flex items-center justify-between gap-2">
                     <span className="text-[13px] font-semibold text-[#2b1b14]">{notification.title}</span>
-                    <span className="text-[11px] text-[#B8A89A]">
+                    <span className="text-[11px] text-[#7d6b58]">
                       {new Date(notification.created_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",

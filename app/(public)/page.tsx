@@ -1,6 +1,8 @@
+import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { CtaSection } from "@/components/public/cta-section"
 import { Music, Calendar, CreditCard, Users, Star, Clock } from "lucide-react"
 
 export default function HomePage() {
@@ -33,7 +35,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-bold">Why Choose ABA Music Academy?</h2>
@@ -43,7 +45,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-16 grid gap-8 md:grid-cols-3">
-            <Card className="border-0 bg-muted/30">
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                   <Users className="h-6 w-6 text-accent" />
@@ -56,7 +58,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-muted/30">
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                   <Calendar className="h-6 w-6 text-accent" />
@@ -68,7 +70,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-muted/30">
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                   <CreditCard className="h-6 w-6 text-accent" />
@@ -84,7 +86,7 @@ export default function HomePage() {
       </section>
 
       {/* Lessons Overview */}
-      <section className="bg-muted/30 py-20">
+      <section className="bg-muted/30 py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-12 md:grid-cols-2">
             <div>
@@ -99,7 +101,7 @@ export default function HomePage() {
                     <Star className="h-4 w-4 text-accent" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Beginner Lessons</h4>
+                    <h3 className="font-medium">Beginner Lessons</h3>
                     <p className="text-sm text-muted-foreground">
                       Build a strong foundation with proper technique and music reading skills.
                     </p>
@@ -111,7 +113,7 @@ export default function HomePage() {
                     <Music className="h-4 w-4 text-accent" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Intermediate Lessons</h4>
+                    <h3 className="font-medium">Intermediate Lessons</h3>
                     <p className="text-sm text-muted-foreground">
                       Expand your repertoire and develop expression and musicality.
                     </p>
@@ -123,7 +125,7 @@ export default function HomePage() {
                     <Clock className="h-4 w-4 text-accent" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Advanced Lessons</h4>
+                    <h3 className="font-medium">Advanced Lessons</h3>
                     <p className="text-sm text-muted-foreground">
                       Refine artistry and prepare for performances, competitions, or auditions.
                     </p>
@@ -137,8 +139,14 @@ export default function HomePage() {
             </div>
 
             <div className="relative">
-              <div className="aspect-[4/3] overflow-hidden rounded-lg bg-muted">
-                <img src="/elegant-grand-piano-in-warm-studio-lighting.jpg" alt="Piano studio" className="h-full w-full object-cover" />
+              <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+                <Image
+                  src="/elegant-grand-piano-in-warm-studio-lighting.jpg"
+                  alt="A grand piano in the warm lighting of the ABA Music Academy studio"
+                  width={1200}
+                  height={900}
+                  className="h-full w-full object-cover"
+                />
               </div>
             </div>
           </div>
@@ -146,17 +154,15 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
+      <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl rounded-2xl bg-primary p-8 text-center text-primary-foreground md:p-12">
-            <h2 className="font-serif text-2xl font-bold md:text-3xl">Ready to Start?</h2>
-            <p className="mt-4 text-primary-foreground/80">
-              Schedule a trial lesson to see if we&apos;re the right fit for you.
-            </p>
-            <Button size="lg" variant="secondary" className="mt-8" asChild>
-              <Link href="/inquire">Book a Trial Lesson</Link>
-            </Button>
-          </div>
+          <CtaSection
+            variant="panel"
+            title="Ready to Start?"
+            body="Schedule a trial lesson to see if we're the right fit for you."
+            buttonLabel="Book a Trial Lesson"
+            href="/inquire"
+          />
         </div>
       </section>
     </>

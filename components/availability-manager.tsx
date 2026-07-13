@@ -189,7 +189,7 @@ export function AvailabilityManager({ availability, exceptions }: AvailabilityMa
                           onChange={(e) => handleUpdateTime(slot.id, "end_time", e.target.value)}
                           className="w-32"
                         />
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(slot.id)}>
+                        <Button variant="ghost" size="icon" aria-label="Delete time slot" onClick={() => handleDelete(slot.id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -282,7 +282,7 @@ export function AvailabilityManager({ availability, exceptions }: AvailabilityMa
                       {exception.reason && ` • ${exception.reason}`}
                     </p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteException(exception.id)}>
+                  <Button variant="ghost" size="icon" aria-label="Delete exception" onClick={() => handleDeleteException(exception.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>

@@ -5,6 +5,7 @@ import styles from "@/components/public-footer.module.css"
 
 const QUICK_LINKS = [
   { label: "About", href: "/about" },
+  { label: "Faculty", href: "/faculty" },
   { label: "Lessons & Pricing", href: "/lessons" },
   { label: "Services", href: "/services" },
   { label: "Policies", href: "/policies" },
@@ -30,15 +31,15 @@ export function PublicFooter() {
       <div className={styles.vignette} />
       <PublicFooterCurves intensity={80} />
 
-      <div className={styles.inner}>
+      <div className={`${styles.inner} container mx-auto px-4`}>
         <div className={styles.grid}>
           <div className={styles.brand}>
-            <Link href="/" className="inline-block">
+            <Link href="/" className={styles.brandLink}>
               <Image
                 src="/aba-logo-cropped.png"
                 alt="ABA Music Academy"
-                width={88}
-                height={88}
+                width={512}
+                height={512}
                 className={styles.logo}
               />
             </Link>
@@ -48,7 +49,7 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <h4 className={styles.heading}>Quick Links</h4>
+            <h3 className={styles.heading}>Quick Links</h3>
             <nav className={styles.linkList} aria-label="Quick links">
               {QUICK_LINKS.map((item) => (
                 <Link key={item.href} href={item.href} className={styles.link}>
@@ -59,7 +60,7 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <h4 className={styles.heading}>Students</h4>
+            <h3 className={styles.heading}>Students</h3>
             <nav className={styles.linkList} aria-label="Student links">
               {STUDENT_LINKS.map((item) => (
                 <Link key={item.href} href={item.href} className={styles.link}>
@@ -70,7 +71,7 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <h4 className={styles.heading}>Contact</h4>
+            <h3 className={styles.heading}>Contact</h3>
             <div className={styles.contactBlock}>
               <div>
                 <span className={styles.contactLabel}>Email</span>
@@ -91,15 +92,13 @@ export function PublicFooter() {
             </div>
           </div>
         </div>
-      </div>
 
-      <div className={styles.dividerWrap}>
         <div className={styles.divider} />
-      </div>
 
-      <div className={styles.bottom}>
-        <p>&copy; {year} ABA Music Academy. All rights reserved.</p>
-        <p className={styles.taglineBottom}>Where talent meets tradition</p>
+        <div className={styles.bottom}>
+          <p>&copy; {year} ABA Music Academy. All rights reserved.</p>
+          <p className={styles.taglineBottom}>Where talent meets tradition</p>
+        </div>
       </div>
     </footer>
   )

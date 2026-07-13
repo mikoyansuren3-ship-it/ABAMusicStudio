@@ -10,7 +10,7 @@ import {
   PortalPageHeader,
   SectionDivider,
 } from "@/components/portal/studio/portal-ui"
-import { formatCurrency, formatTime } from "@/lib/portal/format"
+import { formatCurrency, formatLongDate, formatShortDate, formatTime } from "@/lib/portal/format"
 
 export default async function PortalDashboard() {
   const supabase = await createClient()
@@ -55,11 +55,7 @@ export default async function PortalDashboard() {
   const nextLesson = bookings?.[0]
   const unpaidBalance = invoices?.reduce((sum, inv) => sum + inv.amount, 0) || 0
   const unreadCount = notifications?.length || 0
-  const today = new Date().toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  })
+  const today = formatLongDate(new Date().toISOString())
 
   return (
     <div className="flex min-h-full flex-col">
@@ -76,23 +72,23 @@ export default async function PortalDashboard() {
       <PortalPageBody>
         <div className="relative mb-6 grid gap-4 md:grid-cols-3">
           {nextLesson ? (
-            <Link href="/portal/schedule" className="block">
+            <Link
+              href="/portal/schedule"
+              className="block rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34]"
+            >
               <PortalCard
                 hover
                 className="relative overflow-hidden border-0 bg-[repeating-linear-gradient(176deg,transparent,transparent_6px,rgba(0,0,0,0.025)_6px,rgba(0,0,0,0.025)_7px),linear-gradient(135deg,#4E3828,#3B2518)] p-6 text-[#F5EBD9]"
               >
-                <span className="pointer-events-none absolute top-1.5 right-3.5 font-[family-name:var(--font-noto-music)] text-[90px] leading-none opacity-[0.06]">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1.5 right-3.5 font-[family-name:var(--font-noto-music)] text-[90px] leading-none opacity-[0.06]"
+                >
                   {"\u{1D11E}"}
                 </span>
                 <div className="relative z-1">
                   <p className="text-[11px] font-semibold tracking-[0.08em] uppercase opacity-55">Next Lesson</p>
-                  <p className="mt-3 font-serif text-[28px] font-bold">
-                    {new Date(nextLesson.start_time).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </p>
+                  <p className="mt-3 font-serif text-[28px] font-bold">{formatShortDate(nextLesson.start_time)}</p>
                   <p className="mt-1 text-sm opacity-65">
                     {formatTime(nextLesson.start_time)} ·{" "}
                     {Math.round(
@@ -111,7 +107,10 @@ export default async function PortalDashboard() {
             </PortalCard>
           )}
 
-          <Link href="/portal/payments" className="block">
+          <Link
+            href="/portal/payments"
+            className="block rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34]"
+          >
             <PortalCard hover className="p-6">
               <p className="text-[11px] font-semibold tracking-[0.08em] text-[#8B7355] uppercase">Balance Due</p>
               <p
@@ -125,14 +124,17 @@ export default async function PortalDashboard() {
             </PortalCard>
           </Link>
 
-          <Link href="/portal/notifications" className="block">
+          <Link
+            href="/portal/notifications"
+            className="block rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5E34]"
+          >
             <PortalCard hover className="p-6">
               <p className="text-[11px] font-semibold tracking-[0.08em] text-[#8B7355] uppercase">Notifications</p>
               <div className="mt-3 flex items-baseline gap-2">
                 <span className="font-serif text-[28px] font-bold text-[#2b1b14]">{unreadCount}</span>
                 <span className="text-sm text-[#8B7355]">unread</span>
               </div>
-              <p className="mt-1 text-sm font-medium text-[#C9A96E]">View all →</p>
+              <p className="mt-1 text-sm font-medium text-[#8a6b3c]">View all →</p>
             </PortalCard>
           </Link>
         </div>
@@ -168,11 +170,8 @@ export default async function PortalDashboard() {
                     <div className="mb-1.5 flex items-center gap-2">
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#C9A96E]" />
                       <span className="text-[13.5px] font-semibold text-[#2b1b14]">{notification.title}</span>
-                      <span className="ml-auto text-[11px] text-[#B8A89A]">
-                        {new Date(notification.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
+                      <span className="ml-auto text-[11px] text-[#7d6b58]">
+                        {formatShortDate(notification.created_at)}
                       </span>
                     </div>
                     <p className="ml-3.5 text-xs leading-relaxed text-[#8B7355] line-clamp-2">{notification.body}</p>

@@ -23,6 +23,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Bell, Plus, Loader2, Trash2 } from "lucide-react"
 import type { Notification, Student, Profile } from "@/lib/types"
 import { createNotification, deleteNotification } from "@/app/admin/notifications/actions"
+import { formatDateTime } from "@/lib/portal/format"
 import { useRouter } from "next/navigation"
 
 interface AdminNotificationsViewProps {
@@ -172,12 +173,13 @@ export function AdminNotificationsView({ notifications, students }: AdminNotific
                       </div>
                       <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">{notification.body}</p>
                       <p className="mt-2 text-xs text-muted-foreground">
-                        Sent: {new Date(notification.created_at).toLocaleString()}
+                        Sent: {formatDateTime(notification.created_at)}
                       </p>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Delete notification"
                       onClick={() => handleDelete(notification.id)}
                       disabled={isLoading}
                     >

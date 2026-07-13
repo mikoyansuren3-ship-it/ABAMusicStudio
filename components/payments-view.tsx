@@ -1,9 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Check } from "lucide-react"
 import type { Invoice } from "@/lib/types"
-import { formatCurrency } from "@/lib/portal/format"
+import { formatCurrency, formatMediumDate } from "@/lib/portal/format"
 import {
   PortalButton,
   PortalCard,
@@ -89,14 +88,7 @@ export function PaymentsView({ invoices, studentId }: PaymentsViewProps) {
                   <div>
                     <p className="text-sm font-semibold text-[#2b1b14]">{inv.description || "Invoice"}</p>
                     <p className="mt-1 text-xs text-[#8B7355]">
-                      Due:{" "}
-                      {inv.due_date
-                        ? new Date(inv.due_date).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                        : "—"}
+                      Due: {inv.due_date ? formatMediumDate(inv.due_date) : "—"}
                     </p>
                   </div>
                   <div className="flex items-center gap-3.5">
@@ -122,20 +114,9 @@ export function PaymentsView({ invoices, studentId }: PaymentsViewProps) {
               >
                 <div>
                   <p className="text-[13px] font-semibold text-[#2b1b14]">{inv.description || "Invoice"}</p>
-                  <p className="mt-0.5 text-[11.5px] text-[#B8A89A]">
-                    Created{" "}
-                    {new Date(inv.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                    {inv.paid_at
-                      ? ` · Paid ${new Date(inv.paid_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}`
-                      : ""}
+                  <p className="mt-0.5 text-[11.5px] text-[#7d6b58]">
+                    Created {formatMediumDate(inv.created_at)}
+                    {inv.paid_at ? ` · Paid ${formatMediumDate(inv.paid_at)}` : ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

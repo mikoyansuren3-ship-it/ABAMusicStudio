@@ -42,7 +42,7 @@ function StudioField({
 }
 
 const fieldClass =
-  "w-full rounded-lg border-[1.5px] border-[rgba(78,52,37,0.08)] bg-white px-3.5 py-2.5 text-sm text-[#2b1b14] outline-none transition-colors focus:border-[#C9A96E] disabled:bg-[rgba(78,52,37,0.03)] disabled:text-[#B8A89A]"
+  "w-full rounded-lg border-[1.5px] border-[rgba(78,52,37,0.08)] bg-white px-3.5 py-2.5 text-sm text-[#2b1b14] outline-none transition-colors focus:border-[#C9A96E] focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60 disabled:bg-[rgba(78,52,37,0.03)] disabled:text-[#7d6b58]"
 
 export function ProfileForm({ user, profile, student }: ProfileFormProps) {
   const router = useRouter()
@@ -77,7 +77,7 @@ export function ProfileForm({ user, profile, student }: ProfileFormProps) {
         <PortalCard className="mb-6 p-7">
           <ProfileAvatarUpload user={user} profile={profile} />
           <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-[rgba(78,52,37,0.06)] pt-4 sm:justify-start">
-            <span className="rounded-full bg-[rgba(201,169,110,0.1)] px-3 py-0.5 text-[11px] font-semibold text-[#C9A96E]">
+            <span className="rounded-full bg-[rgba(201,169,110,0.1)] px-3 py-0.5 text-[11px] font-semibold text-[#8a6b3c]">
               {experienceLabel(student?.experience_level)}
             </span>
             <span className="rounded-full bg-[rgba(59,37,24,0.06)] px-3 py-0.5 text-[11px] font-semibold text-[#8B7355]">

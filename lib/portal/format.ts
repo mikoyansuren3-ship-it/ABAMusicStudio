@@ -11,6 +11,15 @@ export function formatShortDate(iso: string) {
   })
 }
 
+/** e.g. "Jul 12, 2026" — short date that keeps the year. */
+export function formatMediumDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
 export function formatLongDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     weekday: "long",
@@ -24,6 +33,11 @@ export function formatTime(iso: string) {
     hour: "numeric",
     minute: "2-digit",
   })
+}
+
+/** e.g. "Sat, Jul 12, 3:30 PM" */
+export function formatDateTime(iso: string) {
+  return `${formatShortDate(iso)}, ${formatTime(iso)}`
 }
 
 export function formatMonthDay(iso: string) {
