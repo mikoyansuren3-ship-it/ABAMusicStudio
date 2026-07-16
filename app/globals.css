@@ -52,6 +52,13 @@
   --wood-card-muted: #6b5344;
   --wood-btn: #5e4e3c;
   --wood-btn-hover: #4a3d30;
+
+  /* Decorative pink shades — awards-section vines only (echoes the logo pink).
+     Not for general UI; see design-system/MASTER.md §1. Ordered light → deep. */
+  --vine-pink-1: #f7cfdd;
+  --vine-pink-2: #e8a2bf;
+  --vine-pink-3: #d47a9f;
+  --vine-pink-4: #b65c82;
 }
 
 .dark {

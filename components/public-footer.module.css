@@ -151,6 +151,33 @@ a.contactValue:focus-visible {
   color: var(--gold-strong);
 }
 
+.social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 0.25rem 0;
+  color: rgba(245, 235, 217, 0.82);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.social:hover {
+  color: var(--gold-strong);
+}
+
+.social:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+  color: var(--gold-strong);
+}
+
+.socialIcon {
+  flex-shrink: 0;
+}
+
 .divider {
   margin-top: 2.5rem;
   height: 1px;

@@ -17,7 +17,9 @@ Enforced automatically by `npm run qc:design` (see “Quality gates” below).
 
 Rules:
 - Gold lives only on stage surfaces; terracotta only on parchment surfaces.
-- Pink appears **only inside the logo asset** — never as a UI color.
+- Pink appears **only inside the logo asset** and the decorative awards-section
+  vines (`--vine-pink-1..4`, see `components/public/piano-note-vine.tsx`) —
+  never as a general UI color (text, buttons, borders, states, icons).
 - The 7 services subject themes supply `--svc-accent` (AA on cream) + `--svc-tint`
   per subject, defined in `app/globals.css`. Cards otherwise share `bg-card`.
 - Status semantics: money due / attention = `text-accent`; overdue / errors /
