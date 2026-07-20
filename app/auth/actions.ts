@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { REMEMBER_EMAIL_COOKIE, rememberEmailCookieOptions } from "@/lib/supabase/auth-cookies"
 import { type AuthRole, roleDestinations, roleLabels } from "@/lib/auth/roles"
+import { isOwnerEmail, promoteOwnerIfNeeded } from "@/lib/auth/owner"
 import { headers } from "next/headers"
 
 export interface AuthActionState {
@@ -15,30 +16,11 @@ export interface AuthActionState {
   message?: string
 }
 
-const defaultOwnerAdminEmail = "arpine@abamusicacademy.org"
 const defaultTeacherSignupCode = "#1024"
 
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key)
   return typeof value === "string" ? value.trim() : ""
-}
-
-function getOwnerAdminEmail() {
-  return defaultOwnerAdminEmail
-}
-
-async function promoteOwnerIfNeeded(userId: string, email?: string | null) {
-  const ownerEmail = getOwnerAdminEmail()
-  if (!ownerEmail || email?.toLowerCase() !== ownerEmail) {
-    return
-  }
-
-  const admin = createAdminClient()
-  const { error } = await admin.from("profiles").upsert({ id: userId, role: "admin" }, { onConflict: "id" })
-
-  if (error) {
-    throw new Error(`Unable to promote owner account: ${error.message}`)
-  }
 }
 
 async function getSiteOrigin() {
@@ -82,8 +64,7 @@ export async function loginWithRole(
   }
 
   let actualRole = profile?.role || "student"
-  const ownerEmail = getOwnerAdminEmail()
-  const isOwner = Boolean(ownerEmail && data.user.email?.toLowerCase() === ownerEmail)
+  const isOwner = isOwnerEmail(data.user.email)
 
   if (expectedRole === "admin" && isOwner && actualRole !== "admin") {
     try {

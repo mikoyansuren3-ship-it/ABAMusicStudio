@@ -15,6 +15,7 @@ import styles from "./public-header.module.css"
 const navLinks = [
   { href: "/about", label: "About" },
   { href: "/faculty", label: "Faculty" },
+  { href: "/awards", label: "Awards" },
   { href: "/lessons", label: "Lessons & Pricing" },
   { href: "/services", label: "Services" },
   { href: "/policies", label: "Policies" },

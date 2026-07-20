@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/public/cta-section"
+import { AwardsSection } from "@/components/public/awards-section"
 import { Music, Calendar, CreditCard, Users, Star, Clock } from "lucide-react"
 
 export default function HomePage() {
@@ -152,6 +153,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Awards teaser band */}
+      <AwardsSection
+        limit={3}
+        viewAllHref="/awards"
+        lede="A selection of the competition results, festival honors, and distinctions earned by our students and faculty."
+      />
 
       {/* CTA Section */}
       <section className="py-16 md:py-24">

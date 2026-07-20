@@ -4,6 +4,7 @@ import type React from "react"
 
 import { createClient } from "@/lib/supabase/client"
 import { AuthShell } from "@/components/auth/auth-shell"
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -160,6 +161,7 @@ export default function SignUpPage() {
               >
                 {isLoading ? "Creating account..." : "Create Account"}
               </Button>
+              <GoogleSignInButton role="student" />
             </div>
             <div className="mt-6 text-center text-sm">
               <span className="text-wood-card-muted">Already have an account? </span>

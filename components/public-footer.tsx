@@ -6,6 +6,7 @@ import styles from "@/components/public-footer.module.css"
 const QUICK_LINKS = [
   { label: "About", href: "/about" },
   { label: "Faculty", href: "/faculty" },
+  { label: "Awards", href: "/awards" },
   { label: "Lessons & Pricing", href: "/lessons" },
   { label: "Services", href: "/services" },
   { label: "Policies", href: "/policies" },
@@ -21,6 +22,11 @@ const CONTACT = {
   email: "arpine@abamusicacademy.org",
   phone: "818-836-2322",
   phoneHref: "tel:+18188362322",
+} as const
+
+const INSTAGRAM = {
+  handle: "@aba_music_academy",
+  href: "https://www.instagram.com/aba_music_academy",
 } as const
 
 export function PublicFooter() {
@@ -86,6 +92,36 @@ export function PublicFooter() {
                 <p>
                   <a href={CONTACT.phoneHref} className={styles.contactValue}>
                     {CONTACT.phone}
+                  </a>
+                </p>
+              </div>
+              <div>
+                <span className={styles.contactLabel}>Follow</span>
+                <p>
+                  <a
+                    href={INSTAGRAM.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.social}
+                    aria-label={`ABA Music Academy on Instagram (${INSTAGRAM.handle})`}
+                  >
+                    <svg
+                      className={styles.socialIcon}
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                      <circle cx="12" cy="12" r="4" />
+                      <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
+                    </svg>
+                    <span>{INSTAGRAM.handle}</span>
                   </a>
                 </p>
               </div>
