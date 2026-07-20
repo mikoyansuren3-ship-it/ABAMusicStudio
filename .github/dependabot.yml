@@ -1,0 +1,37 @@
+# Dependabot configuration — automated dependency maintenance.
+#
+# This file schedules routine version-update PRs. The *vulnerability scanning*
+# that the Plaid questionnaire (Q8) asks about — detecting and auto-patching
+# known-vulnerable packages — is turned on separately in the repo settings:
+#   Settings → Advanced Security → Dependabot alerts  (detect)
+#   Settings → Advanced Security → Dependabot security updates  (auto-fix PRs)
+# Both must be enabled for security fixes to open automatically.
+#
+# Note: Dependabot reads this file from the DEFAULT branch (main), so it only
+# takes effect once these changes are merged there.
+version: 2
+updates:
+  - package-ecosystem: "npm" # covers npm and pnpm lockfiles
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(dev-deps)"
+    # Bundle routine minor/patch bumps to cut PR noise; major bumps still come
+    # as individual PRs so they can be reviewed one at a time.
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"

@@ -7,6 +7,7 @@ import { AuthShell } from "@/components/auth/auth-shell"
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -21,8 +22,10 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [consent, setConsent] = useState(false)
   const errorId = "sign-up-error"
   const isPasswordError = error ? /password/i.test(error) : false
+  const isConsentError = error ? /privacy policy/i.test(error) : false
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,6 +41,11 @@ export default function SignUpPage() {
       return
     }
 
+    if (!consent) {
+      setError("Please agree to the Privacy Policy to create an account.")
+      return
+    }
+
     const supabase = createClient()
     setIsLoading(true)
 
@@ -50,6 +58,8 @@ export default function SignUpPage() {
           emailRedirectTo: `${origin}/auth/confirm?next=/portal/profile`,
           data: {
             full_name: fullName,
+            privacy_policy_accepted: true,
+            privacy_policy_accepted_at: new Date().toISOString(),
           },
         },
       })
@@ -148,6 +158,28 @@ export default function SignUpPage() {
                   aria-describedby={isPasswordError ? errorId : undefined}
                   className="border-wood-mid/15 bg-white/80"
                 />
+              </div>
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="consent"
+                  checked={consent}
+                  onCheckedChange={(value) => setConsent(value === true)}
+                  aria-invalid={isConsentError || undefined}
+                  aria-describedby={isConsentError ? errorId : undefined}
+                  className="mt-0.5 border-wood-mid/30 bg-white/80"
+                />
+                <Label htmlFor="consent" className="text-xs font-normal leading-relaxed text-wood-card-muted">
+                  I agree to the{" "}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-wood-card-fg underline underline-offset-4"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </Label>
               </div>
               {error && (
                 <p id={errorId} role="alert" aria-live="polite" className="text-sm text-destructive">

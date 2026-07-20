@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle, Loader2 } from "lucide-react"
+import Link from "next/link"
 import { submitInquiry } from "./actions"
 import { WeeklyAvailabilityCalendar } from "@/components/weekly-availability-calendar"
 import type { Availability, AvailabilityException, Booking } from "@/lib/types"
@@ -31,6 +32,7 @@ export default function InquirePage() {
   const [submitted, setSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [consent, setConsent] = useState(false)
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [availability, setAvailability] = useState<Availability[]>([])
   const [exceptions, setExceptions] = useState<AvailabilityException[]>([])
@@ -57,11 +59,18 @@ export default function InquirePage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setIsLoading(true)
     setError(null)
+
+    if (!consent) {
+      setError("Please agree to the Privacy Policy to submit your inquiry.")
+      return
+    }
+
+    setIsLoading(true)
 
     const formData = new FormData(e.currentTarget)
     formData.set("preferred_days", JSON.stringify(selectedDays))
+    formData.set("consent", "true")
 
     if (selectedSlot) {
       formData.set("requested_slot_start", selectedSlot.start.toISOString())
@@ -82,6 +91,8 @@ export default function InquirePage() {
   function toggleDay(day: string) {
     setSelectedDays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]))
   }
+
+  const isConsentError = error ? /privacy policy/i.test(error) : false
 
   if (submitted) {
     return (
@@ -254,6 +265,29 @@ export default function InquirePage() {
                   </div>
                 </div>
 
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="consent"
+                    checked={consent}
+                    onCheckedChange={(value) => setConsent(value === true)}
+                    aria-invalid={isConsentError || undefined}
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="consent" className="text-xs font-normal leading-relaxed text-muted-foreground">
+                    I agree to the{" "}
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent underline underline-offset-2 hover:opacity-80"
+                    >
+                      Privacy Policy
+                    </Link>{" "}
+                    and consent to ABA Music Academy collecting the information I provide to respond to my inquiry and
+                    contact me about lessons.
+                  </Label>
+                </div>
+
                 {error && (
                   <p role="alert" aria-live="polite" className="text-sm text-destructive">
                     {error}
@@ -270,10 +304,6 @@ export default function InquirePage() {
                     "Submit Inquiry"
                   )}
                 </Button>
-
-                <p className="text-center text-xs text-muted-foreground">
-                  By submitting this form, you agree to be contacted regarding lessons at ABA Music Academy.
-                </p>
               </form>
             </CardContent>
           </Card>
