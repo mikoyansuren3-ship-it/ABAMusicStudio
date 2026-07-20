@@ -5,6 +5,7 @@ import Link from "next/link"
 import { CheckCircle } from "lucide-react"
 import { loginWithRole, type AuthActionState } from "@/app/auth/actions"
 import { type AuthRole } from "@/lib/auth/roles"
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -113,6 +114,7 @@ export function RoleLoginForm({
           >
             {isPending ? "Signing in..." : "Sign In"}
           </Button>
+          <GoogleSignInButton role={role} />
           <Button
             asChild
             variant="outline"
