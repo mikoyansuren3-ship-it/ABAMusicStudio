@@ -2,6 +2,7 @@
   "name": "aba-music-academy",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@11.11.0",
   "scripts": {
     "build": "next build",
     "dev": "next dev",
