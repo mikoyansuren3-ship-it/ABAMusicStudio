@@ -3,6 +3,10 @@
 # dependencies
 /node_modules
 
+# lockfiles from other package managers (this project standardizes on npm)
+pnpm-lock.yaml
+yarn.lock
+
 # next.js
 /.next/
 /out/
