@@ -10,9 +10,7 @@ import {
 } from "@/lib/portal/avatar"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-
-/** Word the user must type to confirm irreversible account deletion. */
-export const DELETE_CONFIRM_WORD = "DELETE"
+import { DELETE_CONFIRM_WORD } from "./constants"
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient()

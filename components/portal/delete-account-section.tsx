@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import { PortalButton, PortalCard, SectionDivider } from "@/components/portal/studio/portal-ui"
-import { deleteMyAccount, DELETE_CONFIRM_WORD } from "@/app/portal/profile/actions"
+import { deleteMyAccount } from "@/app/portal/profile/actions"
+import { DELETE_CONFIRM_WORD } from "@/app/portal/profile/constants"
 
 export function DeleteAccountSection() {
   const [open, setOpen] = useState(false)
