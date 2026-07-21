@@ -37,9 +37,9 @@ This policy defines how long ABA Music Academy retains personal information, whe
 ## 4. Deletion procedures
 
 ### 4.1 User- or parent-requested deletion
-- Requests go to **[FILL-IN: privacy@abamusicacademy.org]**. We verify the requester's identity/authority (a parent/guardian may request deletion of their child's data).
-- We delete the associated `profiles` row; because student, booking, and payment records are linked by foreign keys with `ON DELETE CASCADE`, dependent personal records are removed automatically, except records subject to a legal-retention requirement (Section 3).
-- We complete verified deletion requests within **[FILL-IN: e.g., 30 days]**.
+- **Self-service:** signed-in members can delete their own account and data from the member portal (Profile → Danger Zone → Delete account). Being authenticated verifies identity; the action removes the account and, via `ON DELETE CASCADE`, the linked students, bookings, and invoices, plus the profile avatar and any inquiries submitted with the same email. Authoritative payment records remain with Stripe (Section 3). Implemented in `app/portal/profile/actions.ts::deleteMyAccount`.
+- **By request:** requests may also be sent to **[FILL-IN: privacy@abamusicacademy.org]**. We verify the requester's identity/authority (a parent/guardian may request deletion of their child's data) and complete verified requests within **[FILL-IN: e.g., 30 days]**.
+- Records subject to a legal-retention requirement (Section 3) are retained as noted there.
 
 ### 4.2 Account closure / inactivity
 - Inactive accounts are reviewed per the retention schedule and deleted or anonymized after the stated period.

@@ -16,6 +16,7 @@ import {
   PortalPageHeader,
   SectionDivider,
 } from "@/components/portal/studio/portal-ui"
+import { DeleteAccountSection } from "@/components/portal/delete-account-section"
 import { cn } from "@/lib/utils"
 
 interface ProfileFormProps {
@@ -173,6 +174,8 @@ export function ProfileForm({ user, profile, student }: ProfileFormProps) {
             ) : null}
           </div>
         </form>
+
+        <DeleteAccountSection />
       </PortalPageBody>
     </div>
   )
