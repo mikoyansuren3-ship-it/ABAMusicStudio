@@ -10,6 +10,7 @@ const QUICK_LINKS = [
   { label: "Lessons & Pricing", href: "/lessons" },
   { label: "Services", href: "/services" },
   { label: "Policies", href: "/policies" },
+  { label: "Privacy Policy", href: "/privacy" },
 ] as const
 
 const STUDENT_LINKS = [

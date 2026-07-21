@@ -22,6 +22,10 @@ export async function submitInquiry(formData: FormData) {
     return { error: "Name and email are required." }
   }
 
+  if (formData.get("consent") !== "true") {
+    return { error: "Please agree to the Privacy Policy to submit your inquiry." }
+  }
+
   if (requestedSlotStart && requestedSlotEnd) {
     const [availabilityRes, exceptionsRes, bookingsRes] = await Promise.all([
       supabase.from("availability").select("*").eq("is_active", true),
