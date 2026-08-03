@@ -62,3 +62,22 @@ Found while reviewing the notifications policies: the table has RLS enabled but 
 ## Recommended next step
 
 Fixes for **F1–F4** are written up as [`scripts/006_rls_hardening.sql`](../../scripts/006_rls_hardening.sql) — a pure-SQL, idempotent migration requiring no app-code changes. **Run it in the Supabase SQL editor**, then re-run the anon probe and the dashboard Security Advisor (Database → Advisors) to confirm a clean bill of health. Also run the authenticated cross-tenant test noted under Limitations before go-live.
+
+---
+
+## Remediation status — 2026-08-03
+
+All findings are **fixed in production**. Migrations applied via the Supabase MCP `apply_migration` (so they appear in the project's migration history) and verified against the live catalog afterward.
+
+| Finding | Fix | Status |
+|---------|-----|--------|
+| F1 notifications UPDATE over-permissive | `006` — authenticated UPDATE grant narrowed to `is_read_by` | ✅ applied + verified |
+| F2 bookings anon SELECT over-broad | `006` — anon SELECT grant narrowed to `start_time, end_time, status` (matches the two anon read sites) | ✅ applied + verified |
+| F3 `is_admin()` mutable search_path | `006` — `search_path = ''` pinned; advisor warning cleared | ✅ applied + verified |
+| F4 broadcasts readable logged-out | `006` — SELECT policy now requires `auth.uid() IS NOT NULL` | ✅ applied + verified (anon probe: 0 rows) |
+| F5 missing notifications DELETE policy | `007` — admin-only DELETE policy added | ✅ applied + verified |
+| **F6 (new)** anon could UPDATE notifications | `008` — found during rollout: the mark-as-read policy was created **without a `TO` clause**, so its `USING (true)` applied to *all* roles, and anon held the default all-column UPDATE grant — a logged-out visitor could issue a filter-less UPDATE rewriting any notification. `008` revokes anon's UPDATE grant and re-creates the policy `TO authenticated` | ✅ applied + verified (only remaining UPDATE grant: `authenticated → is_read_by`) |
+
+Security Advisor re-run after the migrations: the audit's findings are cleared. Three unrelated hygiene items remain open (tracked in [plaid-submission-checklist.md](plaid-submission-checklist.md) A1): `update_updated_at_column` mutable search_path, leaked-password protection disabled, and anon/authenticated `EXECUTE` on the `is_admin()`/`handle_new_user()` RPC endpoints.
+
+Still outstanding from the Limitations section: the **authenticated cross-tenant test** (two parent accounts confirming neither reads the other's students/invoices) — checklist step A6.
