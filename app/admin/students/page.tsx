@@ -6,10 +6,15 @@ import { StudentsManager } from "@/components/students-manager"
 export default async function StudentsPage() {
   const supabase = await createClient()
 
-  const { data: students } = await supabase
+  const { data: studentsData } = await supabase
     .from("students")
-    .select("*, profile:profiles(*)")
+    .select("*, profile:profiles(*), billing:student_billing(*)")
     .order("created_at", { ascending: false })
+
+  const students = (studentsData || []).map((s) => ({
+    ...s,
+    billing: Array.isArray(s.billing) ? (s.billing[0] ?? null) : (s.billing ?? null),
+  }))
 
   return (
     <>
@@ -22,7 +27,7 @@ export default async function StudentsPage() {
       </header>
 
       <div className="p-6">
-        <StudentsManager students={students || []} />
+        <StudentsManager students={students} />
       </div>
     </>
   )

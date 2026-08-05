@@ -21,16 +21,18 @@ export interface TeacherAvailability {
 
 export interface Student {
   id: string
-  parent_id: string
+  parent_id: string | null
   name: string
   experience_level: "beginner" | "intermediate" | "advanced" | null
   preferred_lesson_duration: 30 | 45 | 60
+  contact_name: string | null
+  contact_phone: string | null
   notes: string | null
   is_active: boolean
   created_at: string
   updated_at: string
-  profile?: Profile
-  profiles?: Profile
+  profile?: Profile | null
+  profiles?: Profile | null
 }
 
 export interface Availability {
@@ -61,10 +63,23 @@ export interface Booking {
   status: "pending" | "confirmed" | "cancelled" | "completed"
   is_recurring: boolean
   recurring_day_of_week: number | null
+  attendance: "on_time" | "missed" | null
+  attendance_marked_at: string | null
+  made_up_on: string | null
   notes: string | null
   created_at: string
   updated_at: string
   student?: Student
+}
+
+export interface StudentBilling {
+  student_id: string
+  rate_cents: number
+  day_of_week: number | null
+  lesson_time: string | null
+  duration_minutes: 30 | 45 | 60
+  created_at: string
+  updated_at: string
 }
 
 export interface Inquiry {

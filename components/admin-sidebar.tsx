@@ -23,6 +23,7 @@ import {
   Calendar,
   Users,
   CreditCard,
+  DollarSign,
   Bell,
   Clock,
   UserPlus,
@@ -43,6 +44,7 @@ const menuItems = [
   { href: "/admin/inquiries", label: "Inquiries", icon: UserPlus },
   { href: "/admin/students", label: "Students", icon: Users },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
+  { href: "/admin/ledger", label: "Income", icon: DollarSign },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ]
 

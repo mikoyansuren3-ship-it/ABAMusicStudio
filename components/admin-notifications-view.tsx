@@ -38,6 +38,11 @@ export function AdminNotificationsView({ notifications, students }: AdminNotific
   const [audience, setAudience] = useState<"all" | "selected">("all")
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
 
+  // Notifications go to parent portal accounts; manually added students have none.
+  const notifiableStudents = students.filter(
+    (s): s is Student & { profile: Profile; parent_id: string } => s.parent_id !== null,
+  )
+
   async function handleAddNotification(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
@@ -114,7 +119,7 @@ export function AdminNotificationsView({ notifications, students }: AdminNotific
                   <div className="space-y-2">
                     <Label>Select Students</Label>
                     <div className="max-h-48 space-y-2 overflow-auto rounded-lg border p-3">
-                      {students.map((student) => (
+                      {notifiableStudents.map((student) => (
                         <div key={student.id} className="flex items-center space-x-2">
                           <Checkbox
                             id={student.parent_id}
