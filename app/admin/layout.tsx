@@ -1,8 +1,9 @@
 import type React from "react"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { AdminSidebar } from "@/components/admin-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { StageBar } from "@/components/admin/stage-bar"
+import { AdminSidebar, AdminMobileNav } from "@/components/admin/sidebar-nav"
+import { summarizeAvailability } from "@/lib/admin/format"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -20,12 +21,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/portal")
   }
 
+  const [{ count: studentCount }, { data: availability }] = await Promise.all([
+    supabase.from("students").select("*", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("availability").select("*").eq("is_active", true),
+  ])
+
+  const availabilitySummary = summarizeAvailability(availability || [])
+  const dateLabel = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+
   return (
-    <SidebarProvider>
-      <AdminSidebar profile={profile} />
-      <SidebarInset>
-        <main className="flex-1 overflow-auto">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="flex min-h-svh flex-col">
+      <StageBar profile={profile} dateLabel={dateLabel} />
+      <AdminMobileNav studentCount={studentCount || 0} />
+      <div className="flex flex-1">
+        <AdminSidebar
+          studentCount={studentCount || 0}
+          footerLines={[availabilitySummary.daysLine, availabilitySummary.hoursLine]}
+        />
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
+    </div>
   )
 }

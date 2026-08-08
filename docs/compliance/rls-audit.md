@@ -24,6 +24,8 @@ All 10 tables have RLS enabled with policies, and the live probe confirms an **a
 | invoices (financial) | 0 | 0 | ✅ protected |
 | inquiries (contact + child age) | 0 | 0 | ✅ protected |
 | teacher_availability | 0 | 0 | ✅ protected |
+| teachers (pay rates; added `014`, 2026-08-07) | 0 | 0 (admin-only, anon revoked) | ✅ protected |
+| student_slots (added `014`, 2026-08-07) | 0 | 0 (admin-only, anon revoked) | ✅ protected |
 | notifications | 0 | 0 / broadcast only | ✅ (see F4) |
 | bookings | 0 | busy slots only | ✅ now (see F2) |
 | availability | 3 | public calendar | ✅ intended |
@@ -79,5 +81,7 @@ All findings are **fixed in production**. Migrations applied via the Supabase MC
 | **F6 (new)** anon could UPDATE notifications | `008` — found during rollout: the mark-as-read policy was created **without a `TO` clause**, so its `USING (true)` applied to *all* roles, and anon held the default all-column UPDATE grant — a logged-out visitor could issue a filter-less UPDATE rewriting any notification. `008` revokes anon's UPDATE grant and re-creates the policy `TO authenticated` | ✅ applied + verified (only remaining UPDATE grant: `authenticated → is_read_by`) |
 
 Security Advisor re-run after the migrations: the audit's findings are cleared. Three unrelated hygiene items remain open (tracked in [plaid-submission-checklist.md](plaid-submission-checklist.md) A1): `update_updated_at_column` mutable search_path, leaked-password protection disabled, and anon/authenticated `EXECUTE` on the `is_admin()`/`handle_new_user()` RPC endpoints.
+
+**Update 2026-08-07:** migration `014` (teachers + multi-slot scheduling) added two admin-only tables — `teachers`, `student_slots` — using the `009` pattern (`FOR ALL USING (public.is_admin())` + anon REVOKE), a guarded `bookings.teacher_id` column (guard trigger `enforce_booking_teacher_admin_only`, RPC EXECUTE revoked per `012`/`013` hygiene), and `students.contact_email`/`students.teacher_id`. Advisor re-run after applying: no new warnings (the new guard function does NOT appear in the SECURITY DEFINER lint, confirming the revoke).
 
 Still outstanding from the Limitations section: the **authenticated cross-tenant test** (two parent accounts confirming neither reads the other's students/invoices) — checklist step A6.

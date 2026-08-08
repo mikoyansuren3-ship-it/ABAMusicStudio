@@ -81,7 +81,7 @@ export async function handlePaymentSuccess(invoiceId: string, paymentIntentId: s
   }
 
   revalidatePath("/portal/payments")
-  revalidatePath("/admin/payments")
+  revalidatePath("/admin/money")
 
   return { success: true }
 }
@@ -117,7 +117,7 @@ export async function verifyPaymentAndUpdateInvoice(sessionId: string) {
   }
 
   revalidatePath("/portal/payments")
-  revalidatePath("/admin/payments")
+  revalidatePath("/admin/money")
 
   return { success: true, invoiceId }
 }

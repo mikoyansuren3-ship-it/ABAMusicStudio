@@ -1,204 +1,370 @@
 import { createClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Calendar, CreditCard, UserPlus, Users, Clock, ArrowRight } from "lucide-react"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
-import { BookingStatusBadge } from "@/components/status-badge"
-import { formatCurrency, formatShortDate } from "@/lib/portal/format"
+import { ArrowRight } from "lucide-react"
+import { AdminCard, Eyebrow, PageHeader } from "@/components/admin/ui"
+import { AddLessonButton } from "@/components/admin/add-lesson-dialog"
+import {
+  formatCurrencyCompact,
+  formatMinutes,
+  formatTimeRange,
+  greetingForHour,
+  numberWord,
+  timeToMinutes,
+  toDateKey,
+} from "@/lib/admin/format"
+import { formatTime } from "@/lib/portal/format"
+import type { Availability, AvailabilityException, Booking, Profile, Student, StudentBilling, StudentSlot } from "@/lib/types"
 
-export default async function AdminDashboard() {
+const HOUR_ROW_PX = 66
+
+type BookingRow = Booking & { student: (Student & { profile: Profile | null }) | null }
+type StudentRow = Student & { profile: Profile | null; billing: StudentBilling | null; slots: StudentSlot[] }
+
+function minutesToTimeString(totalMinutes: number) {
+  return `${String(Math.floor(totalMinutes / 60)).padStart(2, "0")}:${String(totalMinutes % 60).padStart(2, "0")}`
+}
+
+export default async function AdminTodayPage() {
   const supabase = await createClient()
 
-  // Today's bookings
-  const today = new Date()
+  const now = new Date()
+  const today = new Date(now)
   today.setHours(0, 0, 0, 0)
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
+  const todayKey = toDateKey(today)
 
-  const { data: todaysBookings } = await supabase
-    .from("bookings")
-    .select("*, student:students(*, profile:profiles(*))")
-    .gte("start_time", today.toISOString())
-    .lt("start_time", tomorrow.toISOString())
-    .in("status", ["confirmed", "pending"])
-    .order("start_time")
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Pending inquiries
-  const { data: pendingInquiries } = await supabase
-    .from("inquiries")
-    .select("*")
-    .eq("status", "pending")
-    .order("created_at", { ascending: false })
-    .limit(5)
+  const [
+    profileRes,
+    todaysBookingsRes,
+    pendingInquiriesRes,
+    unpaidInvoicesRes,
+    pendingBookingsRes,
+    studentsRes,
+    availabilityRes,
+    todayExceptionRes,
+    announcementCountRes,
+  ] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user?.id ?? "").single(),
+    supabase
+      .from("bookings")
+      .select("*, student:students(*, profile:profiles(*))")
+      .gte("start_time", today.toISOString())
+      .lt("start_time", tomorrow.toISOString())
+      .in("status", ["confirmed", "pending"])
+      .order("start_time"),
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("invoices").select("*").eq("status", "unpaid"),
+    supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending")
+      .gte("start_time", today.toISOString()),
+    supabase
+      .from("students")
+      .select("*, profile:profiles(*), billing:student_billing(*), slots:student_slots(*)")
+      .eq("is_active", true),
+    supabase.from("availability").select("*").eq("is_active", true),
+    supabase.from("availability_exceptions").select("*").eq("exception_date", todayKey).maybeSingle(),
+    supabase.from("notifications").select("id", { count: "exact", head: true }),
+  ])
 
-  // Unpaid invoices
-  const { data: unpaidInvoices } = await supabase
-    .from("invoices")
-    .select("*, student:students(*, profile:profiles(*))")
-    .eq("status", "unpaid")
-    .order("due_date")
-    .limit(5)
+  const profile = profileRes.data as Profile | null
+  const todaysBookings = (todaysBookingsRes.data || []) as BookingRow[]
+  const confirmedToday = todaysBookings.filter((booking) => booking.status === "confirmed")
+  const pendingInquiryCount = pendingInquiriesRes.count || 0
+  const unpaidInvoices = unpaidInvoicesRes.data || []
+  const rescheduleCount = pendingBookingsRes.count || 0
+  const students = (
+    (studentsRes.data || []) as (Student & {
+      profile: Profile | null
+      billing: StudentBilling[] | StudentBilling | null
+      slots: StudentSlot[] | null
+    })[]
+  ).map(
+    (student): StudentRow => ({
+      ...student,
+      billing: Array.isArray(student.billing) ? (student.billing[0] ?? null) : (student.billing ?? null),
+      slots: student.slots || [],
+    }),
+  )
+  const availability = (availabilityRes.data || []) as Availability[]
+  const todayException = todayExceptionRes.data as AvailabilityException | null
+  const announcementCount = announcementCountRes.count || 0
 
-  // Active students count
-  const { count: studentCount } = await supabase
-    .from("students")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true)
+  const totalUnpaid = unpaidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0)
+  const overdueInvoices = unpaidInvoices.filter(
+    (invoice) => invoice.due_date && new Date(`${invoice.due_date}T23:59:59`) < now,
+  )
 
-  const totalUnpaid = unpaidInvoices?.reduce((sum, inv) => sum + inv.amount, 0) || 0
+  // Today's open window: a closure wins, then the weekday's availability slots.
+  const todaySlots = availability.filter((slot) => slot.day_of_week === today.getDay())
+  let openStart: number | null = null
+  let openEnd: number | null = null
+  if (todayException) {
+    if (todayException.is_available && todayException.start_time && todayException.end_time) {
+      openStart = timeToMinutes(todayException.start_time)
+      openEnd = timeToMinutes(todayException.end_time)
+    }
+  } else if (todaySlots.length > 0) {
+    openStart = Math.min(...todaySlots.map((slot) => timeToMinutes(slot.start_time)))
+    openEnd = Math.max(...todaySlots.map((slot) => timeToMinutes(slot.end_time)))
+  }
+  const isOpenToday = openStart !== null && openEnd !== null && openEnd > openStart
+
+  // Timeline window: the open block, stretched to cover any lesson booked outside it.
+  let windowStart = isOpenToday ? openStart! : 15 * 60
+  let windowEnd = isOpenToday ? openEnd! : 19 * 60
+  for (const booking of confirmedToday) {
+    const start = new Date(booking.start_time)
+    const end = new Date(booking.end_time)
+    windowStart = Math.min(windowStart, Math.floor((start.getHours() * 60 + start.getMinutes()) / 60) * 60)
+    windowEnd = Math.max(windowEnd, Math.ceil((end.getHours() * 60 + end.getMinutes()) / 60) * 60)
+  }
+  const gridStart = Math.floor(windowStart / 60) * 60
+  const gridEnd = Math.ceil(windowEnd / 60) * 60
+  const gridHours: number[] = []
+  for (let minute = gridStart; minute < gridEnd; minute += 60) gridHours.push(minute)
+  const bandHeight = gridHours.length * HOUR_ROW_PX
+  const showTimeline = isOpenToday || confirmedToday.length > 0
+
+  const openHoursCount = isOpenToday ? (openEnd! - openStart!) / 60 : 0
+  const openRangeLabel = isOpenToday
+    ? formatTimeRange(minutesToTimeString(openStart!), minutesToTimeString(openEnd!))
+    : null
+
+  const greeting = `${greetingForHour(now.getHours())}, ${(profile?.full_name || "there").split(" ")[0]}`
+  const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+  const summary = `${dateLabel} · ${
+    !isOpenToday
+      ? confirmedToday.length > 0
+        ? `studio closed, ${confirmedToday.length} ${confirmedToday.length === 1 ? "lesson" : "lessons"} booked anyway`
+        : "studio closed today"
+      : confirmedToday.length === 0
+        ? `${numberWord(openHoursCount)} ${openHoursCount === 1 ? "hour" : "hours"} open, nothing booked yet`
+        : `${confirmedToday.length} ${confirmedToday.length === 1 ? "lesson" : "lessons"} on the books`
+  }`
+
+  const studentOptions = students.map((student) => ({
+    id: student.id,
+    name: student.name,
+    guardian: student.profile?.full_name || student.contact_name || null,
+  }))
+
+  // "Needs you": inquiries, reschedule requests, overdue invoices.
+  const needsYou: { key: string; label: string; href: string }[] = []
+  if (pendingInquiryCount > 0) {
+    needsYou.push({
+      key: "inquiries",
+      label: `${pendingInquiryCount} ${pendingInquiryCount === 1 ? "inquiry" : "inquiries"} waiting for a reply`,
+      href: "/admin/inquiries",
+    })
+  }
+  if (rescheduleCount > 0) {
+    needsYou.push({
+      key: "reschedules",
+      label: `${rescheduleCount} reschedule ${rescheduleCount === 1 ? "request" : "requests"} to approve`,
+      href: "/admin/schedule",
+    })
+  }
+  if (overdueInvoices.length > 0) {
+    const overdueTotal = overdueInvoices.reduce((sum, invoice) => sum + invoice.amount, 0)
+    needsYou.push({
+      key: "overdue",
+      label: `${overdueInvoices.length} overdue ${overdueInvoices.length === 1 ? "invoice" : "invoices"} · ${formatCurrencyCompact(overdueTotal)}`,
+      href: "/admin/money?tab=invoices",
+    })
+  }
+
+  // "Finish setting up": one-time studio setup work.
+  const setupTasks: { key: string; label: string; href: string }[] = []
+  if (availability.length === 0) {
+    setupTasks.push({ key: "availability", label: "Set your weekly availability", href: "/admin/availability" })
+  }
+  if (students.length === 0) {
+    setupTasks.push({ key: "students", label: "Add your first student", href: "/admin/students" })
+  }
+  for (const student of students) {
+    const hasRate = student.billing && student.billing.rate_cents > 0
+    const hasSlot = student.slots.length > 0
+    if (!hasRate || !hasSlot) {
+      setupTasks.push({
+        key: `billing-${student.id}`,
+        label: `Set ${student.name}'s rate and weekly slot`,
+        href: "/admin/money?tab=income",
+      })
+    }
+  }
+  if (announcementCount === 0) {
+    setupTasks.push({ key: "announcement", label: "Send your first announcement", href: "/admin/announcements" })
+  }
 
   return (
-    <>
-      <header className="flex h-14 items-center gap-4 border-b bg-background px-6">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-6" />
-        <div>
-          <h1 className="text-lg font-semibold">Admin Dashboard</h1>
-        </div>
-      </header>
+    <div className="flex flex-col gap-7 px-5 pb-14 pt-9 md:px-10">
+      <PageHeader
+        title={greeting}
+        summary={summary}
+        actions={<AddLessonButton students={studentOptions} availability={availability} />}
+      />
 
-      <div className="p-6">
-        <div className="mb-8">
-          <h2 className="font-serif text-2xl font-bold">Welcome back!</h2>
-          <p className="mt-1 text-muted-foreground">Here&apos;s what&apos;s happening at the studio today.</p>
-        </div>
+      <div className="flex flex-col items-stretch gap-6 lg:flex-row">
+        <AdminCard className="flex min-w-0 flex-1 flex-col gap-[18px] pb-[26px]">
+          <div className="flex items-center justify-between gap-4">
+            <Eyebrow>Today&apos;s lessons</Eyebrow>
+            <span className="text-xs text-muted-foreground">
+              {isOpenToday ? `Open ${openRangeLabel}` : "Closed today"}
+            </span>
+          </div>
 
-        {/* Quick Stats */}
-        <div className="mb-8 grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Today&apos;s Lessons</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{todaysBookings?.length || 0}</p>
-              <p className="text-sm text-muted-foreground">Scheduled for today</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">New Inquiries</CardTitle>
-              <UserPlus className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{pendingInquiries?.length || 0}</p>
-              <p className="text-sm text-muted-foreground">Awaiting response</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Unpaid Balance</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <p className={`text-3xl font-bold ${totalUnpaid > 0 ? "text-accent" : ""}`}>
-                {formatCurrency(totalUnpaid)}
-              </p>
-              <p className="text-sm text-muted-foreground">{unpaidInvoices?.length || 0} invoices</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Active Students</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{studentCount || 0}</p>
-              <p className="text-sm text-muted-foreground">Currently enrolled</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* Today's Schedule */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Today&apos;s Schedule</CardTitle>
-              <CardDescription>
-                {today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {todaysBookings && todaysBookings.length > 0 ? (
-                <div className="space-y-3">
-                  {todaysBookings.map((booking) => (
-                    <div key={booking.id} className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                          <Clock className="h-5 w-5 text-accent" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{booking.student?.profile?.full_name || "Student"}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(booking.start_time).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            })}{" "}
-                            -{" "}
-                            {new Date(booking.end_time).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                      <BookingStatusBadge status={booking.status} />
-                    </div>
-                  ))}
+          {showTimeline ? (
+            <div className="relative">
+              <div className="flex flex-col">
+                {gridHours.map((minute) => (
+                  <div key={minute} className="flex h-[66px] border-t">
+                    <span className="w-16 shrink-0 pt-1.5 text-[11px] font-medium text-muted-foreground">
+                      {formatMinutes(minute).replace(":00", "")}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex h-0 border-t">
+                  <span className="w-16 shrink-0 pt-1.5 text-[11px] font-medium text-muted-foreground">
+                    {formatMinutes(gridEnd).replace(":00", "")}
+                  </span>
                 </div>
-              ) : (
-                <div className="py-8 text-center text-muted-foreground">No lessons scheduled for today</div>
-              )}
-              <Button variant="outline" className="mt-4 w-full bg-transparent" asChild>
-                <Link href="/admin/schedule">
-                  View Full Schedule
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+              </div>
 
-          {/* Pending Inquiries */}
-          <Card>
-            <CardHeader>
-              <CardTitle>New Student Inquiries</CardTitle>
-              <CardDescription>Pending requests to review</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {pendingInquiries && pendingInquiries.length > 0 ? (
-                <div className="space-y-3">
-                  {pendingInquiries.map((inquiry) => (
-                    <div key={inquiry.id} className="rounded-lg border p-3">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{inquiry.name}</p>
-                        <Badge variant="secondary">{inquiry.experience_level || "New"}</Badge>
+              <div
+                className={`absolute left-16 right-0 top-0 flex flex-col rounded-r-lg ${
+                  isOpenToday ? "border-l-2 border-accent bg-accent/7" : "bg-muted/60"
+                }`}
+                style={{ height: `${bandHeight}px` }}
+              >
+                {confirmedToday.length === 0 ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-3.5 px-6 text-center">
+                    <p className="font-serif text-xl font-semibold">
+                      {`${numberWord(openHoursCount).replace(/^./, (c) => c.toUpperCase())} ${openHoursCount === 1 ? "hour" : "hours"} open`}
+                    </p>
+                    <span className="text-[13px] text-muted-foreground">
+                      Nothing scheduled — drop a lesson anywhere in this block
+                    </span>
+                    <AddLessonButton
+                      students={studentOptions}
+                      availability={availability}
+                      variant="dashed"
+                      label="Book a lesson"
+                    />
+                  </div>
+                ) : (
+                  confirmedToday.map((booking) => {
+                    const start = new Date(booking.start_time)
+                    const end = new Date(booking.end_time)
+                    const startMinutes = start.getHours() * 60 + start.getMinutes()
+                    const durationMinutes = Math.max((end.getTime() - start.getTime()) / 60000, 20)
+                    const top = ((startMinutes - gridStart) / (gridEnd - gridStart)) * bandHeight
+                    const height = (durationMinutes / (gridEnd - gridStart)) * bandHeight
+                    return (
+                      <div
+                        key={booking.id}
+                        title={`${booking.student?.name || "Student"}, ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`}
+                        className="absolute inset-x-2 flex flex-col justify-center overflow-hidden rounded-md bg-primary px-3 text-primary-foreground"
+                        style={{ top: `${top}px`, height: `${Math.max(height - 3, 20)}px` }}
+                      >
+                        <span className="truncate text-[13px] font-semibold leading-tight">
+                          {booking.student?.name || "Student"}
+                        </span>
+                        <span className="truncate text-[11px] leading-tight opacity-80">
+                          {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
+                        </span>
                       </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{inquiry.email}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Requested: {formatShortDate(inquiry.created_at)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-8 text-center text-muted-foreground">No pending inquiries</div>
-              )}
-              <Button variant="outline" className="mt-4 w-full bg-transparent" asChild>
-                <Link href="/admin/inquiries">
-                  Manage Inquiries
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+                    )
+                  })
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 rounded-lg bg-muted px-6 py-14 text-center">
+              <p className="font-serif text-xl font-semibold">Closed today</p>
+              <span className="max-w-[420px] text-[13px] leading-[21px] text-muted-foreground">
+                {todayException?.reason
+                  ? `Marked closed: ${todayException.reason}.`
+                  : "No open hours today."}{" "}
+                Lessons can still be booked — they&apos;ll just ask you to confirm.
+              </span>
+              <Link
+                href="/admin/availability"
+                className="text-[13px] font-semibold text-accent transition-colors hover:text-accent-strong"
+              >
+                Adjust availability
+              </Link>
+            </div>
+          )}
+        </AdminCard>
+
+        <AdminCard className="flex w-full shrink-0 flex-col py-[22px] lg:w-[296px]">
+          <Eyebrow className="mb-2">At a glance</Eyebrow>
+          {[
+            { label: "Lessons today", value: String(todaysBookings.length) },
+            { label: "Awaiting reply", value: String(pendingInquiryCount) },
+            { label: "Unpaid", value: formatCurrencyCompact(totalUnpaid) },
+            { label: "Active students", value: String(students.length) },
+          ].map((row, index, rows) => (
+            <div
+              key={row.label}
+              className={`flex items-baseline justify-between py-4 ${index < rows.length - 1 ? "border-b" : ""}`}
+            >
+              <span className="text-[13px] text-muted-foreground">{row.label}</span>
+              <span className="font-serif text-[26px] font-semibold leading-none">{row.value}</span>
+            </div>
+          ))}
+        </AdminCard>
       </div>
-    </>
+
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <AdminCard className="flex min-w-0 flex-1 flex-col gap-2.5">
+          <Eyebrow>Needs you</Eyebrow>
+          {needsYou.length === 0 ? (
+            <>
+              <p className="font-serif text-[19px] font-semibold">Nothing waiting</p>
+              <p className="text-[13px] leading-5 text-muted-foreground">
+                New inquiries, reschedule requests and overdue invoices collect here.
+              </p>
+            </>
+          ) : (
+            <div className="flex flex-col gap-3 pt-0.5">
+              {needsYou.map((item) => (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-[13px] font-medium transition-colors hover:bg-muted/50"
+                >
+                  {item.label}
+                  <ArrowRight className="size-[15px] shrink-0 text-accent" aria-hidden />
+                </Link>
+              ))}
+            </div>
+          )}
+        </AdminCard>
+
+        {setupTasks.length > 0 && (
+          <AdminCard className="flex min-w-0 flex-1 flex-col gap-3">
+            <Eyebrow>Finish setting up</Eyebrow>
+            {setupTasks.map((task) => (
+              <Link
+                key={task.key}
+                href={task.href}
+                className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-[13px] font-medium transition-colors hover:bg-muted/50"
+              >
+                {task.label}
+                <ArrowRight className="size-[15px] shrink-0 text-accent" aria-hidden />
+              </Link>
+            ))}
+          </AdminCard>
+        )}
+      </div>
+    </div>
   )
 }

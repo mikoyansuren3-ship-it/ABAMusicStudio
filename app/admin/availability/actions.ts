@@ -3,6 +3,12 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
+function revalidateAvailabilityViews() {
+  revalidatePath("/admin/availability")
+  revalidatePath("/admin/schedule")
+  revalidatePath("/admin")
+}
+
 export async function updateAvailability(id: string, updates: Record<string, unknown>) {
   const supabase = await createClient()
 
@@ -10,7 +16,7 @@ export async function updateAvailability(id: string, updates: Record<string, unk
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/availability")
+  revalidateAvailabilityViews()
   return { success: true }
 }
 
@@ -30,7 +36,7 @@ export async function addAvailability(formData: FormData) {
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/availability")
+  revalidateAvailabilityViews()
   return { success: true }
 }
 
@@ -41,7 +47,7 @@ export async function deleteAvailability(id: string) {
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/availability")
+  revalidateAvailabilityViews()
   return { success: true }
 }
 
@@ -51,18 +57,20 @@ export async function addException(formData: FormData) {
   const exceptionDate = formData.get("exception_date") as string
   const reason = (formData.get("reason") as string) || null
   const isAvailable = formData.get("is_available") === "on"
+  const startTime = ((formData.get("start_time") as string) || "").trim() || "09:00"
+  const endTime = ((formData.get("end_time") as string) || "").trim() || "17:00"
 
   const { error } = await supabase.from("availability_exceptions").insert({
     exception_date: exceptionDate,
     reason,
     is_available: isAvailable,
-    start_time: isAvailable ? "09:00" : null,
-    end_time: isAvailable ? "17:00" : null,
+    start_time: isAvailable ? startTime : null,
+    end_time: isAvailable ? endTime : null,
   })
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/availability")
+  revalidateAvailabilityViews()
   return { success: true }
 }
 
@@ -73,6 +81,6 @@ export async function deleteException(id: string) {
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/availability")
+  revalidateAvailabilityViews()
   return { success: true }
 }

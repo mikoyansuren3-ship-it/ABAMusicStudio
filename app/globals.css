@@ -19,6 +19,8 @@
   --muted-foreground: oklch(0.45 0.01 60);
   --accent: oklch(0.55 0.12 45);
   --accent-foreground: oklch(0.98 0.002 90);
+  /* Darker terracotta for small text on parchment (dashed buttons, tinted avatars). */
+  --accent-strong: oklch(0.45 0.11 45);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.86 0.024 78);
@@ -114,6 +116,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-strong: var(--accent-strong);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);

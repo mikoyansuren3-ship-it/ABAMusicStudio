@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-export async function createNotification(formData: FormData) {
+export async function createAnnouncement(formData: FormData) {
   const supabase = await createClient()
 
   const title = formData.get("title") as string
@@ -20,17 +20,19 @@ export async function createNotification(formData: FormData) {
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/notifications")
+  revalidatePath("/admin/announcements")
+  revalidatePath("/admin")
   return { success: true }
 }
 
-export async function deleteNotification(id: string) {
+export async function deleteAnnouncement(id: string) {
   const supabase = await createClient()
 
   const { error } = await supabase.from("notifications").delete().eq("id", id)
 
   if (error) return { error: error.message }
 
-  revalidatePath("/admin/notifications")
+  revalidatePath("/admin/announcements")
+  revalidatePath("/admin")
   return { success: true }
 }
