@@ -22,17 +22,42 @@ export interface TeacherAvailability {
 export interface Student {
   id: string
   parent_id: string | null
+  teacher_id: string | null
   name: string
   experience_level: "beginner" | "intermediate" | "advanced" | null
   preferred_lesson_duration: 30 | 45 | 60
   contact_name: string | null
   contact_phone: string | null
+  contact_email: string | null
   notes: string | null
   is_active: boolean
   created_at: string
   updated_at: string
   profile?: Profile | null
   profiles?: Profile | null
+}
+
+export interface Teacher {
+  id: string
+  name: string
+  instrument: string | null
+  /** Pay per lesson = pay_hourly_cents × duration / 60. The owner's row is 0. */
+  pay_hourly_cents: number
+  is_active: boolean
+  sort_order: number
+  /** Reserved for a future teacher-login phase. */
+  profile_id: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface StudentSlot {
+  id: string
+  student_id: string
+  day_of_week: number
+  lesson_time: string
+  created_at: string
 }
 
 export interface Availability {
@@ -58,6 +83,8 @@ export interface AvailabilityException {
 export interface Booking {
   id: string
   student_id: string
+  /** Snapshot of the student's teacher when the lesson was created; NULL = unassigned. */
+  teacher_id: string | null
   start_time: string
   end_time: string
   status: "pending" | "confirmed" | "cancelled" | "completed"
@@ -75,8 +102,6 @@ export interface Booking {
 export interface StudentBilling {
   student_id: string
   rate_cents: number
-  day_of_week: number | null
-  lesson_time: string | null
   duration_minutes: 30 | 45 | 60
   created_at: string
   updated_at: string
@@ -111,6 +136,9 @@ export interface Invoice {
   paid_at: string | null
   payment_method: "stripe" | "cash" | "check" | null
   stripe_payment_intent_id: string | null
+  /** Set when the invoice email was last sent to the family. */
+  sent_at: string | null
+  sent_to: string | null
   created_at: string
   updated_at: string
   student?: Student

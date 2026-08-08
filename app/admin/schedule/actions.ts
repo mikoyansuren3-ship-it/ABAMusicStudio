@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { isSlotBookable } from "@/lib/schedule"
+import { classifySlot } from "@/lib/schedule"
 import { revalidatePath } from "next/cache"
 
 export async function createBooking(formData: FormData) {
@@ -11,6 +11,7 @@ export async function createBooking(formData: FormData) {
   const date = formData.get("date") as string
   const startTime = formData.get("start_time") as string
   const duration = Number.parseInt(formData.get("duration") as string)
+  const confirmOutside = formData.get("confirm_outside") === "1"
 
   const startDateTime = new Date(`${date}T${startTime}`)
   const endDateTime = new Date(startDateTime.getTime() + duration * 60000)
@@ -19,7 +20,7 @@ export async function createBooking(formData: FormData) {
     return { error: "Please choose a student, date, and time." }
   }
 
-  const [availabilityRes, exceptionsRes, bookingsRes] = await Promise.all([
+  const [availabilityRes, exceptionsRes, bookingsRes, studentRes] = await Promise.all([
     supabase.from("availability").select("*").eq("is_active", true),
     supabase
       .from("availability_exceptions")
@@ -30,9 +31,10 @@ export async function createBooking(formData: FormData) {
       .select("start_time,end_time,status")
       .gte("start_time", new Date().toISOString())
       .in("status", ["confirmed", "pending"]),
+    supabase.from("students").select("teacher_id").eq("id", studentId).single(),
   ])
 
-  const isAvailable = isSlotBookable({
+  const issue = classifySlot({
     start: startDateTime,
     end: endDateTime,
     availability: availabilityRes.data || [],
@@ -40,12 +42,18 @@ export async function createBooking(formData: FormData) {
     existingBookings: bookingsRes.data || [],
   })
 
-  if (!isAvailable) {
-    return { error: "That time is outside availability or already booked." }
+  if (issue === "past") return { error: "That time is in the past." }
+  if (issue === "overlap") return { error: "Another lesson is already booked then." }
+  if (issue === "outside_availability" && !confirmOutside) {
+    return {
+      error: "That time is outside the studio's open hours.",
+      code: "outside_availability" as const,
+    }
   }
 
   const { error } = await supabase.from("bookings").insert({
     student_id: studentId,
+    teacher_id: studentRes.data?.teacher_id ?? null,
     start_time: startDateTime.toISOString(),
     end_time: endDateTime.toISOString(),
     status: "confirmed",
@@ -54,6 +62,7 @@ export async function createBooking(formData: FormData) {
   if (error) return { error: error.message }
 
   revalidatePath("/admin/schedule")
+  revalidatePath("/admin/money")
   revalidatePath("/admin")
   return { success: true }
 }
@@ -66,6 +75,7 @@ export async function updateBookingStatus(bookingId: string, status: string) {
   if (error) return { error: error.message }
 
   revalidatePath("/admin/schedule")
+  revalidatePath("/admin/money")
   revalidatePath("/admin")
   return { success: true }
 }

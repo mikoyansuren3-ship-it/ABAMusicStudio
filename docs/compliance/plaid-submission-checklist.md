@@ -14,10 +14,12 @@ Everything code-side is already built (see [README.md](README.md) for the item-b
 - [x] Run [`scripts/007_notifications_delete_policy.sql`](../../scripts/007_notifications_delete_policy.sql) — applied
 - [x] Run [`scripts/008_notifications_revoke_anon_update.sql`](../../scripts/008_notifications_revoke_anon_update.sql) — follow-up found during rollout (the mark-as-read policy had no `TO` clause, so anon held a usable all-column UPDATE grant); applied
 - [x] Verification queries — confirmed against the live catalog: `is_admin` search_path pinned, anon bookings SELECT limited to start/end/status, authenticated notifications UPDATE limited to `is_read_by`, anon UPDATE revoked, auth-gated SELECT policy, admin DELETE policy present
-- [x] Security Advisor run — the audit's RLS findings are cleared. It surfaced three small hygiene items, none blocking:
-  - [ ] Pin `search_path` on `public.update_updated_at_column` (same class as F3)
-  - [ ] Enable leaked-password protection (Auth → password security — one toggle)
-  - [ ] Revoke anon/authenticated `EXECUTE` on `is_admin()` / `handle_new_user()` RPC endpoints
+- [x] Security Advisor run — the audit's RLS findings are cleared. It surfaced three small hygiene items, worked 2026-08-03 via [`scripts/012_function_hygiene.sql`](../../scripts/012_function_hygiene.sql) (applied):
+  - [x] Pin `search_path` on `public.update_updated_at_column` — applied + verified
+  - [x] Revoke RPC `EXECUTE` on `handle_new_user()` — applied + verified (signup trigger unaffected; fire-time doesn't check the DML role's EXECUTE)
+  - [x] `is_admin()` — **accepted, not revoked**: RLS policies evaluate it as the querying role, so anon/authenticated must keep EXECUTE; the RPC returns only the caller's own admin status. The advisor's two is_admin warnings are expected and documented
+  - [ ] Enable leaked-password protection — dashboard toggle, no API: **Authentication → Sign In / Providers → Passwords → "Prevent the use of compromised passwords"**
+  - [ ] Run [`scripts/013_attendance_fn_hygiene.sql`](../../scripts/013_attendance_fn_hygiene.sql) — same de-exposure for `enforce_attendance_admin_only()` (surfaced by the post-012 advisor run; from the income-ledger feature). Written, **not yet applied**
 
 ### 2. Create the security contact  ·  ~15 min  (Q1)
 - [ ] Create a **monitored** group alias — `security@abamusicacademy.org` (and ideally `privacy@…`)

@@ -18,7 +18,13 @@ function dateKey(date: Date) {
   return `${year}-${month}-${day}`
 }
 
-export function isSlotBookable({
+export type SlotIssue = "past" | "outside_availability" | "overlap" | null
+
+/**
+ * Classify a requested slot. "outside_availability" is soft — the admin may
+ * confirm past it — while "past" and "overlap" are hard rejections.
+ */
+export function classifySlot({
   start,
   end,
   availability,
@@ -30,34 +36,48 @@ export function isSlotBookable({
   availability: Availability[]
   exceptions: AvailabilityException[]
   existingBookings: BookingSlot[]
-}) {
-  if (end <= new Date()) return false
+}): SlotIssue {
+  if (end <= new Date()) return "past"
 
-  const slotStartMinutes = toMinutes(timeFromDate(start))
-  const slotEndMinutes = toMinutes(timeFromDate(end))
-  const exception = exceptions.find((item) => item.exception_date === dateKey(start))
-
-  if (exception) {
-    if (!exception.is_available) return false
-    if (!exception.start_time || !exception.end_time) return false
-
-    const exceptionStart = toMinutes(exception.start_time)
-    const exceptionEnd = toMinutes(exception.end_time)
-    if (slotStartMinutes < exceptionStart || slotEndMinutes > exceptionEnd) return false
-  } else {
-    const dayAvailability = availability.find((item) => item.day_of_week === start.getDay() && item.is_active)
-    if (!dayAvailability) return false
-
-    const availableStart = toMinutes(dayAvailability.start_time)
-    const availableEnd = toMinutes(dayAvailability.end_time)
-    if (slotStartMinutes < availableStart || slotEndMinutes > availableEnd) return false
-  }
-
-  return !existingBookings.some((booking) => {
+  const overlaps = existingBookings.some((booking) => {
     if (booking.status === "cancelled") return false
 
     const bookingStart = new Date(booking.start_time)
     const bookingEnd = new Date(booking.end_time)
     return start < bookingEnd && end > bookingStart
   })
+  if (overlaps) return "overlap"
+
+  const slotStartMinutes = toMinutes(timeFromDate(start))
+  const slotEndMinutes = toMinutes(timeFromDate(end))
+  const exception = exceptions.find((item) => item.exception_date === dateKey(start))
+
+  if (exception) {
+    if (!exception.is_available) return "outside_availability"
+    if (!exception.start_time || !exception.end_time) return "outside_availability"
+
+    const exceptionStart = toMinutes(exception.start_time)
+    const exceptionEnd = toMinutes(exception.end_time)
+    if (slotStartMinutes < exceptionStart || slotEndMinutes > exceptionEnd) return "outside_availability"
+    return null
+  }
+
+  const dayAvailability = availability.find((item) => item.day_of_week === start.getDay() && item.is_active)
+  if (!dayAvailability) return "outside_availability"
+
+  const availableStart = toMinutes(dayAvailability.start_time)
+  const availableEnd = toMinutes(dayAvailability.end_time)
+  if (slotStartMinutes < availableStart || slotEndMinutes > availableEnd) return "outside_availability"
+
+  return null
+}
+
+export function isSlotBookable(params: {
+  start: Date
+  end: Date
+  availability: Availability[]
+  exceptions: AvailabilityException[]
+  existingBookings: BookingSlot[]
+}) {
+  return classifySlot(params) === null
 }
