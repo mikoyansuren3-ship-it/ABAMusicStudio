@@ -90,7 +90,7 @@ async function sendInvoiceEmailInternal(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "ABA Music Academy <noreply@abamusic.com>",
+      from: "ABA Music Academy <noreply@abamusicacademy.org>",
       to: recipient,
       subject,
       html,
