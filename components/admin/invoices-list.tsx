@@ -39,21 +39,32 @@ export function InvoicesList({ invoices, students, nowMs }: InvoicesListProps) {
   async function handleMarkPaid(invoiceId: string, method: "cash" | "check") {
     setPendingId(invoiceId)
     setActionError(null)
-    const result = await markAsPaid(invoiceId, method)
-    if (result?.error) setActionError(result.error)
-    router.refresh()
-    setPendingId(null)
+    try {
+      const result = await markAsPaid(invoiceId, method)
+      if (result?.error) setActionError(result.error)
+      router.refresh()
+    } catch {
+      // Server action can reject (e.g. version skew after a deploy) — surface it instead of wedging the row.
+      setActionError("Something went wrong saving the payment — refresh the page and try again.")
+    } finally {
+      setPendingId(null)
+    }
   }
 
   async function handleSendEmail(invoice: InvoiceRow) {
     setSendingId(invoice.id)
     setActionError(null)
     setSentNotice(null)
-    const result = await sendInvoiceEmail(invoice.id)
-    if (result?.error) setActionError(result.error)
-    else if ("sentTo" in result) setSentNotice(`Invoice for ${studentLabel(invoice)} emailed to ${result.sentTo}.`)
-    router.refresh()
-    setSendingId(null)
+    try {
+      const result = await sendInvoiceEmail(invoice.id)
+      if (result?.error) setActionError(result.error)
+      else if ("sentTo" in result) setSentNotice(`Invoice for ${studentLabel(invoice)} emailed to ${result.sentTo}.`)
+      router.refresh()
+    } catch {
+      setActionError("Something went wrong sending the email — refresh the page and try again.")
+    } finally {
+      setSendingId(null)
+    }
   }
 
   function StatusBadge({ invoice }: { invoice: InvoiceRow }) {
