@@ -4,7 +4,7 @@ import type { InvoiceRow } from "@/components/admin/invoices-list"
 import type { PanelStudent } from "@/components/admin/student-panel"
 import type { Booking, Teacher } from "@/lib/types"
 import { ensureLessons } from "@/lib/admin/lessons"
-import { periodActuals } from "@/lib/admin/economics"
+import { lessonRateCents, periodActuals } from "@/lib/admin/economics"
 import { formatCurrencyCompact, parseDateKey, toDateKey } from "@/lib/admin/format"
 import { dateKeyUtc, studioNow, studioToday, wallClockToUtc } from "@/lib/studio-time"
 
@@ -142,7 +142,8 @@ export default async function AdminMoneyPage({
       const lessons = rangeBookings.filter(
         (booking) => booking.student_id === student.id && booking.status !== "cancelled",
       )
-      // A missed lesson earns nothing unless it was made up.
+      // A missed lesson earns nothing unless it was made up. Each lesson
+      // earns its own stamped rate (multi-teacher slots can differ).
       const paidLessons = lessons.filter((lesson) => !(lesson.attendance === "missed" && !lesson.made_up_on))
       return {
         studentId: student.id,
@@ -151,7 +152,10 @@ export default async function AdminMoneyPage({
         billing: student.billing!,
         slots: student.slots,
         lessons,
-        expectedCents: student.billing!.rate_cents * paidLessons.length,
+        expectedCents: paidLessons.reduce(
+          (sum, lesson) => sum + lessonRateCents(lesson, student.billing!.rate_cents),
+          0,
+        ),
       }
     })
     .filter((row) => row.isActive || row.lessons.length > 0)
@@ -216,8 +220,9 @@ export default async function AdminMoneyPage({
     deductedCents: rows.reduce(
       (sum, row) =>
         sum +
-        row.billing.rate_cents *
-          row.lessons.filter((lesson) => lesson.attendance === "missed" && !lesson.made_up_on).length,
+        row.lessons
+          .filter((lesson) => lesson.attendance === "missed" && !lesson.made_up_on)
+          .reduce((lessonSum, lesson) => lessonSum + lessonRateCents(lesson, row.billing.rate_cents), 0),
       0,
     ),
     attendanceToMark: allLessons.filter(

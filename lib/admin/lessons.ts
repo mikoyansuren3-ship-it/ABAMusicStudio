@@ -20,8 +20,9 @@ interface GenerationStudent {
  * cancellations and reschedules stick. Attendance is never touched. Dates in
  * months before a slot existed are skipped (slot.created_at horizon; slots
  * migrated from the old single-slot billing inherit billing.created_at).
- * teacher_id is stamped from the student's CURRENT teacher at insert time —
- * a snapshot, so later reassignments don't rewrite history.
+ * teacher_id and rate_cents are stamped at insert time from the SLOT (falling
+ * back to the student's default teacher and standing rate) — snapshots, so
+ * later reassignments or rate changes don't rewrite history.
  *
  * Returns true when rows were inserted; callers should refetch their range.
  */
@@ -71,10 +72,14 @@ export async function ensureLessons(
       if (bookedDates.has(`${student.id}|${toDateKey(day)}`)) continue
 
       const start = wallClockToUtc(toDateKey(day), slot.lesson_time)
-      const end = new Date(start.getTime() + student.billing.duration_minutes * 60000)
+      const durationMinutes = slot.duration_minutes ?? student.billing.duration_minutes
+      const end = new Date(start.getTime() + durationMinutes * 60000)
       inserts.push({
         student_id: student.id,
-        teacher_id: student.teacher_id,
+        // Slot overrides first — a multi-teacher student's Monday piano and
+        // Thursday vocal stamp different teachers and rates.
+        teacher_id: slot.teacher_id ?? student.teacher_id,
+        rate_cents: slot.rate_cents ?? student.billing.rate_cents,
         start_time: start.toISOString(),
         end_time: end.toISOString(),
         status: "confirmed",

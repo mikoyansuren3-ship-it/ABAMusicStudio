@@ -57,6 +57,10 @@ export interface StudentSlot {
   student_id: string
   day_of_week: number
   lesson_time: string
+  /** Overrides for this slot; NULL falls back to the student's teacher / billing. */
+  teacher_id: string | null
+  duration_minutes: number | null
+  rate_cents: number | null
   created_at: string
 }
 
@@ -83,8 +87,10 @@ export interface AvailabilityException {
 export interface Booking {
   id: string
   student_id: string
-  /** Snapshot of the student's teacher when the lesson was created; NULL = unassigned. */
+  /** Snapshot of the slot's (or student's) teacher when the lesson was created; NULL = unassigned. */
   teacher_id: string | null
+  /** Snapshot of the rate this lesson earns; NULL on legacy rows = use the student's standing rate. */
+  rate_cents: number | null
   start_time: string
   end_time: string
   status: "pending" | "confirmed" | "cancelled" | "completed"
