@@ -9,7 +9,7 @@ export default async function StudentsPage() {
     supabase
       .from("students")
       .select("*, profile:profiles(*), billing:student_billing(*), slots:student_slots(*)")
-      .order("created_at", { ascending: false }),
+      .order("name"),
     supabase.from("teachers").select("*").order("sort_order").order("name"),
   ])
 

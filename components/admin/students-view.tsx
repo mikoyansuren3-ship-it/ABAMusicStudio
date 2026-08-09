@@ -40,20 +40,24 @@ export function StudentsView({ students, teachers }: StudentsViewProps) {
   const activeStudents = filtered.filter((student) => student.is_active)
   const inactiveStudents = filtered.filter((student) => !student.is_active)
   const allActive = students.filter((student) => student.is_active)
-  const needsSetup = allActive.filter((student) => !hasFullBilling(student)).length
+
+  const weeklyLessons = allActive.reduce((sum, student) => sum + student.slots.length, 0)
+  const teacherCount = new Set(
+    allActive
+      .flatMap((student) =>
+        student.slots.length > 0
+          ? student.slots.map((slot) => slot.teacher_id ?? student.teacher_id)
+          : [student.teacher_id],
+      )
+      .filter(Boolean),
+  ).size
 
   const summary =
     allActive.length === 0
       ? "No students yet · approve an inquiry or add one by hand"
-      : `${allActive.length} enrolled${
-          needsSetup > 0
-            ? ` · ${needsSetup} still ${needsSetup === 1 ? "needs" : "need"} a rate and a weekly slot`
-            : " · rates and weekly slots all set"
+      : `${allActive.length} enrolled · ${weeklyLessons} ${weeklyLessons === 1 ? "lesson" : "lessons"} a week${
+          teacherCount > 0 ? ` with ${teacherCount} ${teacherCount === 1 ? "teacher" : "teachers"}` : ""
         }`
-
-  function hasFullBilling(student: PanelStudent) {
-    return Boolean(student.billing && student.billing.rate_cents > 0 && student.slots.length > 0)
-  }
 
   function openAddForm() {
     setEditingStudent(null)
@@ -214,7 +218,7 @@ export function StudentsView({ students, teachers }: StudentsViewProps) {
         }}
       />
 
-      <StudentFormDialog open={formOpen} onOpenChange={setFormOpen} student={editingStudent} />
+      <StudentFormDialog open={formOpen} onOpenChange={setFormOpen} student={editingStudent} teachers={teachers} />
     </div>
   )
 }
