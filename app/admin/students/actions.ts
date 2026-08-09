@@ -125,24 +125,38 @@ export async function createStudent(formData: FormData) {
   const parsed = parseStudentFields(formData)
   if ("error" in parsed) return { error: parsed.error }
 
-  const rateParsed = parseRateField(formData)
-  if ("error" in rateParsed) return { error: rateParsed.error }
+  // Teacher sections serialize to the same slots JSON as the student panel —
+  // every slot arrives with its teacher, length, and rate explicitly.
+  const slotsParsed = parseSlotFields(formData)
+  if ("error" in slotsParsed) return { error: slotsParsed.error }
+  const firstSlot = slotsParsed.slots[0]
 
   const { data: student, error } = await supabase
     .from("students")
-    .insert({ ...parsed.student, parent_id: null })
+    .insert({
+      ...parsed.student,
+      preferred_lesson_duration: firstSlot?.duration_minutes ?? parsed.student.preferred_lesson_duration,
+      teacher_id: firstSlot?.teacher_id ?? null,
+      parent_id: null,
+    })
     .select("id")
     .single()
 
   if (error) return { error: error.message }
 
-  if (rateParsed.rateCents !== null) {
+  if (firstSlot) {
+    // The first section doubles as the student's standing billing default.
     const { error: billingError } = await supabase.from("student_billing").upsert({
       student_id: student.id,
-      rate_cents: rateParsed.rateCents,
-      duration_minutes: parsed.student.preferred_lesson_duration,
+      rate_cents: firstSlot.rate_cents ?? 0,
+      duration_minutes: firstSlot.duration_minutes ?? parsed.student.preferred_lesson_duration,
     })
     if (billingError) return { error: billingError.message }
+
+    const { error: slotsError } = await supabase
+      .from("student_slots")
+      .insert(slotsParsed.slots.map((slot) => ({ student_id: student.id, ...slot })))
+    if (slotsError) return { error: slotsError.message }
   }
 
   revalidateStudentViews()
