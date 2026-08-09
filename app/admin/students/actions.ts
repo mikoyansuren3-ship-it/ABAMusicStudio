@@ -42,81 +42,84 @@ function parseStudentFields(formData: FormData) {
 interface SlotInput {
   day_of_week: number
   lesson_time: string
-  /** NULL = use the student's default teacher / billing. */
   teacher_id: string | null
-  duration_minutes: number | null
+  duration_minutes: number
   rate_cents: number | null
 }
 
+interface SectionInput {
+  /** NULL = the section's slots have no teacher. */
+  teacher_id: string | null
+  duration_minutes: number
+  rate_cents: number | null
+  slots: SlotInput[]
+}
+
 /**
- * Weekly slots arrive as a JSON field:
- * [{"day":1,"time":"16:00","teacher":"<uuid>|default","duration":"30"|"","rate":"45"|""}, …].
- * At most one slot per weekday (mirrors the DB unique constraint). Teacher,
- * duration, and rate are per-slot overrides; blank/default falls back to the
- * student's own teacher and standing billing.
+ * Teacher sections arrive as a JSON field from TeacherSectionsEditor:
+ * [{"teacher":"<uuid>|","duration":"30","rate":"45"|"","rows":[{"day":1,"time":"16:00"}]}, …]
+ * Each section is one teacher's arrangement (length + rate + weekly days).
+ * The FIRST section doubles as the student's default teacher and standing
+ * billing. At most one slot per weekday across all sections (DB constraint).
  */
-function parseSlotFields(formData: FormData): { slots: SlotInput[] } | { error: string } {
-  const raw = ((formData.get("slots") as string) || "").trim()
-  if (!raw) return { slots: [] }
+function parseSectionFields(formData: FormData): { sections: SectionInput[] } | { error: string } {
+  const raw = ((formData.get("sections") as string) || "").trim()
+  if (!raw) return { sections: [] }
 
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
   } catch {
-    return { error: "Weekly slots could not be read — try again." }
+    return { error: "Teacher sections could not be read — try again." }
   }
-  if (!Array.isArray(parsed) || parsed.length > 7) {
-    return { error: "Weekly slots could not be read — try again." }
+  if (!Array.isArray(parsed) || parsed.length > 20) {
+    return { error: "Teacher sections could not be read — try again." }
   }
 
-  const slots: SlotInput[] = []
+  const sections: SectionInput[] = []
   const seenDays = new Set<number>()
+  const seenTeachers = new Set<string>()
   for (const entry of parsed) {
-    const day = Number((entry as { day?: unknown })?.day)
-    const time = String((entry as { time?: unknown })?.time || "")
     const teacherRaw = String((entry as { teacher?: unknown })?.teacher || "").trim()
-    const durationRaw = String((entry as { duration?: unknown })?.duration ?? "").trim()
-    const rateRaw = String((entry as { rate?: unknown })?.rate ?? "").trim()
-    if (!Number.isInteger(day) || day < 0 || day > 6) return { error: "Choose a valid lesson day." }
-    if (!/^\d{2}:\d{2}$/.test(time)) return { error: "Choose a time for each lesson day." }
-    if (seenDays.has(day)) return { error: "A student can only have one lesson per weekday." }
-    seenDays.add(day)
+    const teacherId = teacherRaw || null
+    const teacherKey = teacherRaw || "none"
+    if (seenTeachers.has(teacherKey)) return { error: "Each teacher can only have one section." }
+    seenTeachers.add(teacherKey)
 
-    let durationMinutes: number | null = null
-    if (durationRaw) {
-      const duration = Number.parseInt(durationRaw)
-      if (!DURATIONS.includes(duration)) return { error: "Choose a valid lesson length for each day." }
-      durationMinutes = duration
-    }
+    const duration = Number.parseInt(String((entry as { duration?: unknown })?.duration ?? ""))
+    if (!DURATIONS.includes(duration)) return { error: "Choose a valid lesson length for each teacher." }
+
+    const rateRaw = String((entry as { rate?: unknown })?.rate ?? "").trim()
     let rateCents: number | null = null
     if (rateRaw) {
       const rate = Number.parseFloat(rateRaw)
-      if (Number.isNaN(rate) || rate < 0) return { error: "Enter a valid rate for each day." }
+      if (Number.isNaN(rate) || rate < 0) return { error: "Enter a valid rate for each teacher." }
       rateCents = Math.round(rate * 100)
     }
-    slots.push({
-      day_of_week: day,
-      lesson_time: time,
-      teacher_id: teacherRaw && teacherRaw !== "default" ? teacherRaw : null,
-      duration_minutes: durationMinutes,
-      rate_cents: rateCents,
-    })
+
+    const rowsRaw = (entry as { rows?: unknown })?.rows
+    if (!Array.isArray(rowsRaw) || rowsRaw.length > 7) {
+      return { error: "Weekly days could not be read — try again." }
+    }
+    const slots: SlotInput[] = []
+    for (const row of rowsRaw) {
+      const day = Number((row as { day?: unknown })?.day)
+      const time = String((row as { time?: unknown })?.time || "")
+      if (!Number.isInteger(day) || day < 0 || day > 6) return { error: "Choose a valid lesson day." }
+      if (!/^\d{2}:\d{2}$/.test(time)) return { error: "Choose a time for each lesson day." }
+      if (seenDays.has(day)) return { error: "A student can only have one lesson per weekday." }
+      seenDays.add(day)
+      slots.push({
+        day_of_week: day,
+        lesson_time: time,
+        teacher_id: teacherId,
+        duration_minutes: duration,
+        rate_cents: rateCents,
+      })
+    }
+    sections.push({ teacher_id: teacherId, duration_minutes: duration, rate_cents: rateCents, slots })
   }
-  return { slots }
-}
-
-/** "none"/blank → null, otherwise the teacher's UUID. */
-function parseTeacherField(formData: FormData) {
-  const raw = ((formData.get("teacher_id") as string) || "").trim()
-  return raw && raw !== "none" ? raw : null
-}
-
-function parseRateField(formData: FormData): { rateCents: number | null } | { error: string } {
-  const raw = ((formData.get("rate") as string) || "").trim()
-  if (!raw) return { rateCents: null }
-  const rate = Number.parseFloat(raw)
-  if (Number.isNaN(rate) || rate < 0) return { error: "Enter a valid rate." }
-  return { rateCents: Math.round(rate * 100) }
+  return { sections }
 }
 
 export async function createStudent(formData: FormData) {
@@ -125,18 +128,18 @@ export async function createStudent(formData: FormData) {
   const parsed = parseStudentFields(formData)
   if ("error" in parsed) return { error: parsed.error }
 
-  // Teacher sections serialize to the same slots JSON as the student panel —
-  // every slot arrives with its teacher, length, and rate explicitly.
-  const slotsParsed = parseSlotFields(formData)
-  if ("error" in slotsParsed) return { error: slotsParsed.error }
-  const firstSlot = slotsParsed.slots[0]
+  const sectionsParsed = parseSectionFields(formData)
+  if ("error" in sectionsParsed) return { error: sectionsParsed.error }
+  const sections = sectionsParsed.sections
+  const firstSection = sections[0]
+  const slots = sections.flatMap((section) => section.slots)
 
   const { data: student, error } = await supabase
     .from("students")
     .insert({
       ...parsed.student,
-      preferred_lesson_duration: firstSlot?.duration_minutes ?? parsed.student.preferred_lesson_duration,
-      teacher_id: firstSlot?.teacher_id ?? null,
+      preferred_lesson_duration: firstSection?.duration_minutes ?? parsed.student.preferred_lesson_duration,
+      teacher_id: firstSection?.teacher_id ?? null,
       parent_id: null,
     })
     .select("id")
@@ -144,18 +147,19 @@ export async function createStudent(formData: FormData) {
 
   if (error) return { error: error.message }
 
-  if (firstSlot) {
+  if (firstSection) {
     // The first section doubles as the student's standing billing default.
     const { error: billingError } = await supabase.from("student_billing").upsert({
       student_id: student.id,
-      rate_cents: firstSlot.rate_cents ?? 0,
-      duration_minutes: firstSlot.duration_minutes ?? parsed.student.preferred_lesson_duration,
+      rate_cents: firstSection.rate_cents ?? 0,
+      duration_minutes: firstSection.duration_minutes,
     })
     if (billingError) return { error: billingError.message }
-
+  }
+  if (slots.length > 0) {
     const { error: slotsError } = await supabase
       .from("student_slots")
-      .insert(slotsParsed.slots.map((slot) => ({ student_id: student.id, ...slot })))
+      .insert(slots.map((slot) => ({ student_id: student.id, ...slot })))
     if (slotsError) return { error: slotsError.message }
   }
 
@@ -213,24 +217,22 @@ export async function toggleStudentActive(studentId: string, isActive: boolean) 
 }
 
 /**
- * Save from the student slide-over panel: teacher, rate, duration, weekly
- * slots, and internal notes in one go. Rate blank AND no slots removes the
- * billing record (and all slots). Changing the teacher re-stamps only FUTURE
- * lessons, so past months' teacher pay reports never drift.
+ * Save from the student slide-over panel: teacher sections (each teacher's
+ * days, length, and rate) plus internal notes in one go. No sections removes
+ * the billing record and all slots. The first section is the student's
+ * default teacher and standing billing. Changes re-stamp only FUTURE
+ * lessons, so past months' teacher pay and income reports never drift.
  */
 export async function saveStudentPanel(studentId: string, formData: FormData) {
   const supabase = await createClient()
 
-  const durationRaw = Number.parseInt((formData.get("duration") as string) || "")
-  const duration = DURATIONS.includes(durationRaw) ? durationRaw : 30
+  const sectionsParsed = parseSectionFields(formData)
+  if ("error" in sectionsParsed) return { error: sectionsParsed.error }
+  const sections = sectionsParsed.sections
+  const firstSection = sections[0]
+  const slots = sections.flatMap((section) => section.slots)
 
-  const rateParsed = parseRateField(formData)
-  if ("error" in rateParsed) return { error: rateParsed.error }
-
-  const slotsParsed = parseSlotFields(formData)
-  if ("error" in slotsParsed) return { error: slotsParsed.error }
-
-  const teacherId = parseTeacherField(formData)
+  const teacherId = firstSection?.teacher_id ?? null
   const notes = ((formData.get("notes") as string) || "").trim() || null
 
   const { data: existing, error: studentError } = await supabase
@@ -240,12 +242,12 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
     .single()
   if (studentError || !existing) return { error: "Student not found." }
 
-  // Billing: any rate or slot keeps the record; all blank removes it.
-  if (rateParsed.rateCents !== null || slotsParsed.slots.length > 0) {
+  // Billing: any teacher section keeps the record; none removes it.
+  if (firstSection) {
     const { error: billingError } = await supabase.from("student_billing").upsert({
       student_id: studentId,
-      rate_cents: rateParsed.rateCents ?? 0,
-      duration_minutes: duration,
+      rate_cents: firstSection.rate_cents ?? 0,
+      duration_minutes: firstSection.duration_minutes,
     })
     if (billingError) return { error: billingError.message }
   } else {
@@ -254,14 +256,14 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
   }
 
   // Slots: upsert per weekday (keeps created_at on unchanged days), drop removed days.
-  if (slotsParsed.slots.length > 0) {
+  if (slots.length > 0) {
     const { error: slotsError } = await supabase.from("student_slots").upsert(
-      slotsParsed.slots.map((slot) => ({ student_id: studentId, ...slot })),
+      slots.map((slot) => ({ student_id: studentId, ...slot })),
       { onConflict: "student_id,day_of_week" },
     )
     if (slotsError) return { error: slotsError.message }
 
-    const keptDays = slotsParsed.slots.map((slot) => slot.day_of_week)
+    const keptDays = slots.map((slot) => slot.day_of_week)
     const { error: pruneError } = await supabase
       .from("student_slots")
       .delete()
@@ -280,8 +282,7 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
   if (updateError) return { error: updateError.message }
 
   // Re-stamp only FUTURE lessons so past months' pay and income never drift.
-  // Recurring lessons take their slot's teacher/rate/duration (slot overrides
-  // fall back to the student's default teacher and standing billing); one-off
+  // Recurring lessons take their slot's teacher/rate/duration; one-off
   // lessons follow the default teacher only when it changed.
   const { data: futureBookings, error: futureError } = await supabase
     .from("bookings")
@@ -290,8 +291,8 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
     .gte("start_time", studioNow().toISOString())
   if (futureError) return { error: futureError.message }
 
-  const billingRate = rateParsed.rateCents ?? 0
-  const slotsByDay = new Map(slotsParsed.slots.map((slot) => [slot.day_of_week, slot]))
+  const billingRate = firstSection?.rate_cents ?? 0
+  const slotsByDay = new Map(slots.map((slot) => [slot.day_of_week, slot]))
   for (const booking of futureBookings || []) {
     if (booking.status === "cancelled") continue
     const slot = booking.is_recurring ? slotsByDay.get(booking.recurring_day_of_week ?? -1) : undefined
@@ -300,7 +301,7 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
       const newTeacher = slot.teacher_id ?? teacherId
       const newRate = slot.rate_cents ?? billingRate
       const newEnd = new Date(
-        new Date(booking.start_time).getTime() + (slot.duration_minutes ?? duration) * 60000,
+        new Date(booking.start_time).getTime() + slot.duration_minutes * 60000,
       ).toISOString()
       if (newTeacher !== booking.teacher_id) patch.teacher_id = newTeacher
       if (newRate !== booking.rate_cents) patch.rate_cents = newRate

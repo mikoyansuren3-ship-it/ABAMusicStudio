@@ -5,17 +5,15 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { Loader2, Plus, X } from "lucide-react"
+import { Loader2, X } from "lucide-react"
 import type { Profile, Student, StudentBilling, StudentSlot, Teacher } from "@/lib/types"
 import { saveStudentPanel, toggleStudentActive } from "@/app/admin/students/actions"
-import { DashedButton, Eyebrow } from "@/components/admin/ui"
-import { DAY_NAMES, initials } from "@/lib/admin/format"
+import { Eyebrow } from "@/components/admin/ui"
+import { initials } from "@/lib/admin/format"
 import { experienceLabel } from "@/lib/portal/format"
+import { TeacherSectionsEditor, sectionsFromStudent } from "@/components/admin/teacher-sections-editor"
 
 export type PanelStudent = Student & {
   profile: Profile | null
@@ -30,156 +28,6 @@ interface StudentPanelProps {
   /** Optional hook to open the full edit-details dialog (name, level, guardian, phone). */
   onEditDetails?: (student: PanelStudent) => void
 }
-
-interface SlotRow {
-  day: string
-  time: string
-  /** "default" = the student's assigned teacher. */
-  teacher: string
-  /** "" = the student's default duration. */
-  duration: string
-  /** "" = the student's default rate. */
-  rate: string
-}
-
-/**
- * Weekly slot rows, one per weekday. Each day can override the teacher,
- * length, and rate — how one student takes piano with one teacher and vocal
- * with another under a single profile. Blank overrides fall back to the
- * student's defaults above. Lives inside the keyed <form> so its state resets
- * when the panel switches students; serializes to a hidden `slots` JSON field
- * for saveStudentPanel.
- */
-function SlotsEditor({ initialSlots, teachers }: { initialSlots: StudentSlot[]; teachers: Teacher[] }) {
-  const [rows, setRows] = useState<SlotRow[]>(() =>
-    initialSlots
-      .slice()
-      .sort((a, b) => a.day_of_week - b.day_of_week)
-      .map((slot) => ({
-        day: String(slot.day_of_week),
-        time: slot.lesson_time.slice(0, 5),
-        teacher: slot.teacher_id ?? "default",
-        duration: slot.duration_minutes != null ? String(slot.duration_minutes) : "",
-        rate: slot.rate_cents != null ? (slot.rate_cents / 100).toFixed(2) : "",
-      })),
-  )
-
-  const serialized = JSON.stringify(
-    rows
-      .filter((row) => row.day !== "" && row.time !== "")
-      .map((row) => ({
-        day: Number(row.day),
-        time: row.time,
-        teacher: row.teacher,
-        duration: row.duration,
-        rate: row.rate,
-      })),
-  )
-  const usedDays = new Set(rows.map((row) => row.day))
-
-  function updateRow(index: number, patch: Partial<SlotRow>) {
-    setRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)))
-  }
-
-  return (
-    <div className="flex flex-col gap-2.5">
-      <input type="hidden" name="slots" value={serialized} />
-      {rows.length === 0 && (
-        <p className="text-[13px] text-muted-foreground">No weekly days yet — lessons won&apos;t generate.</p>
-      )}
-      {rows.map((row, index) => (
-        <div key={index} className="flex flex-col gap-2 rounded-lg border p-2.5">
-          <div className="flex items-center gap-2.5">
-            <Select value={row.day} onValueChange={(value) => updateRow(index, { day: value })}>
-              <SelectTrigger aria-label={`Lesson day ${index + 1}`} className={`${fieldClass} flex-[1.3]`}>
-                <SelectValue placeholder="Day" />
-              </SelectTrigger>
-              <SelectContent>
-                {DAY_NAMES.map((day, dayIndex) => (
-                  <SelectItem
-                    key={day}
-                    value={String(dayIndex)}
-                    disabled={usedDays.has(String(dayIndex)) && row.day !== String(dayIndex)}
-                  >
-                    {day}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="time"
-              aria-label={`Lesson time ${index + 1}`}
-              value={row.time}
-              onChange={(e) => updateRow(index, { time: e.target.value })}
-              className={`${fieldClass} flex-1`}
-            />
-            <button
-              type="button"
-              aria-label={`Remove day ${index + 1}`}
-              onClick={() => setRows((prev) => prev.filter((_, i) => i !== index))}
-              className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <X className="size-4" aria-hidden />
-            </button>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <Select value={row.teacher} onValueChange={(value) => updateRow(index, { teacher: value })}>
-              <SelectTrigger aria-label={`Teacher for day ${index + 1}`} className={`${fieldClass} flex-[1.4]`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Default teacher</SelectItem>
-                {teachers.map((teacher) => (
-                  <SelectItem key={teacher.id} value={teacher.id}>
-                    {teacher.name}
-                    {teacher.is_active ? "" : " (inactive)"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={row.duration || "default"} onValueChange={(value) => updateRow(index, { duration: value === "default" ? "" : value })}>
-              <SelectTrigger aria-label={`Length for day ${index + 1}`} className={`${fieldClass} w-[104px] shrink-0`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="30">30 min</SelectItem>
-                <SelectItem value="45">45 min</SelectItem>
-                <SelectItem value="60">60 min</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              aria-label={`Rate for day ${index + 1}`}
-              placeholder="Rate"
-              value={row.rate}
-              onChange={(e) => updateRow(index, { rate: e.target.value })}
-              className={`${fieldClass} w-[84px] shrink-0`}
-            />
-          </div>
-        </div>
-      ))}
-      {rows.length < 7 && (
-        <DashedButton
-          className="w-fit"
-          onClick={() =>
-            setRows((prev) => {
-              const nextDay = [1, 2, 3, 4, 5, 6, 0].find((day) => !prev.some((row) => row.day === String(day)))
-              return [...prev, { day: nextDay !== undefined ? String(nextDay) : "", time: "", teacher: "default", duration: "", rate: "" }]
-            })
-          }
-        >
-          <Plus className="size-3.5" aria-hidden />
-          Add a day
-        </DashedButton>
-      )}
-    </div>
-  )
-}
-
-const fieldClass = "h-[42px] rounded-lg border-border bg-card text-sm"
 
 /** Right slide-over with a wood header: teacher, rate + weekly slots, internal notes, active toggle. */
 export function StudentPanel({ student, teachers, onClose, onEditDetails }: StudentPanelProps) {
@@ -217,11 +65,6 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
   const guardianPhone = student?.profile?.phone || student?.contact_phone || null
   const guardianEmail = student?.contact_email || null
   const duration = student?.billing?.duration_minutes ?? student?.preferred_lesson_duration ?? 30
-
-  // Offer active teachers, plus the student's current one even if inactive.
-  const teacherOptions = teachers.filter(
-    (teacher) => teacher.is_active || teacher.id === student?.teacher_id,
-  )
 
   return (
     <Sheet open={student !== null} onOpenChange={(open) => !open && onClose()}>
@@ -282,74 +125,12 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
               </div>
 
               <div className="flex flex-col gap-3.5 border-t pt-[22px]">
-                <Eyebrow>Teacher</Eyebrow>
-                <div className="flex flex-col gap-[7px]">
-                  <Label htmlFor="panel-teacher" className="text-xs font-semibold">
-                    Assigned teacher
-                  </Label>
-                  <Select name="teacher_id" defaultValue={student.teacher_id ?? "none"}>
-                    <SelectTrigger id="panel-teacher" className={`${fieldClass} w-full`}>
-                      <SelectValue placeholder="Not assigned" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Not assigned</SelectItem>
-                      {teacherOptions.map((teacher) => (
-                        <SelectItem key={teacher.id} value={teacher.id}>
-                          {teacher.name}
-                          {teacher.is_active ? "" : " (inactive)"}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs leading-[18px] text-muted-foreground">
-                    The default for every lesson day below — individual days can override it. Changing teachers moves
-                    upcoming lessons to their calendar; past months stay with whoever taught them.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3.5 border-t pt-[22px]">
-                <Eyebrow>Rate and weekly slots</Eyebrow>
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex min-w-32 flex-[1.2] flex-col gap-[7px]">
-                    <Label htmlFor="panel-rate" className="text-xs font-semibold">
-                      Rate per lesson
-                    </Label>
-                    <Input
-                      id="panel-rate"
-                      name="rate"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="45.00"
-                      defaultValue={student.billing ? (student.billing.rate_cents / 100).toFixed(2) : ""}
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="flex min-w-28 flex-1 flex-col gap-[7px]">
-                    <Label htmlFor="panel-duration" className="text-xs font-semibold">
-                      Duration
-                    </Label>
-                    <Select name="duration" defaultValue={String(duration)}>
-                      <SelectTrigger id="panel-duration" className={`${fieldClass} w-full`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="30">30 min</SelectItem>
-                        <SelectItem value="45">45 min</SelectItem>
-                        <SelectItem value="60">60 min</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-[7px]">
-                  <span className="text-xs font-semibold">Lesson days</span>
-                  <SlotsEditor initialSlots={student.slots} teachers={teacherOptions} />
-                </div>
+                <Eyebrow>Teachers and weekly days</Eyebrow>
+                <TeacherSectionsEditor teachers={teachers} initialSections={sectionsFromStudent(student)} />
                 <p className="text-xs leading-[18px] text-muted-foreground">
-                  Lessons repeat weekly on each chosen day. Each day can use a different teacher, length, or rate —
-                  &ldquo;Default&rdquo; means the assigned teacher and rate above. Changes apply from the current month
-                  forward, and expected income starts counting.
+                  Lessons repeat weekly on each chosen day. The first teacher listed is the student&apos;s default.
+                  Changes apply from the current month forward — upcoming lessons move to the right teacher and rate;
+                  past months stay with whoever taught them.
                 </p>
               </div>
 
