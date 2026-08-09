@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { isSlotBookable } from "@/lib/schedule"
+import { dateKeyUtc, studioNow } from "@/lib/studio-time"
 import { revalidatePath } from "next/cache"
 
 export async function cancelBooking(bookingId: string) {
@@ -42,12 +43,12 @@ export async function rescheduleBooking(bookingId: string, newStartTime: string,
     supabase
       .from("availability_exceptions")
       .select("*")
-      .gte("exception_date", new Date().toISOString().split("T")[0]),
+      .gte("exception_date", dateKeyUtc(studioNow())),
     supabase
       .from("bookings")
       .select("id,start_time,end_time,status")
       .neq("id", bookingId)
-      .gte("start_time", new Date().toISOString())
+      .gte("start_time", studioNow().toISOString())
       .in("status", ["confirmed", "pending"]),
   ])
 

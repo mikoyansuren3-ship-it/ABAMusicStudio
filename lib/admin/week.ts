@@ -80,9 +80,13 @@ export function buildWeekSkeleton({
     scaleStart = 15 * 60
     scaleEnd = 19 * 60
   }
+  // Snap to whole hours so the scale's endpoints are exactly the first and
+  // last hour labels — day windows and lesson chips position against it.
+  scaleStart = Math.floor(scaleStart / 60) * 60
+  scaleEnd = Math.ceil(scaleEnd / 60) * 60
 
   const hourLabels: string[] = []
-  for (let minute = Math.floor(scaleStart / 60) * 60; minute <= Math.ceil(scaleEnd / 60) * 60; minute += 60) {
+  for (let minute = scaleStart; minute <= scaleEnd; minute += 60) {
     hourLabels.push(formatHour(minute))
   }
 

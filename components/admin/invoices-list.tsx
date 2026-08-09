@@ -19,7 +19,8 @@ interface InvoicesListProps {
 }
 
 function isOverdue(invoice: InvoiceRow, nowMs: number) {
-  return invoice.status === "unpaid" && !!invoice.due_date && new Date(`${invoice.due_date}T23:59:59`).getTime() < nowMs
+  // Z suffix: nowMs is studio wall-clock-as-UTC (see lib/studio-time.ts).
+  return invoice.status === "unpaid" && !!invoice.due_date && Date.parse(`${invoice.due_date}T23:59:59Z`) < nowMs
 }
 
 function studentLabel(invoice: InvoiceRow) {

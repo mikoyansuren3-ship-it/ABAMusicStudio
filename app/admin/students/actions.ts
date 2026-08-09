@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { studioNow } from "@/lib/studio-time"
 import { revalidatePath } from "next/cache"
 
 const DURATIONS = [30, 45, 60]
@@ -241,7 +242,7 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
       .from("bookings")
       .update({ teacher_id: teacherId })
       .eq("student_id", studentId)
-      .gte("start_time", new Date().toISOString())
+      .gte("start_time", studioNow().toISOString())
     if (restampError) return { error: restampError.message }
   }
 

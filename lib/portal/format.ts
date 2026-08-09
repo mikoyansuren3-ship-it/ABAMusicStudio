@@ -1,3 +1,9 @@
+// Date/time formatters here render with an explicit timeZone so output never
+// depends on where the code runs (Vercel is UTC, dev machines are not).
+// Lesson times are studio wall-clock stored as UTC (see lib/studio-time.ts),
+// so "UTC" rendering shows exactly the wall clock that was stored; date-only
+// strings like "2026-08-29" also parse as UTC and render unshifted.
+
 /** Invoice amounts are stored in cents. */
 export function formatCurrency(cents: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100)
@@ -5,6 +11,7 @@ export function formatCurrency(cents: number) {
 
 export function formatShortDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
+    timeZone: "UTC",
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -14,6 +21,7 @@ export function formatShortDate(iso: string) {
 /** e.g. "Jul 12, 2026" — short date that keeps the year. */
 export function formatMediumDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
+    timeZone: "UTC",
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -22,6 +30,7 @@ export function formatMediumDate(iso: string) {
 
 export function formatLongDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
+    timeZone: "UTC",
     weekday: "long",
     month: "long",
     day: "numeric",
@@ -30,6 +39,7 @@ export function formatLongDate(iso: string) {
 
 export function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString("en-US", {
+    timeZone: "UTC",
     hour: "numeric",
     minute: "2-digit",
   })
@@ -43,9 +53,9 @@ export function formatDateTime(iso: string) {
 export function formatMonthDay(iso: string) {
   const d = new Date(iso)
   return {
-    month: d.toLocaleDateString("en-US", { month: "short" }),
-    day: d.getDate(),
-    weekday: d.toLocaleDateString("en-US", { weekday: "long" }),
+    month: d.toLocaleDateString("en-US", { timeZone: "UTC", month: "short" }),
+    day: d.getUTCDate(),
+    weekday: d.toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long" }),
   }
 }
 

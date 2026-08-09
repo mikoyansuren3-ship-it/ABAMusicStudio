@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server"
 import { TeachersView, type MonthTotals, type TeacherSummaryRow } from "@/components/admin/teachers-view"
 import { ensureLessons } from "@/lib/admin/lessons"
 import { periodActuals, weeklyPlan } from "@/lib/admin/economics"
+import { studioToday, wallClockToUtc } from "@/lib/studio-time"
+import { toDateKey } from "@/lib/admin/format"
 import type { Booking, StudentBilling, StudentSlot, Teacher } from "@/lib/types"
 
 interface StudentLite {
@@ -15,7 +17,7 @@ interface StudentLite {
 export default async function AdminTeachersPage() {
   const supabase = await createClient()
 
-  const now = new Date()
+  const now = studioToday()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
 
@@ -30,8 +32,8 @@ export default async function AdminTeachersPage() {
     supabase
       .from("bookings")
       .select("*")
-      .gte("start_time", monthStart.toISOString())
-      .lt("start_time", monthEnd.toISOString()),
+      .gte("start_time", wallClockToUtc(toDateKey(monthStart), "00:00:00").toISOString())
+      .lt("start_time", wallClockToUtc(toDateKey(monthEnd), "00:00:00").toISOString()),
   ])
 
   const teachers = (teachersRes.data || []) as Teacher[]

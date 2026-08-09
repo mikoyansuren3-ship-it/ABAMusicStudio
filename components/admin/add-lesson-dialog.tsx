@@ -20,7 +20,8 @@ import { Input } from "@/components/ui/input"
 import { Loader2, Plus } from "lucide-react"
 import { createBooking } from "@/app/admin/schedule/actions"
 import { DashedButton } from "@/components/admin/ui"
-import { DAY_NAMES, formatTimeRange, toDateKey } from "@/lib/admin/format"
+import { DAY_NAMES, formatTimeRange } from "@/lib/admin/format"
+import { dateKeyUtc, studioNow } from "@/lib/studio-time"
 import type { Availability } from "@/lib/types"
 
 interface StudentOption {
@@ -45,9 +46,9 @@ export function AddLessonButton({ students, availability, variant = "primary", l
   const [isLoading, setIsLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const [needsConfirm, setNeedsConfirm] = useState(false)
-  const [date, setDate] = useState(() => toDateKey(new Date()))
+  const [date, setDate] = useState(() => dateKeyUtc(studioNow()))
 
-  const todayKey = toDateKey(new Date())
+  const todayKey = dateKeyUtc(studioNow())
 
   const hint = (() => {
     const parsed = new Date(`${date}T12:00:00`)

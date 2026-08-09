@@ -9,6 +9,7 @@ import { ensureLessons } from "@/lib/admin/lessons"
 import { buildWeekSkeleton, resolveWeekAnchor, weekRangeLabel } from "@/lib/admin/week"
 import { formatTimeRange, numberWord, toDateKey } from "@/lib/admin/format"
 import { formatTime } from "@/lib/portal/format"
+import { dateKeyUtc, minutesUtc, studioToday, wallClockToUtc } from "@/lib/studio-time"
 import type { Availability, AvailabilityException, Booking, Profile, Student, Teacher } from "@/lib/types"
 
 type BookingRow = Booking & { student: (Student & { profile: Profile | null }) | null }
@@ -23,8 +24,7 @@ export default async function AdminSchedulePage({
   searchParams: Promise<{ week?: string; teacher?: string }>
 }) {
   const params = await searchParams
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const today = studioToday()
 
   const anchor = resolveWeekAnchor(params.week, today)
   const weekEndExclusive = new Date(anchor)
@@ -41,14 +41,14 @@ export default async function AdminSchedulePage({
     supabase
       .from("bookings")
       .select("*, student:students(*, profile:profiles(*))")
-      .gte("start_time", anchor.toISOString())
-      .lt("start_time", weekEndExclusive.toISOString())
+      .gte("start_time", wallClockToUtc(toDateKey(anchor), "00:00:00").toISOString())
+      .lt("start_time", wallClockToUtc(toDateKey(weekEndExclusive), "00:00:00").toISOString())
       .eq("status", "confirmed")
       .order("start_time"),
     supabase
       .from("bookings")
       .select("*, student:students(*, profile:profiles(*))")
-      .gte("start_time", today.toISOString())
+      .gte("start_time", wallClockToUtc(toDateKey(today), "00:00:00").toISOString())
       .eq("status", "pending")
       .order("start_time"),
     supabase.from("students").select("*, profile:profiles(*)").eq("is_active", true).order("created_at"),
@@ -96,7 +96,7 @@ export default async function AdminSchedulePage({
 
   const skeleton = buildWeekSkeleton({ anchor, today, availability, exceptions })
   const days: WeekBandDay[] = skeleton.days.map((day) => {
-    const dayLessons = bookings.filter((booking) => toDateKey(new Date(booking.start_time)) === day.key)
+    const dayLessons = bookings.filter((booking) => dateKeyUtc(booking.start_time) === day.key)
 
     let bandText: string | null = null
     if (day.closed) {
@@ -120,11 +120,12 @@ export default async function AdminSchedulePage({
       lessons: dayLessons.map((booking) => {
         const start = new Date(booking.start_time)
         const end = new Date(booking.end_time)
+        const range = formatTimeRange(minutesToTimeString(minutesUtc(start)), minutesToTimeString(minutesUtc(end)))
         return {
           id: booking.id,
-          label: `${booking.student?.name || "Student"} · ${formatTime(booking.start_time)}`,
+          label: `${booking.student?.name || "Student"} · ${range}`,
           title: `${booking.student?.name || "Student"}, ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`,
-          startMinutes: start.getHours() * 60 + start.getMinutes(),
+          startMinutes: minutesUtc(start),
           durationMinutes: Math.max((end.getTime() - start.getTime()) / 60000, 15),
         }
       }),
@@ -205,7 +206,13 @@ export default async function AdminSchedulePage({
         />
       )}
 
-      <WeekBands eyebrow="This week" hourLabels={skeleton.hourLabels} days={days} />
+      <WeekBands
+        eyebrow="This week"
+        hourLabels={skeleton.hourLabels}
+        scaleStart={skeleton.scaleStart}
+        scaleEnd={skeleton.scaleEnd}
+        days={days}
+      />
 
       <AdminCard className="flex flex-col gap-2.5">
         <Eyebrow>Reschedule requests</Eyebrow>

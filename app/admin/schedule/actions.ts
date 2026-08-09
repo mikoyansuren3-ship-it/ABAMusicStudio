@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { classifySlot } from "@/lib/schedule"
+import { dateKeyUtc, studioNow, wallClockToUtc } from "@/lib/studio-time"
 import { revalidatePath } from "next/cache"
 
 export async function createBooking(formData: FormData) {
@@ -13,7 +14,7 @@ export async function createBooking(formData: FormData) {
   const duration = Number.parseInt(formData.get("duration") as string)
   const confirmOutside = formData.get("confirm_outside") === "1"
 
-  const startDateTime = new Date(`${date}T${startTime}`)
+  const startDateTime = wallClockToUtc(date, startTime)
   const endDateTime = new Date(startDateTime.getTime() + duration * 60000)
 
   if (!studentId || Number.isNaN(startDateTime.getTime()) || Number.isNaN(endDateTime.getTime())) {
@@ -25,11 +26,11 @@ export async function createBooking(formData: FormData) {
     supabase
       .from("availability_exceptions")
       .select("*")
-      .gte("exception_date", new Date().toISOString().split("T")[0]),
+      .gte("exception_date", dateKeyUtc(studioNow())),
     supabase
       .from("bookings")
       .select("start_time,end_time,status")
-      .gte("start_time", new Date().toISOString())
+      .gte("start_time", studioNow().toISOString())
       .in("status", ["confirmed", "pending"]),
     supabase.from("students").select("teacher_id").eq("id", studentId).single(),
   ])

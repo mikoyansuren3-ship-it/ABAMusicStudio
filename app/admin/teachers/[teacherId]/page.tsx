@@ -10,11 +10,16 @@ import type { WeekBandDay } from "@/components/admin/week-bands"
 import { ensureLessons } from "@/lib/admin/lessons"
 import { lessonCounts, periodActuals, weeklyPlan } from "@/lib/admin/economics"
 import { buildWeekSkeleton, resolveWeekAnchor, weekRangeLabel } from "@/lib/admin/week"
-import { formatCurrencyCompact, toDateKey } from "@/lib/admin/format"
+import { formatCurrencyCompact, formatTimeRange, toDateKey } from "@/lib/admin/format"
 import { formatTime } from "@/lib/portal/format"
+import { dateKeyUtc, minutesUtc, studioToday, wallClockToUtc } from "@/lib/studio-time"
 import type { Availability, AvailabilityException, Booking, Teacher } from "@/lib/types"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function minutesToTimeString(totalMinutes: number) {
+  return `${String(Math.floor(totalMinutes / 60)).padStart(2, "0")}:${String(totalMinutes % 60).padStart(2, "0")}`
+}
 
 export default async function TeacherDetailPage({
   params,
@@ -32,17 +37,15 @@ export default async function TeacherDetailPage({
   const { data: teacher } = await supabase.from("teachers").select("*").eq("id", teacherId).maybeSingle()
   if (!teacher) notFound()
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const today = studioToday()
   const anchor = resolveWeekAnchor(query.week, today)
   const weekEndExclusive = new Date(anchor)
   weekEndExclusive.setDate(weekEndExclusive.getDate() + 7)
   const weekLast = new Date(anchor)
   weekLast.setDate(weekLast.getDate() + 6)
 
-  const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 1)
 
   // Materialize both windows so the calendar and the month figures are fresh.
   await ensureLessons(supabase, anchor, weekEndExclusive)
@@ -61,15 +64,15 @@ export default async function TeacherDetailPage({
         .select("*, student:students(id, name)")
         .eq("teacher_id", teacherId)
         .eq("status", "confirmed")
-        .gte("start_time", anchor.toISOString())
-        .lt("start_time", weekEndExclusive.toISOString())
+        .gte("start_time", wallClockToUtc(toDateKey(anchor), "00:00:00").toISOString())
+        .lt("start_time", wallClockToUtc(toDateKey(weekEndExclusive), "00:00:00").toISOString())
         .order("start_time"),
       supabase
         .from("bookings")
         .select("*")
         .eq("teacher_id", teacherId)
-        .gte("start_time", monthStart.toISOString())
-        .lt("start_time", monthEnd.toISOString()),
+        .gte("start_time", wallClockToUtc(toDateKey(monthStart), "00:00:00").toISOString())
+        .lt("start_time", wallClockToUtc(toDateKey(monthEnd), "00:00:00").toISOString()),
       supabase.from("availability").select("*").eq("is_active", true),
       supabase
         .from("availability_exceptions")
@@ -140,7 +143,7 @@ export default async function TeacherDetailPage({
 
   const skeleton = buildWeekSkeleton({ anchor, today, availability, exceptions })
   const weekDays: WeekBandDay[] = skeleton.days.map((day) => {
-    const dayLessons = weekBookings.filter((booking) => toDateKey(new Date(booking.start_time)) === day.key)
+    const dayLessons = weekBookings.filter((booking) => dateKeyUtc(booking.start_time) === day.key)
     return {
       key: day.key,
       eyebrow: day.eyebrow,
@@ -159,11 +162,12 @@ export default async function TeacherDetailPage({
       lessons: dayLessons.map((booking) => {
         const start = new Date(booking.start_time)
         const end = new Date(booking.end_time)
+        const range = formatTimeRange(minutesToTimeString(minutesUtc(start)), minutesToTimeString(minutesUtc(end)))
         return {
           id: booking.id,
-          label: `${booking.student?.name || "Student"} · ${formatTime(booking.start_time)}`,
+          label: `${booking.student?.name || "Student"} · ${range}`,
           title: `${booking.student?.name || "Student"}, ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`,
-          startMinutes: start.getHours() * 60 + start.getMinutes(),
+          startMinutes: minutesUtc(start),
           durationMinutes: Math.max((end.getTime() - start.getTime()) / 60000, 15),
         }
       }),
@@ -191,13 +195,15 @@ export default async function TeacherDetailPage({
         roster={roster}
         weekDays={weekDays}
         hourLabels={skeleton.hourLabels}
+        scaleStart={skeleton.scaleStart}
+        scaleEnd={skeleton.scaleEnd}
         summary={summary}
         hrefs={{
           prev: `${base}?week=${toDateKey(prevAnchor)}`,
           current: base,
           next: `${base}?week=${toDateKey(nextAnchor)}`,
         }}
-        monthName={now.toLocaleDateString("en-US", { month: "long" })}
+        monthName={today.toLocaleDateString("en-US", { month: "long" })}
         monthActuals={monthActuals}
       />
     </div>
