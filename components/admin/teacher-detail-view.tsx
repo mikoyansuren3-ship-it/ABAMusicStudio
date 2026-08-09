@@ -35,6 +35,8 @@ interface TeacherDetailViewProps {
   roster: RosterRow[]
   weekDays: WeekBandDay[]
   hourLabels: string[]
+  scaleStart: number
+  scaleEnd: number
   summary: string
   hrefs: { prev: string; current: string; next: string }
   monthName: string
@@ -48,6 +50,8 @@ export function TeacherDetailView({
   roster,
   weekDays,
   hourLabels,
+  scaleStart,
+  scaleEnd,
   summary,
   hrefs,
   monthName,
@@ -227,7 +231,7 @@ export function TeacherDetailView({
         )}
       </AdminCard>
 
-      <WeekBands eyebrow="This week" hourLabels={hourLabels} days={weekDays} />
+      <WeekBands eyebrow="This week" hourLabels={hourLabels} scaleStart={scaleStart} scaleEnd={scaleEnd} days={weekDays} />
 
       <StudentPanel student={panelStudent} teachers={teachers} onClose={() => setPanelStudentId(null)} />
       <TeacherFormDialog open={editOpen} onOpenChange={setEditOpen} teacher={teacher} />

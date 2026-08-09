@@ -195,6 +195,8 @@ export default async function TeacherDetailPage({
         roster={roster}
         weekDays={weekDays}
         hourLabels={skeleton.hourLabels}
+        scaleStart={skeleton.scaleStart}
+        scaleEnd={skeleton.scaleEnd}
         summary={summary}
         hrefs={{
           prev: `${base}?week=${toDateKey(prevAnchor)}`,

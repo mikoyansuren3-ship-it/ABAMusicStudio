@@ -206,7 +206,13 @@ export default async function AdminSchedulePage({
         />
       )}
 
-      <WeekBands eyebrow="This week" hourLabels={skeleton.hourLabels} days={days} />
+      <WeekBands
+        eyebrow="This week"
+        hourLabels={skeleton.hourLabels}
+        scaleStart={skeleton.scaleStart}
+        scaleEnd={skeleton.scaleEnd}
+        days={days}
+      />
 
       <AdminCard className="flex flex-col gap-2.5">
         <Eyebrow>Reschedule requests</Eyebrow>
