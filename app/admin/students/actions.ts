@@ -205,6 +205,42 @@ export async function updateStudentNotes(studentId: string, notes: string) {
   return { success: true }
 }
 
+/** What a hard delete takes with it — shown in the panel's confirm step. */
+export async function getStudentDeleteImpact(studentId: string) {
+  const supabase = await createClient()
+  const [lessonsRes, invoicesRes, paidRes] = await Promise.all([
+    supabase.from("bookings").select("id", { count: "exact", head: true }).eq("student_id", studentId),
+    supabase.from("invoices").select("id", { count: "exact", head: true }).eq("student_id", studentId),
+    supabase
+      .from("invoices")
+      .select("id", { count: "exact", head: true })
+      .eq("student_id", studentId)
+      .eq("status", "paid"),
+  ])
+  return {
+    lessons: lessonsRes.count ?? 0,
+    invoices: invoicesRes.count ?? 0,
+    paidInvoices: paidRes.count ?? 0,
+  }
+}
+
+/**
+ * Permanently delete a student. Weekly slots, billing, lessons, and invoices
+ * all cascade with the row — this erases their history, which is why the
+ * panel gates it behind an explicit confirm. Students who simply stopped
+ * should be marked inactive instead, which keeps every record.
+ */
+export async function deleteStudent(studentId: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.from("students").delete().eq("id", studentId).select("id")
+  if (error) return { error: error.message }
+  if (!data || data.length === 0) return { error: "Student not found." }
+
+  revalidateStudentViews()
+  return { success: true }
+}
+
 export async function toggleStudentActive(studentId: string, isActive: boolean) {
   const supabase = await createClient()
 

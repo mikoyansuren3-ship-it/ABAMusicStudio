@@ -9,7 +9,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Loader2, X } from "lucide-react"
 import type { Profile, Student, StudentBilling, StudentSlot, Teacher } from "@/lib/types"
-import { saveStudentPanel, toggleStudentActive } from "@/app/admin/students/actions"
+import {
+  deleteStudent,
+  getStudentDeleteImpact,
+  saveStudentPanel,
+  toggleStudentActive,
+} from "@/app/admin/students/actions"
 import { Eyebrow } from "@/components/admin/ui"
 import { initials } from "@/lib/admin/format"
 import { experienceLabel } from "@/lib/portal/format"
@@ -35,6 +40,21 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
   const [isSaving, setIsSaving] = useState(false)
   const [isTogglingActive, setIsTogglingActive] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [deleteStep, setDeleteStep] = useState<"idle" | "confirm">("idle")
+  const [deleteImpact, setDeleteImpact] = useState<{
+    lessons: number
+    invoices: number
+    paidInvoices: number
+  } | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  /** Close and clear transient state so the next student opens fresh. */
+  function closePanel() {
+    setDeleteStep("idle")
+    setDeleteImpact(null)
+    setSaveError(null)
+    onClose()
+  }
 
   async function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -49,7 +69,7 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
     }
     router.refresh()
     setIsSaving(false)
-    onClose()
+    closePanel()
   }
 
   async function handleToggleActive() {
@@ -58,7 +78,30 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
     await toggleStudentActive(student.id, !student.is_active)
     router.refresh()
     setIsTogglingActive(false)
-    onClose()
+    closePanel()
+  }
+
+  async function handleDeleteClick() {
+    if (!student) return
+    setDeleteStep("confirm")
+    setDeleteImpact(null)
+    setDeleteImpact(await getStudentDeleteImpact(student.id))
+  }
+
+  async function handleDeleteConfirm() {
+    if (!student) return
+    setIsDeleting(true)
+    setSaveError(null)
+    const result = await deleteStudent(student.id)
+    if (result?.error) {
+      setSaveError(result.error)
+      setIsDeleting(false)
+      setDeleteStep("idle")
+      return
+    }
+    router.refresh()
+    setIsDeleting(false)
+    closePanel()
   }
 
   const guardianName = student?.profile?.full_name || student?.contact_name || null
@@ -67,7 +110,7 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
   const duration = student?.billing?.duration_minutes ?? student?.preferred_lesson_duration ?? 30
 
   return (
-    <Sheet open={student !== null} onOpenChange={(open) => !open && onClose()}>
+    <Sheet open={student !== null} onOpenChange={(open) => !open && closePanel()}>
       <SheetContent
         side="right"
         className="w-[460px] max-w-[92vw] gap-0 border-border bg-background p-0 sm:max-w-[460px] [&>button.absolute]:hidden"
@@ -94,7 +137,7 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
               </span>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={closePanel}
                 aria-label="Close"
                 className="flex size-[34px] shrink-0 items-center justify-center rounded-lg text-cream/70 transition-colors hover:text-cream focus-visible:outline-2 focus-visible:outline-gold"
               >
@@ -152,24 +195,71 @@ export function StudentPanel({ student, teachers, onClose, onEditDetails }: Stud
                 </p>
               )}
 
-              <div className="mt-auto flex items-center justify-between gap-3 border-t pt-[22px]">
-                <button
-                  type="button"
-                  onClick={handleToggleActive}
-                  disabled={isTogglingActive}
-                  className="text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
-                >
-                  {isTogglingActive ? "Saving…" : student.is_active ? "Mark as inactive" : "Mark as active"}
-                </button>
-                <div className="flex gap-2.5">
-                  <Button type="button" variant="outline" className="h-10 rounded-lg px-4" onClick={onClose}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isSaving} className="h-10 rounded-lg px-[18px] font-semibold">
-                    {isSaving ? <Loader2 className="size-4 animate-spin" /> : "Save"}
-                  </Button>
+              {deleteStep === "confirm" ? (
+                <div className="mt-auto flex flex-col gap-3 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+                  <p className="text-sm font-semibold text-destructive">Delete {student.name} forever?</p>
+                  <p className="text-xs leading-[18px] text-muted-foreground">
+                    {deleteImpact
+                      ? `This permanently removes ${deleteImpact.lessons} ${
+                          deleteImpact.lessons === 1 ? "lesson" : "lessons"
+                        } and ${deleteImpact.invoices} ${deleteImpact.invoices === 1 ? "invoice" : "invoices"}${
+                          deleteImpact.paidInvoices > 0
+                            ? ` (${deleteImpact.paidInvoices} already paid — that income history goes too)`
+                            : ""
+                        }, along with their weekly days and billing. `
+                      : "Counting what goes with them… "}
+                    This can&apos;t be undone. If they&apos;ve simply stopped lessons, use Mark as inactive instead —
+                    that keeps every record.
+                  </p>
+                  <div className="flex justify-end gap-2.5">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 rounded-lg px-4"
+                      onClick={() => setDeleteStep("idle")}
+                    >
+                      Keep student
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      disabled={isDeleting}
+                      className="h-10 rounded-lg px-[18px] font-semibold"
+                      onClick={handleDeleteConfirm}
+                    >
+                      {isDeleting ? <Loader2 className="size-4 animate-spin" /> : "Delete forever"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="mt-auto flex items-center justify-between gap-3 border-t pt-[22px]">
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleToggleActive}
+                      disabled={isTogglingActive}
+                      className="text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                    >
+                      {isTogglingActive ? "Saving…" : student.is_active ? "Mark as inactive" : "Mark as active"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteClick}
+                      className="text-[13px] font-medium text-destructive/80 transition-colors hover:text-destructive"
+                    >
+                      Delete…
+                    </button>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <Button type="button" variant="outline" className="h-10 rounded-lg px-4" onClick={closePanel}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isSaving} className="h-10 rounded-lg px-[18px] font-semibold">
+                      {isSaving ? <Loader2 className="size-4 animate-spin" /> : "Save"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         )}
