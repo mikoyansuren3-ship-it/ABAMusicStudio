@@ -1,4 +1,4 @@
-import type { Booking } from "@/lib/types"
+import type { Booking, StudentBilling, StudentSlot } from "@/lib/types"
 
 /**
  * Teacher and studio money math. Two distinct kinds of figures:
@@ -34,21 +34,68 @@ export function weeklyPlan(
   return { grossCents, payCents, profitCents: grossCents - payCents }
 }
 
+type SlotOverrides = Pick<StudentSlot, "duration_minutes" | "rate_cents">
+type BillingDefaults = Pick<StudentBilling, "rate_cents" | "duration_minutes">
+
+/**
+ * The standing weekly arrangement across specific slots, honoring each slot's
+ * rate/duration overrides (a vocal hour and a piano half-hour can differ).
+ */
+export function weeklyPlanFromSlots(
+  slots: SlotOverrides[],
+  billing: BillingDefaults,
+  hourlyCents: number,
+): MoneyBreakdown {
+  let grossCents = 0
+  let payCents = 0
+  for (const slot of slots) {
+    grossCents += slot.rate_cents ?? billing.rate_cents
+    payCents += payPerLessonCents(hourlyCents, slot.duration_minutes ?? billing.duration_minutes)
+  }
+  return { grossCents, payCents, profitCents: grossCents - payCents }
+}
+
+/** What one lesson earns: its stamped snapshot, else the student's standing rate. */
+export function lessonRateCents(lesson: Pick<Booking, "rate_cents">, fallbackRateCents: number) {
+  return lesson.rate_cents ?? fallbackRateCents
+}
+
+/** A lesson's real length from its own start/end (slot overrides shape these). */
+export function lessonDurationMinutes(lesson: Pick<Booking, "start_time" | "end_time">, fallbackMinutes: number) {
+  const minutes = (new Date(lesson.end_time).getTime() - new Date(lesson.start_time).getTime()) / 60000
+  return Number.isFinite(minutes) && minutes > 0 ? minutes : fallbackMinutes
+}
+
 /** A lesson counts unless it was cancelled or missed without a make-up. */
 export function lessonCounts(lesson: Pick<Booking, "status" | "attendance" | "made_up_on">) {
   if (lesson.status === "cancelled") return false
   return !(lesson.attendance === "missed" && !lesson.made_up_on)
 }
 
-/** What one student's lessons actually earned (and cost) in a period. */
+type LessonForActuals = Pick<
+  Booking,
+  "status" | "attendance" | "made_up_on" | "rate_cents" | "start_time" | "end_time"
+>
+
+/**
+ * What one student's lessons actually earned (and cost) in a period, lesson
+ * by lesson: each uses its own rate snapshot and real duration, falling back
+ * to the student's standing billing for legacy rows.
+ */
 export function periodActuals(
-  lessons: Pick<Booking, "status" | "attendance" | "made_up_on">[],
-  rateCents: number,
+  lessons: LessonForActuals[],
+  fallbackRateCents: number,
   hourlyCents: number,
-  durationMinutes: number,
+  fallbackDurationMinutes: number,
 ): MoneyBreakdown & { countedLessons: number } {
-  const countedLessons = lessons.filter(lessonCounts).length
-  const grossCents = rateCents * countedLessons
-  const payCents = payPerLessonCents(hourlyCents, durationMinutes) * countedLessons
+  let grossCents = 0
+  let payCents = 0
+  let countedLessons = 0
+  for (const lesson of lessons) {
+    if (!lessonCounts(lesson)) continue
+    countedLessons += 1
+    grossCents += lessonRateCents(lesson, fallbackRateCents)
+    payCents += payPerLessonCents(hourlyCents, lessonDurationMinutes(lesson, fallbackDurationMinutes))
+  }
   return { grossCents, payCents, profitCents: grossCents - payCents, countedLessons }
 }

@@ -68,7 +68,17 @@ export function StudentsView({ students, teachers }: StudentsViewProps) {
   function StudentRowButton({ student, isLast }: { student: PanelStudent; isLast: boolean }) {
     const guardian = student.profile?.full_name || student.contact_name || null
     const duration = student.billing?.duration_minutes ?? student.preferred_lesson_duration
-    const teacherName = teachers.find((teacher) => teacher.id === student.teacher_id)?.name ?? null
+    // Every teacher the student actually studies with: slot teachers (falling
+    // back to the default) — or the default alone when no slots are set.
+    const teacherIds =
+      student.slots.length > 0
+        ? [...new Set(student.slots.map((slot) => slot.teacher_id ?? student.teacher_id))]
+        : [student.teacher_id]
+    const teacherName =
+      teacherIds
+        .map((id) => teachers.find((teacher) => teacher.id === id)?.name)
+        .filter(Boolean)
+        .join(" · ") || null
     const slotLabel = slotsLabel(student.slots)
     const rateLabel = student.billing && student.billing.rate_cents > 0 ? formatCurrency(student.billing.rate_cents) : null
 

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { TeachersView, type MonthTotals, type TeacherSummaryRow } from "@/components/admin/teachers-view"
 import { ensureLessons } from "@/lib/admin/lessons"
-import { periodActuals, weeklyPlan } from "@/lib/admin/economics"
+import { periodActuals, weeklyPlanFromSlots } from "@/lib/admin/economics"
 import { studioToday, wallClockToUtc } from "@/lib/studio-time"
 import { toDateKey } from "@/lib/admin/format"
 import type { Booking, StudentBilling, StudentSlot, Teacher } from "@/lib/types"
@@ -46,18 +46,27 @@ export default async function AdminTeachersPage() {
   }))
   const monthBookings = (bookingsRes.data || []) as Booking[]
 
+  // A student belongs to a teacher through any weekly slot taught by them
+  // (slot teacher, falling back to the student's default) — or through the
+  // default alone when no slots are set yet. Multi-teacher students appear
+  // on every teacher they study with.
+  const slotsForTeacher = (student: StudentLite, teacherId: string) =>
+    student.slots.filter((slot) => (slot.teacher_id ?? student.teacher_id) === teacherId)
+
   const rows: TeacherSummaryRow[] = teachers.map((teacher) => {
-    const assigned = students.filter((student) => student.teacher_id === teacher.id && student.is_active)
+    const assigned = students.filter(
+      (student) =>
+        student.is_active &&
+        (slotsForTeacher(student, teacher.id).length > 0 ||
+          (student.slots.length === 0 && student.teacher_id === teacher.id)),
+    )
     let weeklyGrossCents = 0
     let weeklyPayCents = 0
     for (const student of assigned) {
-      if (!student.billing || student.slots.length === 0) continue
-      const plan = weeklyPlan(
-        student.billing.rate_cents,
-        teacher.pay_hourly_cents,
-        student.billing.duration_minutes,
-        student.slots.length,
-      )
+      if (!student.billing) continue
+      const slots = slotsForTeacher(student, teacher.id)
+      if (slots.length === 0) continue
+      const plan = weeklyPlanFromSlots(slots, student.billing, teacher.pay_hourly_cents)
       weeklyGrossCents += plan.grossCents
       weeklyPayCents += plan.payCents
     }

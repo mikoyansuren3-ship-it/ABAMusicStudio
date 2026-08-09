@@ -42,11 +42,18 @@ function parseStudentFields(formData: FormData) {
 interface SlotInput {
   day_of_week: number
   lesson_time: string
+  /** NULL = use the student's default teacher / billing. */
+  teacher_id: string | null
+  duration_minutes: number | null
+  rate_cents: number | null
 }
 
 /**
- * Weekly slots arrive as a JSON field: [{"day":1,"time":"16:00"}, …].
- * At most one slot per weekday (mirrors the DB unique constraint).
+ * Weekly slots arrive as a JSON field:
+ * [{"day":1,"time":"16:00","teacher":"<uuid>|default","duration":"30"|"","rate":"45"|""}, …].
+ * At most one slot per weekday (mirrors the DB unique constraint). Teacher,
+ * duration, and rate are per-slot overrides; blank/default falls back to the
+ * student's own teacher and standing billing.
  */
 function parseSlotFields(formData: FormData): { slots: SlotInput[] } | { error: string } {
   const raw = ((formData.get("slots") as string) || "").trim()
@@ -67,11 +74,33 @@ function parseSlotFields(formData: FormData): { slots: SlotInput[] } | { error: 
   for (const entry of parsed) {
     const day = Number((entry as { day?: unknown })?.day)
     const time = String((entry as { time?: unknown })?.time || "")
+    const teacherRaw = String((entry as { teacher?: unknown })?.teacher || "").trim()
+    const durationRaw = String((entry as { duration?: unknown })?.duration ?? "").trim()
+    const rateRaw = String((entry as { rate?: unknown })?.rate ?? "").trim()
     if (!Number.isInteger(day) || day < 0 || day > 6) return { error: "Choose a valid lesson day." }
     if (!/^\d{2}:\d{2}$/.test(time)) return { error: "Choose a time for each lesson day." }
     if (seenDays.has(day)) return { error: "A student can only have one lesson per weekday." }
     seenDays.add(day)
-    slots.push({ day_of_week: day, lesson_time: time })
+
+    let durationMinutes: number | null = null
+    if (durationRaw) {
+      const duration = Number.parseInt(durationRaw)
+      if (!DURATIONS.includes(duration)) return { error: "Choose a valid lesson length for each day." }
+      durationMinutes = duration
+    }
+    let rateCents: number | null = null
+    if (rateRaw) {
+      const rate = Number.parseFloat(rateRaw)
+      if (Number.isNaN(rate) || rate < 0) return { error: "Enter a valid rate for each day." }
+      rateCents = Math.round(rate * 100)
+    }
+    slots.push({
+      day_of_week: day,
+      lesson_time: time,
+      teacher_id: teacherRaw && teacherRaw !== "default" ? teacherRaw : null,
+      duration_minutes: durationMinutes,
+      rate_cents: rateCents,
+    })
   }
   return { slots }
 }
@@ -236,13 +265,37 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
     .eq("id", studentId)
   if (updateError) return { error: updateError.message }
 
-  // Reassignment: move only future lessons to the new teacher.
-  if (existing.teacher_id !== teacherId) {
-    const { error: restampError } = await supabase
-      .from("bookings")
-      .update({ teacher_id: teacherId })
-      .eq("student_id", studentId)
-      .gte("start_time", studioNow().toISOString())
+  // Re-stamp only FUTURE lessons so past months' pay and income never drift.
+  // Recurring lessons take their slot's teacher/rate/duration (slot overrides
+  // fall back to the student's default teacher and standing billing); one-off
+  // lessons follow the default teacher only when it changed.
+  const { data: futureBookings, error: futureError } = await supabase
+    .from("bookings")
+    .select("id, start_time, end_time, teacher_id, rate_cents, is_recurring, recurring_day_of_week, status")
+    .eq("student_id", studentId)
+    .gte("start_time", studioNow().toISOString())
+  if (futureError) return { error: futureError.message }
+
+  const billingRate = rateParsed.rateCents ?? 0
+  const slotsByDay = new Map(slotsParsed.slots.map((slot) => [slot.day_of_week, slot]))
+  for (const booking of futureBookings || []) {
+    if (booking.status === "cancelled") continue
+    const slot = booking.is_recurring ? slotsByDay.get(booking.recurring_day_of_week ?? -1) : undefined
+    const patch: { teacher_id?: string | null; rate_cents?: number | null; end_time?: string } = {}
+    if (slot) {
+      const newTeacher = slot.teacher_id ?? teacherId
+      const newRate = slot.rate_cents ?? billingRate
+      const newEnd = new Date(
+        new Date(booking.start_time).getTime() + (slot.duration_minutes ?? duration) * 60000,
+      ).toISOString()
+      if (newTeacher !== booking.teacher_id) patch.teacher_id = newTeacher
+      if (newRate !== booking.rate_cents) patch.rate_cents = newRate
+      if (newEnd !== new Date(booking.end_time).toISOString()) patch.end_time = newEnd
+    } else if (existing.teacher_id !== teacherId && booking.teacher_id === existing.teacher_id) {
+      patch.teacher_id = teacherId
+    }
+    if (Object.keys(patch).length === 0) continue
+    const { error: restampError } = await supabase.from("bookings").update(patch).eq("id", booking.id)
     if (restampError) return { error: restampError.message }
   }
 

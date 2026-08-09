@@ -8,12 +8,12 @@ import {
 import type { PanelStudent } from "@/components/admin/student-panel"
 import type { WeekBandDay } from "@/components/admin/week-bands"
 import { ensureLessons } from "@/lib/admin/lessons"
-import { lessonCounts, periodActuals, weeklyPlan } from "@/lib/admin/economics"
+import { periodActuals, weeklyPlanFromSlots } from "@/lib/admin/economics"
 import { buildWeekSkeleton, resolveWeekAnchor, weekRangeLabel } from "@/lib/admin/week"
 import { formatCurrencyCompact, formatTimeRange, toDateKey } from "@/lib/admin/format"
 import { formatTime } from "@/lib/portal/format"
 import { dateKeyUtc, minutesUtc, studioToday, wallClockToUtc } from "@/lib/studio-time"
-import type { Availability, AvailabilityException, Booking, Teacher } from "@/lib/types"
+import type { Availability, AvailabilityException, Booking, StudentSlot, Teacher } from "@/lib/types"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -56,7 +56,6 @@ export default async function TeacherDetailPage({
       supabase
         .from("students")
         .select("*, profile:profiles(*), billing:student_billing(*), slots:student_slots(*)")
-        .eq("teacher_id", teacherId)
         .order("name"),
       supabase.from("teachers").select("*").order("sort_order").order("name"),
       supabase
@@ -81,11 +80,22 @@ export default async function TeacherDetailPage({
         .lte("exception_date", toDateKey(weekLast)),
     ])
 
-  const students: PanelStudent[] = (studentsRes.data || []).map((student) => ({
-    ...student,
-    billing: Array.isArray(student.billing) ? (student.billing[0] ?? null) : (student.billing ?? null),
-    slots: student.slots || [],
-  }))
+  // Membership: any weekly slot taught by this teacher (slot teacher falls
+  // back to the student's default), or the default alone when no slots exist.
+  const slotsForThisTeacher = (student: { teacher_id: string | null; slots: StudentSlot[] }) =>
+    student.slots.filter((slot) => (slot.teacher_id ?? student.teacher_id) === teacherId)
+
+  const students: PanelStudent[] = (studentsRes.data || [])
+    .map((student) => ({
+      ...student,
+      billing: Array.isArray(student.billing) ? (student.billing[0] ?? null) : (student.billing ?? null),
+      slots: student.slots || [],
+    }))
+    .filter(
+      (student) =>
+        slotsForThisTeacher(student).length > 0 ||
+        (student.slots.length === 0 && student.teacher_id === teacherId),
+    )
   const teachers = (teachersRes.data || []) as Teacher[]
   const weekBookings = (weekBookingsRes.data || []) as (Booking & { student: { id: string; name: string } | null })[]
   const monthBookings = (monthBookingsRes.data || []) as Booking[]
@@ -94,21 +104,22 @@ export default async function TeacherDetailPage({
 
   const activeStudents = students.filter((student) => student.is_active)
 
-  // Roster economics: planned weekly + this month's actual gross per student.
+  // Roster economics: planned weekly + this month's actual gross per student,
+  // counting only this teacher's slots and this teacher's stamped lessons.
   const roster: RosterRow[] = activeStudents.map((student) => {
     const plan = student.billing
-      ? weeklyPlan(
-          student.billing.rate_cents,
-          teacher.pay_hourly_cents,
-          student.billing.duration_minutes,
-          student.slots.length,
-        )
+      ? weeklyPlanFromSlots(slotsForThisTeacher(student), student.billing, teacher.pay_hourly_cents)
       : { grossCents: 0, payCents: 0, profitCents: 0 }
     const studentMonthLessons = monthBookings.filter(
       (booking) => booking.student_id === student.id && booking.status !== "cancelled",
     )
     const monthGross = student.billing
-      ? student.billing.rate_cents * studentMonthLessons.filter(lessonCounts).length
+      ? periodActuals(
+          studentMonthLessons,
+          student.billing.rate_cents,
+          teacher.pay_hourly_cents,
+          student.billing.duration_minutes,
+        ).grossCents
       : 0
     return {
       studentId: student.id,
@@ -174,7 +185,7 @@ export default async function TeacherDetailPage({
     }
   })
 
-  const weeklyLessonCount = activeStudents.reduce((sum, student) => sum + student.slots.length, 0)
+  const weeklyLessonCount = activeStudents.reduce((sum, student) => sum + slotsForThisTeacher(student).length, 0)
   const weeklyPayTotal = roster.reduce((sum, row) => sum + row.weeklyPayCents, 0)
   const summary = `${weekRangeLabel(anchor, weekLast)} · ${activeStudents.length} ${
     activeStudents.length === 1 ? "student" : "students"
