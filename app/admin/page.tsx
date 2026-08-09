@@ -13,6 +13,7 @@ import {
   toDateKey,
 } from "@/lib/admin/format"
 import { formatTime } from "@/lib/portal/format"
+import { minutesUtc, studioNow, studioToday, wallClockToUtc } from "@/lib/studio-time"
 import type { Availability, AvailabilityException, Booking, Profile, Student, StudentBilling, StudentSlot } from "@/lib/types"
 
 const HOUR_ROW_PX = 66
@@ -27,9 +28,8 @@ function minutesToTimeString(totalMinutes: number) {
 export default async function AdminTodayPage() {
   const supabase = await createClient()
 
-  const now = new Date()
-  const today = new Date(now)
-  today.setHours(0, 0, 0, 0)
+  const now = studioNow()
+  const today = studioToday()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
   const todayKey = toDateKey(today)
@@ -53,8 +53,8 @@ export default async function AdminTodayPage() {
     supabase
       .from("bookings")
       .select("*, student:students(*, profile:profiles(*))")
-      .gte("start_time", today.toISOString())
-      .lt("start_time", tomorrow.toISOString())
+      .gte("start_time", wallClockToUtc(todayKey, "00:00:00").toISOString())
+      .lt("start_time", wallClockToUtc(toDateKey(tomorrow), "00:00:00").toISOString())
       .in("status", ["confirmed", "pending"])
       .order("start_time"),
     supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("status", "pending"),
@@ -63,7 +63,7 @@ export default async function AdminTodayPage() {
       .from("bookings")
       .select("id", { count: "exact", head: true })
       .eq("status", "pending")
-      .gte("start_time", today.toISOString()),
+      .gte("start_time", wallClockToUtc(todayKey, "00:00:00").toISOString()),
     supabase
       .from("students")
       .select("*, profile:profiles(*), billing:student_billing(*), slots:student_slots(*)")
@@ -98,7 +98,7 @@ export default async function AdminTodayPage() {
 
   const totalUnpaid = unpaidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0)
   const overdueInvoices = unpaidInvoices.filter(
-    (invoice) => invoice.due_date && new Date(`${invoice.due_date}T23:59:59`) < now,
+    (invoice) => invoice.due_date && wallClockToUtc(invoice.due_date, "23:59:59") < now,
   )
 
   // Today's open window: a closure wins, then the weekday's availability slots.
@@ -122,8 +122,8 @@ export default async function AdminTodayPage() {
   for (const booking of confirmedToday) {
     const start = new Date(booking.start_time)
     const end = new Date(booking.end_time)
-    windowStart = Math.min(windowStart, Math.floor((start.getHours() * 60 + start.getMinutes()) / 60) * 60)
-    windowEnd = Math.max(windowEnd, Math.ceil((end.getHours() * 60 + end.getMinutes()) / 60) * 60)
+    windowStart = Math.min(windowStart, Math.floor(minutesUtc(start) / 60) * 60)
+    windowEnd = Math.max(windowEnd, Math.ceil(minutesUtc(end) / 60) * 60)
   }
   const gridStart = Math.floor(windowStart / 60) * 60
   const gridEnd = Math.ceil(windowEnd / 60) * 60
@@ -137,8 +137,8 @@ export default async function AdminTodayPage() {
     ? formatTimeRange(minutesToTimeString(openStart!), minutesToTimeString(openEnd!))
     : null
 
-  const greeting = `${greetingForHour(now.getHours())}, ${(profile?.full_name || "there").split(" ")[0]}`
-  const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+  const greeting = `${greetingForHour(now.getUTCHours())}, ${(profile?.full_name || "there").split(" ")[0]}`
+  const dateLabel = today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
   const summary = `${dateLabel} · ${
     !isOpenToday
       ? confirmedToday.length > 0
@@ -262,7 +262,7 @@ export default async function AdminTodayPage() {
                   confirmedToday.map((booking) => {
                     const start = new Date(booking.start_time)
                     const end = new Date(booking.end_time)
-                    const startMinutes = start.getHours() * 60 + start.getMinutes()
+                    const startMinutes = minutesUtc(start)
                     const durationMinutes = Math.max((end.getTime() - start.getTime()) / 60000, 20)
                     const top = ((startMinutes - gridStart) / (gridEnd - gridStart)) * bandHeight
                     const height = (durationMinutes / (gridEnd - gridStart)) * bandHeight

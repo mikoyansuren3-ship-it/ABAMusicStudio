@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { AvailabilityView } from "@/components/admin/availability-view"
 import { compressDays, formatTimeRange, hoursLabel, summarizeAvailability } from "@/lib/admin/format"
+import { dateKeyUtc, studioNow } from "@/lib/studio-time"
 
 export default async function AvailabilityPage() {
   const supabase = await createClient()
@@ -10,13 +11,13 @@ export default async function AvailabilityPage() {
     supabase
       .from("availability_exceptions")
       .select("*")
-      .gte("exception_date", new Date().toISOString().split("T")[0])
+      .gte("exception_date", dateKeyUtc(studioNow()))
       .order("exception_date"),
     supabase
       .from("bookings")
       .select("start_time")
       .eq("status", "confirmed")
-      .gte("start_time", new Date().toISOString()),
+      .gte("start_time", studioNow().toISOString()),
   ])
 
   const availability = availabilityRes.data || []
@@ -24,7 +25,7 @@ export default async function AvailabilityPage() {
 
   const upcomingByWeekday: Record<number, number> = {}
   for (const booking of upcomingRes.data || []) {
-    const day = new Date(booking.start_time).getDay()
+    const day = new Date(booking.start_time).getUTCDay()
     upcomingByWeekday[day] = (upcomingByWeekday[day] || 0) + 1
   }
 

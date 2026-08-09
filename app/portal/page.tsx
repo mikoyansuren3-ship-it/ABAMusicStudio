@@ -11,6 +11,7 @@ import {
   SectionDivider,
 } from "@/components/portal/studio/portal-ui"
 import { formatCurrency, formatLongDate, formatShortDate, formatTime } from "@/lib/portal/format"
+import { studioNow } from "@/lib/studio-time"
 
 export default async function PortalDashboard() {
   const supabase = await createClient()
@@ -28,7 +29,7 @@ export default async function PortalDashboard() {
         .from("bookings")
         .select("*")
         .eq("student_id", student.id)
-        .gte("start_time", new Date().toISOString())
+        .gte("start_time", studioNow().toISOString())
         .in("status", ["confirmed", "pending"])
         .order("start_time")
         .limit(4)
@@ -55,7 +56,7 @@ export default async function PortalDashboard() {
   const nextLesson = bookings?.[0]
   const unpaidBalance = invoices?.reduce((sum, inv) => sum + inv.amount, 0) || 0
   const unreadCount = notifications?.length || 0
-  const today = formatLongDate(new Date().toISOString())
+  const today = formatLongDate(studioNow().toISOString())
 
   return (
     <div className="flex min-h-full flex-col">

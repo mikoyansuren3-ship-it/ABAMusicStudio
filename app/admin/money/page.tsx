@@ -6,6 +6,7 @@ import type { Booking, Teacher } from "@/lib/types"
 import { ensureLessons } from "@/lib/admin/lessons"
 import { periodActuals } from "@/lib/admin/economics"
 import { formatCurrencyCompact, parseDateKey, toDateKey } from "@/lib/admin/format"
+import { dateKeyUtc, studioNow, studioToday, wallClockToUtc } from "@/lib/studio-time"
 
 interface Period {
   mode: "month" | "week"
@@ -17,8 +18,8 @@ interface Period {
 }
 
 function resolvePeriod(params: { view?: string; month?: string; week?: string }): Period {
-  const now = new Date()
-  const nowMs = now.getTime()
+  const now = studioToday()
+  const nowMs = studioNow().getTime()
 
   if (params.view === "week") {
     let start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -117,8 +118,8 @@ export default async function AdminMoneyPage({
     const { data } = await supabase
       .from("bookings")
       .select("*")
-      .gte("start_time", rangeStart.toISOString())
-      .lt("start_time", rangeEnd.toISOString())
+      .gte("start_time", wallClockToUtc(toDateKey(rangeStart), "00:00:00").toISOString())
+      .lt("start_time", wallClockToUtc(toDateKey(rangeEnd), "00:00:00").toISOString())
       .order("start_time")
     return (data || []) as Booking[]
   }
@@ -255,7 +256,7 @@ export default async function AdminMoneyPage({
     return `/admin/money?${query.toString()}`
   }
 
-  const currentMonthKey = toDateKey(new Date(nowMs)).slice(0, 7)
+  const currentMonthKey = dateKeyUtc(new Date(nowMs)).slice(0, 7)
   const hrefs = {
     prev: href({ anchor: mode === "week" ? shiftWeek(anchor, -7) : shiftMonth(anchor, -1) }),
     next: href({ anchor: mode === "week" ? shiftWeek(anchor, 7) : shiftMonth(anchor, 1) }),

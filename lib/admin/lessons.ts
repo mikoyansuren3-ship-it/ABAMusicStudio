@@ -1,6 +1,7 @@
 import type { createClient } from "@/lib/supabase/server"
 import type { Booking, StudentBilling, StudentSlot } from "@/lib/types"
 import { toDateKey } from "@/lib/admin/format"
+import { dateKeyUtc, wallClockToUtc } from "@/lib/studio-time"
 
 type ServerSupabase = Awaited<ReturnType<typeof createClient>>
 
@@ -37,8 +38,8 @@ export async function ensureLessons(
     supabase
       .from("bookings")
       .select("student_id, start_time")
-      .gte("start_time", rangeStart.toISOString())
-      .lt("start_time", rangeEnd.toISOString()),
+      .gte("start_time", wallClockToUtc(toDateKey(rangeStart), "00:00:00").toISOString())
+      .lt("start_time", wallClockToUtc(toDateKey(rangeEnd), "00:00:00").toISOString()),
   ])
 
   const students: GenerationStudent[] = (studentsRes.data || []).map((student) => ({
@@ -50,7 +51,7 @@ export async function ensureLessons(
   }))
 
   const bookedDates = new Set(
-    (bookingsRes.data || []).map((booking) => `${booking.student_id}|${toDateKey(new Date(booking.start_time))}`),
+    (bookingsRes.data || []).map((booking) => `${booking.student_id}|${dateKeyUtc(booking.start_time)}`),
   )
 
   const inserts: Array<Partial<Booking>> = []
@@ -69,7 +70,7 @@ export async function ensureLessons(
 
       if (bookedDates.has(`${student.id}|${toDateKey(day)}`)) continue
 
-      const start = new Date(`${toDateKey(day)}T${slot.lesson_time}`)
+      const start = wallClockToUtc(toDateKey(day), slot.lesson_time)
       const end = new Date(start.getTime() + student.billing.duration_minutes * 60000)
       inserts.push({
         student_id: student.id,

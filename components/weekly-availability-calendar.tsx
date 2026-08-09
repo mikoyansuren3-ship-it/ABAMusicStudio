@@ -6,8 +6,14 @@ import type { Availability, AvailabilityException, Booking } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { isSlotBookable } from "@/lib/schedule"
+import { studioToday } from "@/lib/studio-time"
 
 type BookingSlot = Pick<Booking, "start_time" | "end_time" | "status">
+
+/** Wall-clock-as-UTC instant for a calendar day + clock time (see lib/studio-time.ts). */
+function slotInstant(date: Date, hour: number, minute: number) {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute))
+}
 
 interface WeeklyAvailabilityCalendarProps {
   availability: Availability[]
@@ -33,7 +39,7 @@ export function WeeklyAvailabilityCalendar({
 
   // Get the current week's dates
   const weekDates = useMemo(() => {
-    const today = new Date()
+    const today = studioToday()
     const startOfWeek = new Date(today)
     startOfWeek.setDate(today.getDate() - today.getDay() + 1) // Start from Monday
     startOfWeek.setDate(startOfWeek.getDate() + weekOffset * 7)
@@ -48,10 +54,8 @@ export function WeeklyAvailabilityCalendar({
   // Check if a time slot is available
   function isSlotAvailable(date: Date, hour: number, minute: number): boolean {
     const dayOfWeek = date.getDay()
-    const slotStart = new Date(date)
-    slotStart.setHours(hour, minute, 0, 0)
-    const slotEnd = new Date(slotStart)
-    slotEnd.setMinutes(slotEnd.getMinutes() + lessonDuration)
+    const slotStart = slotInstant(date, hour, minute)
+    const slotEnd = new Date(slotStart.getTime() + lessonDuration * 60000)
 
     return isSlotBookable({
       start: slotStart,
@@ -66,19 +70,15 @@ export function WeeklyAvailabilityCalendar({
     if (!onSelectSlot) return
     if (!isSlotAvailable(date, hour, minute)) return
 
-    const start = new Date(date)
-    start.setHours(hour, minute, 0, 0)
-    const end = new Date(start)
-    end.setMinutes(end.getMinutes() + lessonDuration)
+    const start = slotInstant(date, hour, minute)
+    const end = new Date(start.getTime() + lessonDuration * 60000)
 
     onSelectSlot(start, end)
   }
 
   function isSelectedSlot(date: Date, hour: number, minute: number): boolean {
     if (!selectedSlot) return false
-    const slotStart = new Date(date)
-    slotStart.setHours(hour, minute, 0, 0)
-    return selectedSlot.start.getTime() === slotStart.getTime()
+    return selectedSlot.start.getTime() === slotInstant(date, hour, minute).getTime()
   }
 
   return (

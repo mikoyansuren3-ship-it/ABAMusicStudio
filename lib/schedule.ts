@@ -1,4 +1,5 @@
 import type { Availability, AvailabilityException, Booking } from "@/lib/types"
+import { dateKeyUtc, studioNow } from "@/lib/studio-time"
 
 type BookingSlot = Pick<Booking, "start_time" | "end_time" | "status">
 
@@ -7,15 +8,10 @@ function toMinutes(time: string) {
   return Number(hours) * 60 + Number(minutes)
 }
 
+// Candidate slots are studio wall-clock-as-UTC (see lib/studio-time.ts),
+// so their wall-clock parts live on the UTC accessors.
 function timeFromDate(date: Date) {
-  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`
-}
-
-function dateKey(date: Date) {
-  const year = date.getFullYear()
-  const month = (date.getMonth() + 1).toString().padStart(2, "0")
-  const day = date.getDate().toString().padStart(2, "0")
-  return `${year}-${month}-${day}`
+  return `${date.getUTCHours().toString().padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`
 }
 
 export type SlotIssue = "past" | "outside_availability" | "overlap" | null
@@ -37,7 +33,7 @@ export function classifySlot({
   exceptions: AvailabilityException[]
   existingBookings: BookingSlot[]
 }): SlotIssue {
-  if (end <= new Date()) return "past"
+  if (end <= studioNow()) return "past"
 
   const overlaps = existingBookings.some((booking) => {
     if (booking.status === "cancelled") return false
@@ -50,7 +46,7 @@ export function classifySlot({
 
   const slotStartMinutes = toMinutes(timeFromDate(start))
   const slotEndMinutes = toMinutes(timeFromDate(end))
-  const exception = exceptions.find((item) => item.exception_date === dateKey(start))
+  const exception = exceptions.find((item) => item.exception_date === dateKeyUtc(start))
 
   if (exception) {
     if (!exception.is_available) return "outside_availability"
@@ -62,7 +58,7 @@ export function classifySlot({
     return null
   }
 
-  const dayAvailability = availability.find((item) => item.day_of_week === start.getDay() && item.is_active)
+  const dayAvailability = availability.find((item) => item.day_of_week === start.getUTCDay() && item.is_active)
   if (!dayAvailability) return "outside_availability"
 
   const availableStart = toMinutes(dayAvailability.start_time)

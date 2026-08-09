@@ -31,7 +31,8 @@ import { AdminCard, Eyebrow, NavSquareLink, PageHeader, PillTabs } from "@/compo
 import { CreateInvoiceButton, type InvoiceStudentOption } from "@/components/admin/create-invoice-dialog"
 import { InvoicesList, type InvoiceRow } from "@/components/admin/invoices-list"
 import { StudentPanel, type PanelStudent } from "@/components/admin/student-panel"
-import { initials, slotsLabel, toDateKey } from "@/lib/admin/format"
+import { initials, slotsLabel } from "@/lib/admin/format"
+import { dateKeyUtc } from "@/lib/studio-time"
 import { formatCurrency, experienceLabel } from "@/lib/portal/format"
 
 export interface MoneyLedgerRow {
@@ -616,7 +617,7 @@ export function MoneyView({
                   name="made_up_on"
                   type="date"
                   required
-                  defaultValue={makeupLesson.made_up_on ?? toDateKey(new Date(nowMs))}
+                  defaultValue={makeupLesson.made_up_on ?? dateKeyUtc(new Date(nowMs))}
                   className="h-[42px] rounded-lg border-border bg-background text-sm"
                 />
               </div>

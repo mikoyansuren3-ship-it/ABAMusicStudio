@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { ScheduleView } from "@/components/schedule-view"
+import { dateKeyUtc, studioNow } from "@/lib/studio-time"
 
 export default async function SchedulePage() {
   const supabase = await createClient()
-  const bookingCutoff = new Date()
+  const bookingCutoff = studioNow()
   bookingCutoff.setDate(bookingCutoff.getDate() - 30)
 
   const {
@@ -28,7 +29,7 @@ export default async function SchedulePage() {
   const { data: exceptions } = await supabase
     .from("availability_exceptions")
     .select("*")
-    .gte("exception_date", new Date().toISOString().split("T")[0])
+    .gte("exception_date", dateKeyUtc(studioNow()))
 
   return (
     <ScheduleView bookings={bookings || []} availability={availability || []} exceptions={exceptions || []} />
