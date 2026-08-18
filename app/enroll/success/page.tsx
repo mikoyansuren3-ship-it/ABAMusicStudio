@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { stripe } from "@/lib/stripe"
 
 export const metadata: Metadata = {
-  title: "Enrollment Complete | ABA Music Academy",
+  title: "Enrollment Complete",
   description: "Your ABA Music Academy enrollment payment confirmation.",
+  robots: { index: false, follow: false },
 }
 
 function getStripeId(value: string | { id: string } | null | undefined) {

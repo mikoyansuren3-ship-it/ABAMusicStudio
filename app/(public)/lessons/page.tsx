@@ -1,21 +1,28 @@
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/metadata"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Check } from "lucide-react"
 import { PageHeader } from "@/components/public/page-header"
 import { PricingSection } from "@/components/pricing-section"
+import { Breadcrumbs } from "@/components/seo/breadcrumbs"
+import { SITE } from "@/lib/site"
 
-export const metadata = {
-  title: "Lessons & Pricing | ABA Music Academy",
-  description: "View lesson types, durations, and pricing at ABA Music Academy.",
-}
+export const metadata: Metadata = publicPageMetadata({
+  title: "Piano Lesson Prices & Packages",
+  description:
+    "Piano lesson pricing in the Santa Clarita Valley: 30, 45, and 60-minute weekly lessons from $160/month, multi-lesson discounts, and a free trial lesson.",
+  path: "/lessons",
+})
 
 export default function LessonsPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4">
+        <Breadcrumbs trail={[{ name: "Lessons & Pricing", href: "/lessons" }]} className="mb-6" />
         <PageHeader
           title="Lessons & Pricing"
-          lede="Choose the lesson format that best fits your needs and goals."
+          lede={`Piano lesson pricing for the ${SITE.location.area} — choose the lesson format that best fits your needs and goals.`}
         />
 
         <div className="mt-16">
@@ -28,9 +35,14 @@ export default function LessonsPage() {
             Not sure where to start? Book a free trial lesson to meet your teacher, assess your current level, and
             discuss your musical goals.
           </p>
-          <Button size="lg" className="mt-6" asChild>
-            <Link href="/inquire">Book a Free Trial</Link>
-          </Button>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Button size="lg" asChild>
+              <Link href="/inquire">Book a Free Trial</Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/programs/piano-lessons">About Our Piano Program</Link>
+            </Button>
+          </div>
         </div>
 
         {/* What's Included */}

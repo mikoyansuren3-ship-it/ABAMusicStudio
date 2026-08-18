@@ -3,8 +3,10 @@ import type { Metadata } from "next"
 import { EnrollmentForm } from "@/app/enroll/enrollment-form"
 
 export const metadata: Metadata = {
-  title: "Enroll | ABA Music Academy",
+  title: "Enroll",
   description: "Enroll in recurring monthly piano lesson tuition at ABA Music Academy.",
+  // Transactional checkout step — keep out of search results.
+  robots: { index: false, follow: false },
 }
 
 export default function EnrollPage() {

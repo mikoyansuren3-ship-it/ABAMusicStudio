@@ -1,10 +1,12 @@
+import type { Metadata } from "next"
 import type React from "react"
 import Link from "next/link"
 import { PageHeader } from "@/components/public/page-header"
 import { FileWarning } from "lucide-react"
 
-export const metadata = {
-  title: "Privacy Policy | ABA Music Academy",
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  alternates: { canonical: "/privacy" },
   description: "How ABA Music Academy collects, uses, shares, and protects personal information.",
   // DRAFT: keep this page out of search indexes until the policy is finalized
   // and counsel-approved. Remove `robots` once it is in effect.

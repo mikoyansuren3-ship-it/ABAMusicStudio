@@ -28,8 +28,11 @@ const HEX_ALLOWLIST = [
   "app/portal/",
 ]
 
-/** Raw <img> is allowed only where next/image cannot work (blob: previews). */
-const RAW_IMG_ALLOWLIST = ["components/portal/profile-avatar-upload.tsx"]
+/**
+ * Raw <img> is allowed only where next/image cannot work: blob: previews, and
+ * the Open Graph renderer (Satori/ImageResponse renders raw JSX to PNG).
+ */
+const RAW_IMG_ALLOWLIST = ["components/portal/profile-avatar-upload.tsx", "lib/seo/og-image.tsx"]
 
 /**
  * Owner-requested exception (2026-07-12): the services showcase keeps its

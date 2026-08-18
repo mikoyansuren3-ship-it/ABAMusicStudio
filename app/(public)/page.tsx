@@ -5,6 +5,21 @@ import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/public/cta-section"
 import { AwardsSection } from "@/components/public/awards-section"
 import { Music, Calendar, CreditCard, Users, Star, Clock } from "lucide-react"
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/metadata"
+import { SITE } from "@/lib/site"
+
+const HOME_TITLE = `${SITE.name} | Piano Lessons in ${SITE.location.area}`
+
+export const metadata: Metadata = {
+  ...publicPageMetadata({
+    title: HOME_TITLE,
+    description: `Private piano lessons in the ${SITE.location.areaLong} for kids, teens, and adults. PhD-trained, MTAC-member instruction, free trial lesson, flexible 30/45/60-minute formats, and easy online scheduling.`,
+    path: "/",
+  }),
+  // Homepage keeps the full brand title (no template suffix).
+  title: { absolute: HOME_TITLE },
+}
 
 export default function HomePage() {
   return (
@@ -13,12 +28,16 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-muted/50 to-background py-20 md:py-32">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="font-serif text-4xl font-bold tracking-tight text-balance md:text-6xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+              Piano Lessons in the {SITE.location.area}
+            </p>
+            <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight text-balance md:text-6xl">
               Begin Your Musical Journey Today
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-pretty">
-              Professional piano instruction tailored to your goals. Whether you&apos;re a beginner or advancing your
-              skills, discover the joy of making music.
+              Professional piano instruction tailored to your goals, serving families across the{" "}
+              {SITE.location.areaLong}. Whether you&apos;re a beginner or advancing your skills, discover the joy of
+              making music.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>
@@ -134,9 +153,14 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <Button className="mt-8" asChild>
-                <Link href="/lessons">View Pricing</Link>
-              </Button>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button asChild>
+                  <Link href="/programs/piano-lessons">Explore Piano Lessons</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/lessons">View Pricing</Link>
+                </Button>
+              </div>
             </div>
 
             <div className="relative">
@@ -146,6 +170,7 @@ export default function HomePage() {
                   alt="A grand piano in the warm lighting of the ABA Music Academy studio"
                   width={1200}
                   height={900}
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   className="h-full w-full object-cover"
                 />
               </div>

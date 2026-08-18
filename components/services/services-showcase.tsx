@@ -116,6 +116,13 @@ export function ServicesShowcase() {
             ABA Music Academy is preparing a wider set of learning options. Teacher details and schedules will be updated
             here as each service is confirmed.
           </p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Enrolling now:{" "}
+            <Link href="/programs/piano-lessons" className="font-medium text-accent underline-offset-4 hover:underline">
+              piano lessons in the Santa Clarita Valley
+            </Link>
+            .
+          </p>
         </header>
 
         {services.map((service) => (

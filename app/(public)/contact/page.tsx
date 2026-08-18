@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { PageHeader } from "@/components/public/page-header"
 import { submitContactMessage, type ContactFormState } from "./actions"
-import { Mail, Phone, CheckCircle } from "lucide-react"
+import { Mail, Phone, MapPin, CheckCircle } from "lucide-react"
+import { SITE } from "@/lib/site"
 
 const initialState: ContactFormState = {}
 
@@ -39,10 +40,10 @@ export default function ContactPage() {
                   <h3 className="font-medium">Email</h3>
                   <p className="text-muted-foreground">
                     <a
-                      href="mailto:arpine@abamusicacademy.org"
+                      href={`mailto:${SITE.email}`}
                       className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
-                      arpine@abamusicacademy.org
+                      {SITE.email}
                     </a>
                   </p>
                 </div>
@@ -56,13 +57,29 @@ export default function ContactPage() {
                   <h3 className="font-medium">Phone</h3>
                   <p className="text-muted-foreground">
                     <a
-                      href="tel:+18188362322"
+                      href={`tel:${SITE.phoneE164}`}
                       className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
-                      818-836-2322
+                      {SITE.phone}
                     </a>
                   </p>
                   <p className="text-sm text-muted-foreground">Available during business hours</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                  <MapPin className="h-5 w-5 text-accent" aria-hidden />
+                </div>
+                <div>
+                  <h3 className="font-medium">Location</h3>
+                  <p className="text-muted-foreground">
+                    Private studio in the {SITE.location.areaLong}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Serving {SITE.location.areaServed.slice(0, -1).join(", ")}, and{" "}
+                    {SITE.location.areaServed.at(-1)}. Directions are shared when you book.
+                  </p>
                 </div>
               </div>
             </div>
@@ -70,9 +87,14 @@ export default function ContactPage() {
             <div className="rounded-xl bg-muted/50 p-6">
               <h3 className="font-medium">Studio Hours</h3>
               <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                <p>Monday - Friday: 1:00 PM - 9:00 PM</p>
-                <p>Saturday: 10:00 AM - 2:00 PM</p>
-                <p>Sunday: Closed</p>
+                {SITE.hours.map((h) => (
+                  <p key={h.label}>
+                    {h.label}: {h.display}
+                  </p>
+                ))}
+                {SITE.closedDays.map((day) => (
+                  <p key={day}>{day}: Closed</p>
+                ))}
               </div>
             </div>
           </div>

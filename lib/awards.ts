@@ -78,3 +78,13 @@ export const awards: Award[] = [
 ]
 
 export const publishedAwards = awards.filter((award) => award.published)
+
+/** Placeholder marker used by the scaffold entries above. */
+const PLACEHOLDER_TITLE = "Award Title"
+
+/**
+ * True once at least one published award is real (not a layout scaffold).
+ * Drives whether /awards is indexable and listed in the sitemap — search
+ * engines shouldn't see a page of "Award Title / Issuing Organization".
+ */
+export const hasRealAwards = publishedAwards.some((award) => award.title !== PLACEHOLDER_TITLE)

@@ -1,11 +1,15 @@
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/metadata"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { PageHeader } from "@/components/public/page-header"
 import { AlertCircle, Clock, CreditCard, Calendar } from "lucide-react"
 
-export const metadata = {
-  title: "Studio Policies | ABA Music Academy",
-  description: "View cancellation, payment, and studio policies at ABA Music Academy.",
-}
+export const metadata: Metadata = publicPageMetadata({
+  title: "Studio Policies",
+  description:
+    "ABA Music Academy studio policies: 24-hour cancellation, late arrivals, monthly tuition and payment, scheduling, makeup lessons, and holiday closures.",
+  path: "/policies",
+})
 
 export default function PoliciesPage() {
   return (

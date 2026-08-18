@@ -1,22 +1,29 @@
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/metadata"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import Image from "next/image"
 import { CtaSection } from "@/components/public/cta-section"
 import { PageHeader } from "@/components/public/page-header"
+import { Breadcrumbs } from "@/components/seo/breadcrumbs"
+import { SITE } from "@/lib/site"
 import { GraduationCap, Heart, Award } from "lucide-react"
 
-export const metadata = {
-  title: "About | ABA Music Academy",
-  description: "Learn about our teaching philosophy and experience at ABA Music Academy.",
-}
+export const metadata: Metadata = publicPageMetadata({
+  title: "About Our Piano Studio",
+  description:
+    "Meet Arpine, founder of ABA Music Academy — PhD in Music, MTAC member, 10+ years teaching piano to students of all ages in the Santa Clarita Valley.",
+  path: "/about",
+})
 
 export default function AboutPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4">
+        <Breadcrumbs trail={[{ name: "About", href: "/about" }]} className="mb-6" />
         <PageHeader
           title="About ABA Music Academy"
-          lede="Dedicated to nurturing musical talent and fostering a lifelong love of music."
+          lede={`A private piano studio in the ${SITE.location.areaLong}, dedicated to nurturing musical talent and fostering a lifelong love of music.`}
         />
 
         {/* Bio Section */}
@@ -28,6 +35,7 @@ export default function AboutPage() {
                 alt="Arpine, founder of ABA Music Academy"
                 width={768}
                 height={1024}
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className="h-full w-full object-cover"
                 priority
               />
