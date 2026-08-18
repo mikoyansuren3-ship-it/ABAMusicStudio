@@ -113,7 +113,7 @@ export const programs: Program[] = [
       {
         question: "Do you teach adult beginners?",
         answer:
-          "Yes. Adults are some of our most rewarding students. Lessons move at your pace and are built around the music you want to play, with technique and reading introduced as you go.",
+          "Yes. Adults are some of our most rewarding students, whether you're starting from zero or returning after years away. Lessons move at your pace and are built around the music you want to play, with technique, reading, and theory introduced as you go. Evening and Saturday times are available for working schedules.",
       },
       {
         question: "How much do piano lessons cost?",
@@ -123,11 +123,11 @@ export const programs: Program[] = [
       {
         question: "Do I need a piano at home?",
         answer:
-          "You need something to practice on. A full-size (88-key) weighted digital piano is a great start; an acoustic piano is ideal as students progress. We're happy to recommend options at any budget.",
+          "You need something to practice on between lessons. A full-size, 88-key digital piano with weighted keys is a great start for beginners; an acoustic upright or grand is ideal as students progress and tone control matters more. We're happy to recommend options at any budget before you buy.",
       },
       {
         question: "Where are lessons held?",
-        answer: `Lessons are taught in-studio in the ${AREA}, serving families in ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Contact us for the studio location and directions.`,
+        answer: `Lessons are taught in person at our private studio in the ${AREA}, serving families in ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Studio hours are ${SITE.hours.map((h) => `${h.label} ${h.display}`).join(" and ")}. We share the exact location and directions when you book your trial lesson.`,
       },
       {
         question: "What is your cancellation policy?",
@@ -224,12 +224,12 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "What instruments do you teach?",
     answer:
-      "Piano lessons are open for enrollment now. Voice and violin instruction are being added as new faculty join — inquire to be matched when spots open.",
+      "Private piano lessons are open for enrollment now, for beginners through advanced students of all ages. Voice and violin instruction are being added as new faculty join the studio — send an inquiry and we'll match you with a teacher as soon as spots open.",
   },
   {
     question: "Do you offer a free trial lesson?",
     answer:
-      "Yes. Every new student can book a free trial lesson to meet the teacher, assess their current level, and talk through goals before enrolling.",
+      "Yes. Every new student can book a free trial lesson before enrolling. You'll meet the teacher, play a little (or nothing at all if you're brand new), get an honest read on your current level, and talk through goals, lesson length, and a regular weekly time. There's no obligation to continue.",
   },
   {
     question: "How much do lessons cost?",
@@ -239,7 +239,7 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "What ages do you teach?",
     answer:
-      "Students of all ages — young beginners from around age 5, school-age children and teens, and adults who are starting fresh or returning to music.",
+      "Students of all ages. Young beginners are usually ready around age 5 or 6, once they can focus for a 30-minute lesson; we also teach school-age children, teens preparing for festivals or auditions, and adults who are starting fresh or returning to the piano after years away.",
   },
   {
     question: "Who will my teacher be?",
@@ -263,7 +263,7 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "Are there recitals or performance opportunities?",
     answer:
-      "Yes. Students have optional recitals and performance events throughout the year, and advancing students can prepare for MTAC festivals, competitions, and auditions.",
+      "Yes. Students have optional studio recitals and performance events throughout the year, and performing is encouraged but never required. Advancing students can also prepare for MTAC festivals, Certificate of Merit evaluations, competitions, and school or conservatory auditions with their teacher.",
   },
   {
     question: "How do I get started?",

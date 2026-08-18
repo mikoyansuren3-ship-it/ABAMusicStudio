@@ -7,7 +7,7 @@ import { AwardsSection } from "@/components/public/awards-section"
 import { Music, Calendar, CreditCard, Users, Star, Clock } from "lucide-react"
 import type { Metadata } from "next"
 import { publicPageMetadata } from "@/lib/seo/metadata"
-import { SITE } from "@/lib/site"
+import { SITE, SITE_DEFINITION } from "@/lib/site"
 
 const HOME_TITLE = `${SITE.name} | Piano Lessons in ${SITE.location.area}`
 
@@ -29,15 +29,15 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              Piano Lessons in the {SITE.location.area}
+              Begin Your Musical Journey Today
             </p>
             <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight text-balance md:text-6xl">
-              Begin Your Musical Journey Today
+              Piano Lessons in the {SITE.location.area}
             </h1>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-pretty">
-              Professional piano instruction tailored to your goals, serving families across the{" "}
-              {SITE.location.areaLong}. Whether you&apos;re a beginner or advancing your skills, discover the joy of
-              making music.
+            <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-pretty">{SITE_DEFINITION}</p>
+            <p className="mt-3 text-muted-foreground leading-relaxed text-pretty">
+              Whether you&apos;re a beginner or advancing your skills, every lesson is tailored to your goals — and
+              your first trial lesson is free.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button size="lg" asChild>

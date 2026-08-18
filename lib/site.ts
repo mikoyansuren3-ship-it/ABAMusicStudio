@@ -95,6 +95,13 @@ export const SITE = {
   },
 } as const
 
+/**
+ * One-sentence plain-language definition of the business. Used verbatim near
+ * the top of the homepage and About page and as the schema.org `description`
+ * — the sentence search/AI engines lift when describing the entity.
+ */
+export const SITE_DEFINITION = `${SITE.name} is a private piano studio in the ${SITE.location.areaLong}, offering one-on-one piano lessons for kids, teens, and adults — from first notes to advanced repertoire — taught by a PhD-trained, MTAC-member founder.`
+
 /** Absolute URL for a site path ("/about" → "https://…/about"). */
 export function absoluteUrl(path = "/") {
   return new URL(path, `${SITE.url}/`).toString()

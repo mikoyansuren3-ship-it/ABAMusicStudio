@@ -6,7 +6,7 @@ import Image from "next/image"
 import { CtaSection } from "@/components/public/cta-section"
 import { PageHeader } from "@/components/public/page-header"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
-import { SITE } from "@/lib/site"
+import { SITE, SITE_DEFINITION } from "@/lib/site"
 import { GraduationCap, Heart, Award } from "lucide-react"
 
 export const metadata: Metadata = publicPageMetadata({
@@ -23,7 +23,7 @@ export default function AboutPage() {
         <Breadcrumbs trail={[{ name: "About", href: "/about" }]} className="mb-6" />
         <PageHeader
           title="About ABA Music Academy"
-          lede={`A private piano studio in the ${SITE.location.areaLong}, dedicated to nurturing musical talent and fostering a lifelong love of music.`}
+          lede={SITE_DEFINITION}
         />
 
         {/* Bio Section */}
@@ -61,6 +61,56 @@ export default function AboutPage() {
             </p>
           </div>
         </div>
+
+        {/* At a glance — concrete, citable facts (all sourced from lib/site.ts and pricing) */}
+        <section className="mt-24" aria-labelledby="about-glance">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 id="about-glance" className="font-serif text-3xl font-bold">
+              The Studio at a Glance
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              What families in {SITE.location.areaServed.slice(0, 3).join(", ")}, and across the{" "}
+              {SITE.location.area} can expect.
+            </p>
+          </div>
+          <dl className="mx-auto mt-10 grid max-w-4xl gap-6 sm:grid-cols-2">
+            {[
+              {
+                term: "Where",
+                detail: `A private, in-studio piano program serving ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Directions are shared when you book.`,
+              },
+              {
+                term: "Who we teach",
+                detail:
+                  "Young beginners from around age 5, school-age children and teens, and adults starting fresh or returning to the piano.",
+              },
+              {
+                term: "Lesson formats",
+                detail:
+                  "Private 30-, 45-, or 60-minute lessons, once to three times per week, at a regular weekly time. Monthly tuition from $160; every new student starts with a free trial lesson.",
+              },
+              {
+                term: "Hours",
+                detail: `${SITE.hours.map((h) => `${h.label} ${h.display}`).join(" · ")} · ${SITE.closedDays.join(", ")} closed.`,
+              },
+              {
+                term: "Approach",
+                detail:
+                  "Classical technique and reading fundamentals paired with the music each student wants to play; optional recitals and MTAC festival preparation for students who want to perform.",
+              },
+              {
+                term: "Tools",
+                detail:
+                  "An online student portal for scheduling, secure card payments, monthly billing, and communication with your teacher.",
+              },
+            ].map((item) => (
+              <div key={item.term} className="rounded-xl border bg-card p-6">
+                <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{item.term}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
 
         {/* Philosophy Section */}
         <div className="mt-24">

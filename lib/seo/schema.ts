@@ -1,4 +1,4 @@
-import { SITE, absoluteUrl } from "@/lib/site"
+import { SITE, SITE_DEFINITION, absoluteUrl } from "@/lib/site"
 import { publishedTeachers, type Teacher } from "@/lib/teachers"
 import { SUBSCRIPTION_PRICES_USD } from "@/lib/stripe-prices"
 import type { Program, ProgramFaq } from "@/lib/programs"
@@ -108,6 +108,7 @@ export function organizationSchema(): JsonLdObject {
     name: SITE.name,
     legalName: SITE.legalName,
     slogan: SITE.tagline,
+    description: SITE_DEFINITION,
     url: SITE.url,
     logo: absoluteUrl(SITE.logo),
     image: [absoluteUrl(SITE.heroImage), absoluteUrl(SITE.logo)],
