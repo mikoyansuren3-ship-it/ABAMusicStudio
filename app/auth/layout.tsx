@@ -1,4 +1,8 @@
+import type { Metadata } from "next"
 import { Noto_Music } from "next/font/google"
+
+// Authenticated / private surface — never index.
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 const notoMusic = Noto_Music({
   weight: "400",

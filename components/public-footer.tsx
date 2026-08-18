@@ -2,13 +2,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { PublicFooterCurves } from "@/components/public-footer-curves"
 import styles from "@/components/public-footer.module.css"
+import { SITE } from "@/lib/site"
 
 const QUICK_LINKS = [
   { label: "About", href: "/about" },
+  { label: "Piano Lessons", href: "/programs/piano-lessons" },
   { label: "Faculty", href: "/faculty" },
   { label: "Awards", href: "/awards" },
   { label: "Lessons & Pricing", href: "/lessons" },
   { label: "Services", href: "/services" },
+  { label: "FAQ", href: "/faq" },
   { label: "Policies", href: "/policies" },
   { label: "Privacy Policy", href: "/privacy" },
 ] as const
@@ -20,14 +23,14 @@ const STUDENT_LINKS = [
 ] as const
 
 const CONTACT = {
-  email: "arpine@abamusicacademy.org",
-  phone: "818-836-2322",
-  phoneHref: "tel:+18188362322",
+  email: SITE.email,
+  phone: SITE.phone,
+  phoneHref: `tel:${SITE.phoneE164}`,
 } as const
 
 const INSTAGRAM = {
-  handle: "@aba_music_academy",
-  href: "https://www.instagram.com/aba_music_academy",
+  handle: SITE.instagram.handle,
+  href: SITE.instagram.url,
 } as const
 
 export function PublicFooter() {
@@ -45,13 +48,15 @@ export function PublicFooter() {
               <Image
                 src="/aba-logo-cropped.png"
                 alt="ABA Music Academy"
-                width={512}
-                height={512}
+                width={445}
+                height={198}
+                sizes="180px"
                 className={styles.logo}
               />
             </Link>
             <p className={styles.tagline}>
-              Professional piano instruction for students of all ages and skill levels.
+              Professional piano instruction for students of all ages and skill levels, serving the{" "}
+              {SITE.location.areaLong}.
             </p>
           </div>
 

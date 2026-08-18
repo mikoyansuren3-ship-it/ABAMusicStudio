@@ -1,8 +1,12 @@
+import type { Metadata } from "next"
 import type React from "react"
 import { Noto_Music } from "next/font/google"
 import { redirect } from "next/navigation"
 import { PortalSidebar } from "@/components/portal-sidebar"
 import { createClient } from "@/lib/supabase/server"
+
+// Authenticated / private surface — never index.
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 const notoMusic = Noto_Music({
   weight: "400",

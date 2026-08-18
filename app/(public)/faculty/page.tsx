@@ -1,20 +1,29 @@
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/metadata"
 import Image from "next/image"
 import Link from "next/link"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/public/cta-section"
 import { PageHeader } from "@/components/public/page-header"
+import { Breadcrumbs } from "@/components/seo/breadcrumbs"
+import { JsonLd } from "@/components/seo/json-ld"
+import { personListSchema } from "@/lib/seo/schema"
 import { publishedTeachers } from "@/lib/teachers"
 
-export const metadata = {
-  title: "Faculty | ABA Music Academy",
-  description: "Meet the teachers behind ABA Music Academy — piano, voice, and violin instructors.",
-}
+export const metadata: Metadata = publicPageMetadata({
+  title: "Faculty — Piano, Voice & Violin Teachers",
+  description:
+    "Meet the teachers behind ABA Music Academy in the Santa Clarita Valley — conservatory-trained piano, voice, and violin instructors.",
+  path: "/faculty",
+})
 
 export default function FacultyPage() {
   return (
     <div className="py-16 md:py-24">
+      <JsonLd data={personListSchema(publishedTeachers)} />
       <div className="container mx-auto px-4">
+        <Breadcrumbs trail={[{ name: "Faculty", href: "/faculty" }]} className="mb-6" />
         <PageHeader
           eyebrow="Our Faculty"
           title="Teachers Who Care About Every Note"
@@ -31,6 +40,7 @@ export default function FacultyPage() {
                   alt={teacher.imageAlt}
                   width={768}
                   height={1024}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="h-full w-full object-cover"
                 />
               </div>

@@ -9,16 +9,17 @@ import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { SITE } from "@/lib/site"
 
 import styles from "./public-header.module.css"
 
 const navLinks = [
   { href: "/about", label: "About" },
+  { href: "/programs/piano-lessons", label: "Piano Lessons" },
   { href: "/faculty", label: "Faculty" },
-  { href: "/awards", label: "Awards" },
-  { href: "/lessons", label: "Lessons & Pricing" },
+  { href: "/lessons", label: "Pricing" },
   { href: "/services", label: "Services" },
-  { href: "/policies", label: "Policies" },
+  { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
 ]
 
@@ -32,12 +33,12 @@ export function PublicHeader() {
       <div className={styles.utilityBar}>
         <div className={`${styles.utilityInner} container mx-auto px-4`}>
           <div className={styles.utilityContact}>
-            <a href="tel:18188362322">818-836-2322</a>
+            <a href={`tel:${SITE.phoneE164}`}>{SITE.phone}</a>
             <span className={styles.utilitySep} aria-hidden>
               |
             </span>
-            <a href="mailto:arpine@abamusicacademy.org" className={styles.utilityEmail}>
-              arpine@abamusicacademy.org
+            <a href={`mailto:${SITE.email}`} className={styles.utilityEmail}>
+              {SITE.email}
             </a>
           </div>
           <Link href="/auth/login" className={styles.utilityLogin}>
@@ -53,8 +54,9 @@ export function PublicHeader() {
             <Image
               src="/aba-logo-cropped.png"
               alt="ABA Music Academy"
-              width={512}
-              height={512}
+              width={445}
+              height={198}
+              sizes="(max-width: 768px) 140px, 200px"
               priority
             />
           </Link>

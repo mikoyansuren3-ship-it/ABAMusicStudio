@@ -1,9 +1,13 @@
+import type { Metadata } from "next"
 import type React from "react"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { StageBar } from "@/components/admin/stage-bar"
 import { AdminSidebar, AdminMobileNav } from "@/components/admin/sidebar-nav"
 import { summarizeAvailability } from "@/lib/admin/format"
+
+// Authenticated / private surface — never index.
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
