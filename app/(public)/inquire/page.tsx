@@ -190,18 +190,34 @@ export default function InquirePage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="preferred_lesson_duration">Preferred Lesson Length</Label>
-                    <Select name="preferred_lesson_duration" defaultValue="30">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select duration" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="30">30 minutes</SelectItem>
-                        <SelectItem value="45">45 minutes</SelectItem>
-                        <SelectItem value="60">60 minutes</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="instrument">Instrument</Label>
+                      <Select name="instrument" defaultValue="Piano">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select instrument" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Piano">Piano</SelectItem>
+                          <SelectItem value="Voice">Voice</SelectItem>
+                          <SelectItem value="Violin">Violin</SelectItem>
+                          <SelectItem value="Qanun">Qanun</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="preferred_lesson_duration">Preferred Lesson Length</Label>
+                      <Select name="preferred_lesson_duration" defaultValue="30">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select duration" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="30">30 minutes</SelectItem>
+                          <SelectItem value="45">45 minutes</SelectItem>
+                          <SelectItem value="60">60 minutes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="space-y-2">

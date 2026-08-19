@@ -1,6 +1,5 @@
 import { SITE, SITE_DEFINITION, absoluteUrl } from "@/lib/site"
 import { publishedTeachers, type Teacher } from "@/lib/teachers"
-import { SUBSCRIPTION_PRICES_USD } from "@/lib/stripe-prices"
 import type { Program, ProgramFaq } from "@/lib/programs"
 
 /**
@@ -73,31 +72,6 @@ export function personSchema(teacher: Teacher, { minimal = false } = {}): JsonLd
   })
 }
 
-function lessonOffers(subject = "Piano") {
-  const offers: JsonLdObject[] = []
-  for (const [duration, byFrequency] of Object.entries(SUBSCRIPTION_PRICES_USD)) {
-    for (const [frequency, price] of Object.entries(byFrequency)) {
-      const perWeek = Number(frequency)
-      offers.push({
-        "@type": "Offer",
-        name: `${duration}-minute ${subject.toLowerCase()} lessons, ${perWeek}x per week`,
-        price,
-        priceCurrency: "USD",
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price,
-          priceCurrency: "USD",
-          unitCode: "MON",
-          unitText: "per month",
-        },
-        availability: "https://schema.org/InStock",
-        url: absoluteUrl("/lessons"),
-      })
-    }
-  }
-  return offers
-}
-
 /** MusicSchool (a LocalBusiness) — emitted on every public page. */
 export function organizationSchema(): JsonLdObject {
   const founder = publishedTeachers.find((t) => t.slug === SITE.founder.slug)
@@ -122,12 +96,15 @@ export function organizationSchema(): JsonLdObject {
     paymentAccepted: "Credit Card, Cash, Check",
     sameAs: [SITE.instagram.url],
     founder: founder ? personSchema(founder, { minimal: true }) : undefined,
-    knowsAbout: ["Piano lessons", "Music education", "Classical piano", "Music theory"],
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: "Private music lessons",
-      itemListElement: lessonOffers(),
-    },
+    knowsAbout: [
+      "Piano lessons",
+      "Voice lessons",
+      "Violin lessons",
+      "Qanun lessons",
+      "Music education",
+      "Classical piano",
+      "Music theory",
+    ],
   })
 }
 
@@ -186,7 +163,6 @@ export function programSchema(program: Program): JsonLdObject[] {
     educationalLevel: "Beginner to Advanced",
     teaches: program.sections.find((s) => s.heading.toLowerCase().includes("learn"))?.bullets,
     availableLanguage: "en",
-    offers: lessonOffers(program.subject).map((offer) => ({ ...offer, category: "Private lesson" })),
     hasCourseInstance: {
       "@type": "CourseInstance",
       courseMode: program.courseMode,

@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Check } from "lucide-react"
 import { PageHeader } from "@/components/public/page-header"
-import { PricingSection } from "@/components/pricing-section"
+import { LessonFormatsSection } from "@/components/lesson-formats-section"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { SITE } from "@/lib/site"
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Piano Lesson Prices & Packages",
+  title: "Lessons — Formats & What's Included",
   description:
-    "Piano lesson pricing in the Santa Clarita Valley: 30, 45, and 60-minute weekly lessons from $160/month, multi-lesson discounts, and a free trial lesson.",
+    "Private music lessons in the Santa Clarita Valley: 30- and 45-minute weekly lessons, flexible scheduling, and a free trial lesson. Inquire for current rates.",
   path: "/lessons",
 })
 
@@ -19,14 +19,14 @@ export default function LessonsPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <Breadcrumbs trail={[{ name: "Lessons & Pricing", href: "/lessons" }]} className="mb-6" />
+        <Breadcrumbs trail={[{ name: "Lessons", href: "/lessons" }]} className="mb-6" />
         <PageHeader
-          title="Lessons & Pricing"
-          lede={`Piano lesson pricing for the ${SITE.location.area} — choose the lesson format that best fits your needs and goals.`}
+          title="Lessons"
+          lede={`Private music lessons for the ${SITE.location.area} — choose the lesson format that best fits your needs and goals.`}
         />
 
         <div className="mt-16">
-          <PricingSection />
+          <LessonFormatsSection />
         </div>
 
         <div className="mt-16 rounded-xl border bg-muted/30 p-8 text-center md:p-12">

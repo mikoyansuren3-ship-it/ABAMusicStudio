@@ -62,7 +62,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* At a glance — concrete, citable facts (all sourced from lib/site.ts and pricing) */}
+        {/* At a glance — concrete, citable facts (all sourced from lib/site.ts) */}
         <section className="mt-24" aria-labelledby="about-glance">
           <div className="mx-auto max-w-2xl text-center">
             <h2 id="about-glance" className="font-serif text-3xl font-bold">
@@ -77,7 +77,7 @@ export default function AboutPage() {
             {[
               {
                 term: "Where",
-                detail: `A private, in-studio piano program serving ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Directions are shared when you book.`,
+                detail: `A private, in-studio music program — piano, voice, violin, and qanun — serving ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Directions are shared when you book.`,
               },
               {
                 term: "Who we teach",
@@ -87,7 +87,7 @@ export default function AboutPage() {
               {
                 term: "Lesson formats",
                 detail:
-                  "Private 30-, 45-, or 60-minute lessons, once to three times per week, at a regular weekly time. Monthly tuition from $160; every new student starts with a free trial lesson.",
+                  "Private 30- or 45-minute lessons, once or twice per week, at a regular weekly time. Every new student starts with a free trial lesson; inquire for current rates.",
               },
               {
                 term: "Hours",

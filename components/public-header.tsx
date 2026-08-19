@@ -17,7 +17,7 @@ const navLinks = [
   { href: "/about", label: "About" },
   { href: "/programs/piano-lessons", label: "Piano Lessons" },
   { href: "/faculty", label: "Faculty" },
-  { href: "/lessons", label: "Pricing" },
+  { href: "/lessons", label: "Lessons" },
   { href: "/services", label: "Services" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },

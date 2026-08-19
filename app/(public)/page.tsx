@@ -14,7 +14,7 @@ const HOME_TITLE = `${SITE.name} | Piano Lessons in ${SITE.location.area}`
 export const metadata: Metadata = {
   ...publicPageMetadata({
     title: HOME_TITLE,
-    description: `Private piano lessons in the ${SITE.location.areaLong} for kids, teens, and adults. PhD-trained, MTAC-member instruction, free trial lesson, flexible 30/45/60-minute formats, and easy online scheduling.`,
+    description: `Private piano lessons in the ${SITE.location.areaLong} for kids, teens, and adults. PhD-trained, MTAC-member instruction, free trial lesson, flexible 30/45-minute formats, and easy online scheduling.`,
     path: "/",
   }),
   // Homepage keeps the full brand title (no template suffix).
@@ -158,7 +158,7 @@ export default function HomePage() {
                   <Link href="/programs/piano-lessons">Explore Piano Lessons</Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link href="/lessons">View Pricing</Link>
+                  <Link href="/lessons">Explore Lessons</Link>
                 </Button>
               </div>
             </div>
