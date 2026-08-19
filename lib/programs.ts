@@ -51,7 +51,7 @@ export const programs: Program[] = [
     subject: "Piano",
     navLabel: "Piano Lessons",
     metaTitle: `Piano Lessons in ${AREA}`,
-    metaDescription: `Private piano lessons in the ${AREA} for kids, teens, and adults. Conservatory-trained, MTAC-member instruction, free trial lesson, flexible 30/45/60-minute formats.`,
+    metaDescription: `Private piano lessons in the ${AREA} for kids, teens, and adults. Conservatory-trained, MTAC-member instruction, free trial lesson, flexible 30/45-minute formats.`,
     eyebrow: "Piano Program",
     title: `Piano Lessons in the ${AREA}`,
     lede: "Private, one-on-one piano instruction for beginners through advanced students — taught with patience, classical rigor, and a curriculum built around each student.",
@@ -86,9 +86,9 @@ export const programs: Program[] = [
         ],
       },
       {
-        heading: "Lesson lengths and pricing",
+        heading: "Lesson lengths",
         body: [
-          "Choose 30-, 45-, or 60-minute weekly lessons, once, twice, or three times per week. Monthly tuition starts at $160 for weekly 30-minute lessons; multi-lesson weeks are discounted. A one-time $35 registration fee applies at enrollment. See the full pricing table on the Lessons & Pricing page.",
+          "Choose 30- or 45-minute weekly lessons, once or twice per week, at a regular weekly time. Tuition depends on lesson length and weekly frequency — send an inquiry and we'll share current rates and available times. A one-time registration fee applies at enrollment.",
         ],
       },
       {
@@ -113,21 +113,21 @@ export const programs: Program[] = [
       {
         question: "Do you teach adult beginners?",
         answer:
-          "Yes. Adults are some of our most rewarding students. Lessons move at your pace and are built around the music you want to play, with technique and reading introduced as you go.",
+          "Yes. Adults are some of our most rewarding students, whether you're starting from zero or returning after years away. Lessons move at your pace and are built around the music you want to play, with technique, reading, and theory introduced as you go. Evening and Saturday times are available for working schedules.",
       },
       {
         question: "How much do piano lessons cost?",
         answer:
-          "Monthly tuition starts at $160 for one 30-minute lesson per week, $230 for 45 minutes, and $300 for 60 minutes. Two or three lessons per week are discounted. There is a one-time $35 registration fee. The Lessons & Pricing page has the full table.",
+          "Tuition depends on the lesson length (30 or 45 minutes) and how many lessons per week you choose, and is billed monthly. There is also a one-time registration fee at enrollment. Send an inquiry and we'll share current rates along with available lesson times.",
       },
       {
         question: "Do I need a piano at home?",
         answer:
-          "You need something to practice on. A full-size (88-key) weighted digital piano is a great start; an acoustic piano is ideal as students progress. We're happy to recommend options at any budget.",
+          "You need something to practice on between lessons. A full-size, 88-key digital piano with weighted keys is a great start for beginners; an acoustic upright or grand is ideal as students progress and tone control matters more. We're happy to recommend options at any budget before you buy.",
       },
       {
         question: "Where are lessons held?",
-        answer: `Lessons are taught in-studio in the ${AREA}, serving families in ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Contact us for the studio location and directions.`,
+        answer: `Lessons are taught in person at our private studio in the ${AREA}, serving families in ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Studio hours are ${SITE.hours.map((h) => `${h.label} ${h.display}`).join(" and ")}. We share the exact location and directions when you book your trial lesson.`,
       },
       {
         question: "What is your cancellation policy?",
@@ -140,10 +140,6 @@ export const programs: Program[] = [
     imageAlt: "A grand piano in the warm lighting of the ABA Music Academy studio",
     published: true,
   },
-  // Voice and violin programs are scaffolds. Flip `published: true` only once
-  // the corresponding instructor is published in lib/teachers.ts and the copy
-  // below has been reviewed — the content-honesty rule in design-system/MASTER.md
-  // forbids "coming soon" landing pages that read as live offerings.
   {
     slug: "voice-lessons",
     subject: "Voice",
@@ -155,6 +151,7 @@ export const programs: Program[] = [
     lede: "Healthy technique, confidence, and expressive singing — voice lessons that support musicality from warmups to performance.",
     intro: [
       `ABA Music Academy offers private voice lessons for singers across the ${SITE.location.areaLong}. Lessons are one-on-one and tailored to the student's voice, age, and goals.`,
+      "Voice lessons are taught by Marietta Galstyan, a singer with an extensive international background who has earned top prizes at competitions and festivals across Europe, and who loves working with kids.",
     ],
     sections: [
       {
@@ -166,12 +163,18 @@ export const programs: Program[] = [
           "Audition, recital, and stage confidence preparation",
         ],
       },
+      {
+        heading: "How to get started",
+        body: [
+          "Start with a free trial lesson. You'll meet your teacher, sing a little (or nothing at all, if you're brand new), and talk through goals and scheduling. Send an inquiry with the student's age and experience, and we'll match you with a regular weekly time.",
+        ],
+      },
     ],
     faqs: [],
     courseMode: ["Onsite"],
     image: "/services/vocal.png",
     imageAlt: "Illustration of a singer at a microphone",
-    published: false,
+    published: true,
   },
   {
     slug: "violin-lessons",
@@ -184,6 +187,7 @@ export const programs: Program[] = [
     lede: "Expression, technique, and beautiful tone. Classical violin instruction rooted in the same conservatory tradition as our piano program.",
     intro: [
       `ABA Music Academy offers private violin lessons for students across the ${SITE.location.areaLong}. Lessons are one-on-one and tailored to the student's level and goals.`,
+      "Violin lessons are taught by Asya Anisimova, an award-winning violinist trained at the Tchaikovsky Specialized Music School in Yerevan who has performed as a soloist with the Armenian State Symphony Orchestra.",
     ],
     sections: [
       {
@@ -195,12 +199,57 @@ export const programs: Program[] = [
           "Ensemble preparation and recital performance",
         ],
       },
+      {
+        heading: "How to get started",
+        body: [
+          "Start with a free trial lesson. You'll meet your teacher, play a little (or nothing at all, if you're brand new), and talk through goals, instrument sizing, and scheduling. Send an inquiry with the student's age and experience, and we'll match you with a regular weekly time.",
+        ],
+      },
     ],
     faqs: [],
     courseMode: ["Onsite"],
     image: "/services/violin.png",
     imageAlt: "Illustration of a violin",
-    published: false,
+    published: true,
+  },
+  {
+    slug: "qanun-lessons",
+    subject: "Qanun",
+    navLabel: "Qanun Lessons",
+    metaTitle: `Qanun Lessons in ${AREA}`,
+    metaDescription: `Private qanun lessons in the ${AREA} — learn the traditional Armenian zither with an instructor who has 25+ years of teaching and performing experience.`,
+    eyebrow: "Qanun Program",
+    title: `Qanun Lessons in the ${AREA}`,
+    lede: "Learn the qanun — the shimmering plucked zither at the heart of Armenian traditional music — with a teacher who has spent 25+ years performing and passing it on.",
+    intro: [
+      `ABA Music Academy offers private qanun lessons for students across the ${SITE.location.areaLong}. The qanun is a traditional Armenian plucked string instrument with a bright, harp-like voice, played flat on the lap with plectra on both hands.`,
+      "Qanun lessons are taught by Gohar Harutunyan, who holds a music education degree, brings more than 25 years of experience as a qanun teacher and performer, and specializes in working with children.",
+    ],
+    sections: [
+      {
+        heading: "What you'll learn",
+        body: [
+          "Lessons build technique and repertoire side by side, connecting students to Armenian musical heritage while developing well-rounded musicianship.",
+        ],
+        bullets: [
+          "Posture, hand position, and plectrum technique",
+          "Traditional Armenian melodies and folk repertoire",
+          "Note reading, rhythm, and ear training on the instrument",
+          "Performance preparation for recitals and cultural events",
+        ],
+      },
+      {
+        heading: "How to get started",
+        body: [
+          "Start with a free trial lesson. You'll meet your teacher, try the instrument, and talk through goals and scheduling. Send an inquiry with the student's age and experience, and we'll match you with a regular weekly time.",
+        ],
+      },
+    ],
+    faqs: [],
+    courseMode: ["Onsite"],
+    image: "/teachers/gohar-harutunyan.jpg",
+    imageAlt: "Gohar Harutunyan, ABA Music Academy qanun instructor, with her qanun",
+    published: true,
   },
 ]
 
@@ -224,27 +273,27 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "What instruments do you teach?",
     answer:
-      "Piano lessons are open for enrollment now. Voice and violin instruction are being added as new faculty join — inquire to be matched when spots open.",
+      "Private lessons are open for enrollment in piano, voice, violin, and qanun — the traditional Armenian zither — for beginners through advanced students of all ages. Guitar, chess, and math enrichment are on the way; send an inquiry and we'll match you with a teacher as soon as spots open.",
   },
   {
     question: "Do you offer a free trial lesson?",
     answer:
-      "Yes. Every new student can book a free trial lesson to meet the teacher, assess their current level, and talk through goals before enrolling.",
+      "Yes. Every new student can book a free trial lesson before enrolling. You'll meet the teacher, play a little (or nothing at all if you're brand new), get an honest read on your current level, and talk through goals, lesson length, and a regular weekly time. There's no obligation to continue.",
   },
   {
     question: "How much do lessons cost?",
     answer:
-      "Monthly tuition starts at $160 for one 30-minute lesson per week ($230 for 45 minutes, $300 for 60 minutes), with discounts for two or three lessons per week. There is a one-time $35 registration fee. See Lessons & Pricing for the full table.",
+      "Tuition depends on the lesson length (30 or 45 minutes) and how many lessons per week you choose, and is billed monthly. There is also a one-time registration fee at enrollment. Send an inquiry and we'll share current rates along with available lesson times.",
   },
   {
     question: "What ages do you teach?",
     answer:
-      "Students of all ages — young beginners from around age 5, school-age children and teens, and adults who are starting fresh or returning to music.",
+      "Students of all ages. Young beginners are usually ready around age 5 or 6, once they can focus for a 30-minute lesson; we also teach school-age children, teens preparing for festivals or auditions, and adults who are starting fresh or returning to the piano after years away.",
   },
   {
     question: "Who will my teacher be?",
     answer:
-      "Piano lessons are taught by our founder, Arpine, who holds a PhD in Music, has over 10 years of teaching experience, and is an MTAC member. Meet the full faculty on the Faculty page.",
+      "Piano lessons are led by our founder, Arpine, who holds a PhD in Music, has over 10 years of teaching experience, and is an MTAC member, alongside award-winning pianist Valeria Boroda. Voice is taught by Marietta Galstyan, violin by Asya Anisimova, and qanun by Gohar Harutunyan. Meet the full faculty on the Faculty page.",
   },
   {
     question: "What is your cancellation policy?",
@@ -263,7 +312,7 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "Are there recitals or performance opportunities?",
     answer:
-      "Yes. Students have optional recitals and performance events throughout the year, and advancing students can prepare for MTAC festivals, competitions, and auditions.",
+      "Yes. Students have optional studio recitals and performance events throughout the year, and performing is encouraged but never required. Advancing students can also prepare for MTAC festivals, Certificate of Merit evaluations, competitions, and school or conservatory auditions with their teacher.",
   },
   {
     question: "How do I get started?",

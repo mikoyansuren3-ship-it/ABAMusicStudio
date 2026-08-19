@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/public/cta-section"
 import { PageHeader } from "@/components/public/page-header"
-import { PricingSection } from "@/components/pricing-section"
+import { LessonFormatsSection } from "@/components/lesson-formats-section"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { JsonLd } from "@/components/seo/json-ld"
 import { getProgram, publishedPrograms } from "@/lib/programs"
@@ -66,7 +66,7 @@ export default async function ProgramPage({ params }: { params: Promise<Params> 
                 <Link href="/inquire">Book a Free Trial</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/lessons">See Pricing</Link>
+                <Link href="/lessons">Lesson Options</Link>
               </Button>
             </div>
           </div>
@@ -145,10 +145,10 @@ export default async function ProgramPage({ params }: { params: Promise<Params> 
           </section>
         ) : null}
 
-        {/* Pricing (piano program embeds the live table) */}
+        {/* Lesson formats (piano program embeds the shared section) */}
         {isPiano ? (
           <div className="mt-20">
-            <PricingSection />
+            <LessonFormatsSection />
           </div>
         ) : null}
 

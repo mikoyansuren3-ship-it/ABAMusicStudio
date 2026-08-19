@@ -12,9 +12,9 @@ import { personListSchema } from "@/lib/seo/schema"
 import { publishedTeachers } from "@/lib/teachers"
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Faculty — Piano, Voice & Violin Teachers",
+  title: "Faculty — Piano, Voice, Violin & Qanun Teachers",
   description:
-    "Meet the teachers behind ABA Music Academy in the Santa Clarita Valley — conservatory-trained piano, voice, and violin instructors.",
+    "Meet the teachers behind ABA Music Academy in the Santa Clarita Valley — conservatory-trained piano, voice, violin, and qanun instructors.",
   path: "/faculty",
 })
 
@@ -27,7 +27,7 @@ export default function FacultyPage() {
         <PageHeader
           eyebrow="Our Faculty"
           title="Teachers Who Care About Every Note"
-          lede="Meet the instructors guiding students at ABA Music Academy across piano, voice, and violin."
+          lede="Meet the instructors guiding students at ABA Music Academy across piano, voice, violin, and qanun."
         />
 
         {/* Faculty grid */}
@@ -66,12 +66,12 @@ export default function FacultyPage() {
           ))}
 
           {/* Growing-faculty note keeps the grid honest while new instructors are onboarded. */}
-          <Card className="border-dashed bg-muted/30 shadow-none sm:col-span-2 lg:col-span-2">
+          <Card className="border-dashed bg-muted/30 shadow-none">
             <CardContent className="flex h-full flex-col items-start justify-center gap-3 p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Growing Faculty</p>
-              <h2 className="font-serif text-2xl font-bold">Voice & Violin Instructors Joining Soon</h2>
+              <h2 className="font-serif text-2xl font-bold">More Instructors Joining Soon</h2>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                We are expanding beyond piano with carefully selected voice and violin teachers. Instructor profiles
+                Guitar, chess, and math enrichment teachers are joining as those programs launch. Instructor profiles
                 will appear here as each one is confirmed — or{" "}
                 <Link href="/inquire" className="font-medium text-accent underline-offset-4 hover:underline">
                   inquire now

@@ -8,7 +8,7 @@ import { absoluteUrl } from "@/lib/site"
  * Bump when public copy changes meaningfully; used as `lastModified` for the
  * static marketing routes so crawlers don't see a fresh date on every build.
  */
-const CONTENT_UPDATED = new Date("2026-08-17")
+const CONTENT_UPDATED = new Date("2026-08-18")
 
 type Entry = {
   path: string

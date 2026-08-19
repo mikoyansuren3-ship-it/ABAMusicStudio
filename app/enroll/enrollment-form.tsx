@@ -2,68 +2,76 @@
 
 import { useState, useTransition } from "react"
 
-import { createSubscriptionCheckout } from "@/app/actions/stripe-subscription"
+import { submitEnrollmentRequest } from "@/app/enroll/actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { REGISTRATION_FEE_USD, SUBSCRIPTION_PRICES_USD, type Duration, type Frequency } from "@/lib/stripe-prices"
+import { CheckCircle } from "lucide-react"
+import type { Duration, Frequency } from "@/lib/stripe-prices"
 
-const durations: Duration[] = [30, 45, 60]
-const frequencies: Frequency[] = [1, 2, 3]
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value)
-}
+const durations: Duration[] = [30, 45]
+const frequencies: Frequency[] = [1, 2]
 
 function parseDuration(value: string): Duration {
   const duration = Number(value)
-  if (duration === 30 || duration === 45 || duration === 60) return duration
+  if (duration === 30 || duration === 45) return duration
   return 30
 }
 
 function parseFrequency(value: string): Frequency {
   const frequency = Number(value)
-  if (frequency === 1 || frequency === 2 || frequency === 3) return frequency
+  if (frequency === 1 || frequency === 2) return frequency
   return 1
 }
 
 export function EnrollmentForm() {
   const [parentName, setParentName] = useState("")
   const [parentEmail, setParentEmail] = useState("")
+  const [parentPhone, setParentPhone] = useState("")
   const [studentName, setStudentName] = useState("")
   const [duration, setDuration] = useState<Duration>(30)
   const [frequency, setFrequency] = useState<Frequency>(1)
   const [error, setError] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState(false)
   const [isPending, startTransition] = useTransition()
-
-  const monthlyPrice = SUBSCRIPTION_PRICES_USD[duration][frequency]
-  const firstCheckoutTotal = monthlyPrice + REGISTRATION_FEE_USD
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
 
     startTransition(async () => {
-      try {
-        const checkoutUrl = await createSubscriptionCheckout({
-          duration,
-          frequency,
-          isFirstTime: true,
-          parentEmail,
-          studentName,
-        })
+      const result = await submitEnrollmentRequest({
+        parentName,
+        parentEmail,
+        parentPhone,
+        studentName,
+        duration,
+        frequency,
+      })
 
-        window.location.href = checkoutUrl
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "Unable to start checkout. Please try again.")
+      if (result.error) {
+        setError(result.error)
+      } else {
+        setSubmitted(true)
       }
     })
+  }
+
+  if (submitted) {
+    return (
+      <Card className="mx-auto max-w-lg">
+        <CardContent className="flex flex-col items-center py-12 text-center">
+          <CheckCircle className="h-16 w-16 text-accent" />
+          <h2 className="mt-6 font-serif text-2xl font-bold">Enrollment Request Sent!</h2>
+          <p className="mt-4 text-muted-foreground">
+            Thank you for choosing ABA Music Academy. We&apos;ll call or email you within 1-2 business days to confirm
+            your plan and schedule the first lesson.
+          </p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -71,7 +79,7 @@ export function EnrollmentForm() {
       <Card>
         <CardHeader>
           <CardTitle>Student Details</CardTitle>
-          <CardDescription>Tell us who the lessons are for and choose a monthly plan.</CardDescription>
+          <CardDescription>Tell us who the lessons are for and choose a lesson plan.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -98,15 +106,28 @@ export function EnrollmentForm() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="studentName">Student Name</Label>
-            <Input
-              id="studentName"
-              required
-              autoComplete="off"
-              value={studentName}
-              onChange={(event) => setStudentName(event.target.value)}
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="parentPhone">Parent Phone</Label>
+              <Input
+                id="parentPhone"
+                type="tel"
+                autoComplete="tel"
+                placeholder="(818) 555-0123"
+                value={parentPhone}
+                onChange={(event) => setParentPhone(event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="studentName">Student Name</Label>
+              <Input
+                id="studentName"
+                required
+                autoComplete="off"
+                value={studentName}
+                onChange={(event) => setStudentName(event.target.value)}
+              />
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -117,7 +138,7 @@ export function EnrollmentForm() {
             <RadioGroup
               value={String(duration)}
               onValueChange={(value) => setDuration(parseDuration(value))}
-              className="grid gap-3 sm:grid-cols-3"
+              className="grid gap-3 sm:grid-cols-2"
             >
               {durations.map((option) => (
                 <Label
@@ -140,7 +161,7 @@ export function EnrollmentForm() {
             <RadioGroup
               value={String(frequency)}
               onValueChange={(value) => setFrequency(parseFrequency(value))}
-              className="grid gap-3 sm:grid-cols-3"
+              className="grid gap-3 sm:grid-cols-2"
             >
               {frequencies.map((option) => (
                 <Label
@@ -159,24 +180,16 @@ export function EnrollmentForm() {
 
       <Card className="h-fit lg:sticky lg:top-24">
         <CardHeader>
-          <CardTitle>Payment Preview</CardTitle>
-          <CardDescription>Registration is included in the first checkout.</CardDescription>
+          <CardTitle>Request Summary</CardTitle>
+          <CardDescription>We&apos;ll confirm final details when we reach out.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-3 text-sm" aria-live="polite">
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">
+              <span className="text-muted-foreground">Requested plan</span>
+              <span className="font-medium">
                 {duration} min, {frequency}x/week
               </span>
-              <span className="font-medium">{formatCurrency(monthlyPrice)}/mo</span>
-            </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">One-time registration fee</span>
-              <span className="font-medium">{formatCurrency(REGISTRATION_FEE_USD)}</span>
-            </div>
-            <div className="flex justify-between gap-4 border-t pt-3 text-base">
-              <span className="font-medium">Due today</span>
-              <span className="font-bold">{formatCurrency(firstCheckoutTotal)}</span>
             </div>
           </div>
 
@@ -187,15 +200,14 @@ export function EnrollmentForm() {
           )}
 
           <Button type="submit" className="w-full" size="lg" disabled={isPending}>
-            {isPending ? "Preparing Checkout..." : "Continue to Payment"}
+            {isPending ? "Sending Request..." : "Submit Enrollment Request"}
           </Button>
 
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Monthly tuition renews automatically through Stripe. You can update payment details through the billing portal.
+            No payment is collected here. Our team will call or email you to confirm your plan and set up billing.
           </p>
         </CardContent>
       </Card>
     </form>
   )
 }
-

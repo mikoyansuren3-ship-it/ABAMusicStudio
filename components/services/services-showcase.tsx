@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 type Service = {
-  id: "violin" | "vocal" | "guitar" | "chess" | "math" | "science" | "english"
+  id: "guitar" | "chess" | "math"
   number: string
   name: string
   description: string
@@ -13,34 +13,8 @@ type Service = {
 
 const services: Service[] = [
   {
-    id: "violin",
-    number: "01",
-    name: "Violin",
-    description:
-      "Expression, technique, and beautiful tone. Classical violin instruction rooted in the same conservatory tradition as our piano program.",
-    bullets: [
-      "Posture, bowing, and intonation fundamentals",
-      "Repertoire across Baroque, Classical, and Romantic periods",
-      "Ensemble preparation and recital performance",
-    ],
-    image: "/services/violin.png",
-  },
-  {
-    id: "vocal",
-    number: "02",
-    name: "Vocal",
-    description:
-      "Healthy technique, confidence, and expressive singing. Voice lessons that support musicality from warmups to performance.",
-    bullets: [
-      "Breath support, tone production, and range building",
-      "Song interpretation across classical and contemporary styles",
-      "Audition, recital, and stage confidence preparation",
-    ],
-    image: "/services/vocal.png",
-  },
-  {
     id: "guitar",
-    number: "03",
+    number: "01",
     name: "Guitar",
     description:
       "Rhythm, chords, and expressive playing. Guitar instruction designed to build strong fundamentals and musical independence.",
@@ -53,7 +27,7 @@ const services: Service[] = [
   },
   {
     id: "chess",
-    number: "04",
+    number: "02",
     name: "Chess",
     description:
       "Strategy, focus, and creative problem solving. A disciplined approach to the game that sharpens thinking across every subject.",
@@ -66,7 +40,7 @@ const services: Service[] = [
   },
   {
     id: "math",
-    number: "05",
+    number: "03",
     name: "Math",
     description:
       "Number sense, practice, and problem solving. Building confidence and fluency in mathematical thinking from the ground up.",
@@ -76,32 +50,6 @@ const services: Service[] = [
       "Competition math and enrichment for advanced students",
     ],
     image: "/services/math.png",
-  },
-  {
-    id: "science",
-    number: "06",
-    name: "Science",
-    description:
-      "Curiosity, experiments, and big ideas. Hands-on exploration across physics, chemistry, and biology for young investigators.",
-    bullets: [
-      "Observation-based learning and the scientific method",
-      "Guided experiments with real lab materials",
-      "Connecting classroom science to the real world",
-    ],
-    image: "/services/science.png",
-  },
-  {
-    id: "english",
-    number: "07",
-    name: "English",
-    description:
-      "Reading, writing, and clear communication. Strengthening literacy skills and building confidence in expression, across every age.",
-    bullets: [
-      "Reading comprehension and analytical writing",
-      "Grammar, vocabulary, and essay structure",
-      "Creative writing and public speaking foundations",
-    ],
-    image: "/services/english.png",
   },
 ]
 
@@ -119,9 +67,21 @@ export function ServicesShowcase() {
           <p className="mt-4 text-sm text-muted-foreground">
             Enrolling now:{" "}
             <Link href="/programs/piano-lessons" className="font-medium text-accent underline-offset-4 hover:underline">
-              piano lessons in the Santa Clarita Valley
+              piano
             </Link>
-            .
+            ,{" "}
+            <Link href="/programs/voice-lessons" className="font-medium text-accent underline-offset-4 hover:underline">
+              voice
+            </Link>
+            ,{" "}
+            <Link href="/programs/violin-lessons" className="font-medium text-accent underline-offset-4 hover:underline">
+              violin
+            </Link>
+            , and{" "}
+            <Link href="/programs/qanun-lessons" className="font-medium text-accent underline-offset-4 hover:underline">
+              qanun
+            </Link>{" "}
+            lessons in the Santa Clarita Valley.
           </p>
         </header>
 
@@ -198,7 +158,7 @@ export function ServicesShowcase() {
 
         <footer className="mx-auto max-w-3xl pt-6 text-center">
           <p className="font-serif text-xl italic leading-relaxed text-muted-foreground">
-            More details — including teachers, schedules, and pricing — will be announced as each service is confirmed.
+            More details — including teachers and schedules — will be announced as each service is confirmed.
           </p>
         </footer>
       </div>
