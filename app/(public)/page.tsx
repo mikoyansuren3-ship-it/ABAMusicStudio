@@ -65,7 +65,7 @@ export default function HomePage() {
       </section>
 
       {/* Our Students on Stage — social proof from the June 2026 concert.
-          Captions name the moment, never the student (docs/content/photo-usage.md). */}
+          Alt text describes the moment, never the student (docs/content/photo-usage.md). */}
       <section className="py-16 md:py-24" aria-labelledby="students-on-stage">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
@@ -82,32 +82,26 @@ export default function HomePage() {
               {
                 src: "/students/recital-june-2026-young-beginner.jpg",
                 alt: "A young beginner performing at ABA Music Academy's 2026 end-of-year concert",
-                caption: "A first-year student's recital debut",
               },
               {
                 src: "/students/recital-june-2026-teen-soloist.jpg",
                 alt: "A teen student performing advanced repertoire at the grand piano",
-                caption: "Advanced repertoire at the June concert",
               },
               {
                 src: "/students/recital-june-2026-duet.jpg",
                 alt: "Two students performing a duet, four hands at one piano",
-                caption: "Four hands, one piano — spring duet",
               },
             ].map((photo) => (
-              <figure key={photo.src} className="overflow-hidden rounded-xl border bg-card">
-                <div className="aspect-[4/5] overflow-hidden bg-muted">
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    width={900}
-                    height={1125}
-                    sizes="(min-width: 640px) 33vw, 100vw"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <figcaption className="p-4 text-sm text-muted-foreground">{photo.caption}</figcaption>
-              </figure>
+              <div key={photo.src} className="aspect-[4/5] overflow-hidden rounded-xl border bg-muted">
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  width={900}
+                  height={1125}
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             ))}
           </div>
         </div>
