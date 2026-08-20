@@ -159,6 +159,32 @@ a.utilityLogin:hover {
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Dropdown trigger buttons share .navItem type styles; this resets UA button
+   chrome and lays out the label + chevron. */
+.navTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.navTrigger svg {
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.navTrigger[data-state="open"] svg {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navTrigger svg {
+    transition: none;
+  }
+}
+
 .navItemActive {
   color: var(--gold-strong);
   text-decoration: underline;

@@ -12,7 +12,7 @@ import { personListSchema } from "@/lib/seo/schema"
 import { publishedTeachers } from "@/lib/teachers"
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Faculty — Piano, Voice, Violin & Qanun Teachers",
+  title: "Our Teachers — Piano, Voice, Violin & Qanun",
   description:
     "Meet the teachers behind ABA Music Academy in the Santa Clarita Valley — conservatory-trained piano, voice, violin, and qanun instructors.",
   path: "/faculty",
@@ -23,9 +23,9 @@ export default function FacultyPage() {
     <div className="py-16 md:py-24">
       <JsonLd data={personListSchema(publishedTeachers)} />
       <div className="container mx-auto px-4">
-        <Breadcrumbs trail={[{ name: "Faculty", href: "/faculty" }]} className="mb-6" />
+        <Breadcrumbs trail={[{ name: "Our Teachers", href: "/faculty" }]} className="mb-6" />
         <PageHeader
-          eyebrow="Our Faculty"
+          eyebrow="Our Teachers"
           title="Teachers Who Care About Every Note"
           lede="Meet the instructors guiding students at ABA Music Academy across piano, voice, violin, and qanun."
         />
@@ -68,7 +68,7 @@ export default function FacultyPage() {
           {/* Growing-faculty note keeps the grid honest while new instructors are onboarded. */}
           <Card className="border-dashed bg-muted/30 shadow-none">
             <CardContent className="flex h-full flex-col items-start justify-center gap-3 p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Growing Faculty</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Growing Team</p>
               <h2 className="font-serif text-2xl font-bold">More Instructors Joining Soon</h2>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
                 Guitar, chess, and math enrichment teachers are joining as those programs launch. Instructor profiles

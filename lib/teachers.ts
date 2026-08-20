@@ -9,6 +9,12 @@ export type Teacher = {
   /** Path under /public. Use a real portrait when available. */
   image: string
   imageAlt: string
+  /**
+   * Tailwind object-position class used when the portrait has to be cropped
+   * (e.g. the landscape cards on program pages). Defaults to `object-top`.
+   * Set it when a centered/top crop would cut the face.
+   */
+  imagePosition?: string
   bio: string
   /** Founder is featured first and labeled distinctly */
   isFounder?: boolean
@@ -65,6 +71,9 @@ export const teachers: Teacher[] = [
     subjects: ["Qanun"],
     image: "/teachers/gohar-harutunyan.jpg",
     imageAlt: "Gohar Harutunyan, qanun teacher at ABA Music Academy, with her qanun",
+    // Her face sits high in the frame; a plain top crop clips it on the
+    // landscape program cards.
+    imagePosition: "object-[center_18%]",
     published: true,
     bio: "Gohar holds a degree in music education and brings more than 25 years of experience as a qanun teacher and performer, with a specialty in working with children. For the past five years in the U.S., she has actively shared her love of music and Armenian culture through teaching and community performance.",
   },

@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle, Loader2 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { submitInquiry } from "./actions"
 import { WeeklyAvailabilityCalendar } from "@/components/weekly-availability-calendar"
@@ -136,6 +137,23 @@ export default function InquirePage() {
               onSelectSlot={(start, end) => setSelectedSlot({ start, end })}
               selectedSlot={selectedSlot}
             />
+
+            {/* Warm accent — kept secondary to the form */}
+            <figure className="mx-auto mt-8 max-w-md">
+              <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+                <Image
+                  src="/students/teacher-student-after-recital.jpg"
+                  alt="A teacher embracing a young student holding flowers after the recital"
+                  width={900}
+                  height={675}
+                  sizes="(min-width: 1024px) 28rem, 100vw"
+                  className="h-full w-full object-cover object-[center_25%]"
+                />
+              </div>
+              <figcaption className="mt-3 text-center text-sm text-muted-foreground">
+                Every student gets their moment — and your first lesson is free.
+              </figcaption>
+            </figure>
           </div>
 
           {/* Inquiry Form */}

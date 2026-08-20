@@ -107,6 +107,34 @@ export default async function ProgramPage({ params }: { params: Promise<Params> 
           ))}
         </div>
 
+        {/* Recital photos — real students, anonymous captions */}
+        {program.gallery && program.gallery.length > 0 ? (
+          <section className="mt-20" aria-labelledby="program-gallery">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 id="program-gallery" className="font-serif text-2xl font-bold md:text-3xl">
+                From Our Recitals
+              </h2>
+            </div>
+            <div className="mx-auto mt-10 grid max-w-5xl gap-6 sm:grid-cols-3">
+              {program.gallery.map((photo) => (
+                <figure key={photo.src} className="overflow-hidden rounded-xl border bg-card">
+                  <div className="aspect-[4/5] overflow-hidden bg-muted">
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      width={900}
+                      height={1125}
+                      sizes="(min-width: 640px) 33vw, 100vw"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <figcaption className="p-4 text-sm text-muted-foreground">{photo.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         {/* Instructors */}
         {instructors.length > 0 ? (
           <section className="mt-20" aria-labelledby="program-teachers">
@@ -125,7 +153,7 @@ export default async function ProgramPage({ params }: { params: Promise<Params> 
                       width={768}
                       height={576}
                       sizes="(min-width: 640px) 50vw, 100vw"
-                      className="h-full w-full object-cover object-top"
+                      className={`h-full w-full object-cover ${teacher.imagePosition ?? "object-top"}`}
                     />
                   </div>
                   <CardContent>
@@ -136,7 +164,7 @@ export default async function ProgramPage({ params }: { params: Promise<Params> 
                       href="/faculty"
                       className="mt-4 inline-block text-sm font-medium text-accent underline-offset-4 hover:underline"
                     >
-                      Meet the full faculty
+                      Meet our teachers
                     </Link>
                   </CardContent>
                 </Card>
