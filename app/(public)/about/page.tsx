@@ -1,13 +1,10 @@
 import type { Metadata } from "next"
 import { publicPageMetadata } from "@/lib/seo/metadata"
-import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import Image from "next/image"
-import { CtaSection } from "@/components/public/cta-section"
 import { PageHeader } from "@/components/public/page-header"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { SITE, SITE_DEFINITION } from "@/lib/site"
-import { GraduationCap, Heart, Award } from "lucide-react"
 
 export const metadata: Metadata = publicPageMetadata({
   title: "About Our Piano Studio",
@@ -55,117 +52,118 @@ export default function AboutPage() {
             <p className="mt-4 text-muted-foreground leading-relaxed">
               ABA Music Academy is growing.{" "}
               <Link href="/faculty" className="font-medium text-accent underline-offset-4 hover:underline">
-                Meet the full faculty
+                Meet our teachers
               </Link>{" "}
-              of piano, voice, and violin instructors.
+              in piano, voice, violin, and qanun.
             </p>
           </div>
         </div>
 
-        {/* At a glance — concrete, citable facts (all sourced from lib/site.ts) */}
-        <section className="mt-24" aria-labelledby="about-glance">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 id="about-glance" className="font-serif text-3xl font-bold">
-              The Studio at a Glance
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              What families in {SITE.location.areaServed.slice(0, 3).join(", ")}, and across the{" "}
-              {SITE.location.area} can expect.
-            </p>
+        {/* Teaching candids — the philosophy in practice, mid-lesson */}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="aspect-[16/10] overflow-hidden rounded-xl border bg-muted">
+            <Image
+              src="/students/founder-guiding-student.jpg"
+              alt="Arpine guiding a young student at the piano on stage"
+              width={900}
+              height={563}
+              sizes="(min-width: 640px) 50vw, 100vw"
+              className="h-full w-full object-cover object-[center_30%]"
+            />
           </div>
-          <dl className="mx-auto mt-10 grid max-w-4xl gap-6 sm:grid-cols-2">
-            {[
-              {
-                term: "Where",
-                detail: `A private, in-studio music program — piano, voice, violin, and qanun — serving ${SITE.location.areaServed.slice(0, -1).join(", ")}, and ${SITE.location.areaServed.at(-1)}. Directions are shared when you book.`,
-              },
-              {
-                term: "Who we teach",
-                detail:
-                  "Young beginners from around age 5, school-age children and teens, and adults starting fresh or returning to the piano.",
-              },
-              {
-                term: "Lesson formats",
-                detail:
-                  "Private 30- or 45-minute lessons, once or twice per week, at a regular weekly time. Every new student starts with a free trial lesson; inquire for current rates.",
-              },
-              {
-                term: "Hours",
-                detail: `${SITE.hours.map((h) => `${h.label} ${h.display}`).join(" · ")} · ${SITE.closedDays.join(", ")} closed.`,
-              },
-              {
-                term: "Approach",
-                detail:
-                  "Classical technique and reading fundamentals paired with the music each student wants to play; optional recitals and MTAC festival preparation for students who want to perform.",
-              },
-              {
-                term: "Tools",
-                detail:
-                  "An online student portal for scheduling, secure card payments, monthly billing, and communication with your teacher.",
-              },
-            ].map((item) => (
-              <div key={item.term} className="rounded-xl border bg-card p-6">
-                <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{item.term}</dt>
-                <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.detail}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="aspect-[16/10] overflow-hidden rounded-xl border bg-muted">
+            <Image
+              src="/students/founder-four-hands.jpg"
+              alt="Arpine playing a duet with a student, four hands at one piano"
+              width={900}
+              height={563}
+              sizes="(min-width: 640px) 50vw, 100vw"
+              className="h-full w-full object-cover object-[center_35%]"
+            />
+          </div>
+        </div>
+
+        {/* Origin story */}
+        <section className="mt-24" aria-labelledby="about-origin">
+          <div className="mx-auto max-w-3xl">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-accent">Our Story</p>
+            <h2
+              id="about-origin"
+              className="mt-3 text-center font-serif text-3xl font-bold text-balance"
+            >
+              Established in 2019: From Humble Beginnings to a Thriving Community
+            </h2>
+
+            <div className="mt-8 space-y-5 text-muted-foreground leading-relaxed">
+              <p>
+                ABA Music Academy began in a garage in Newhall.
+              </p>
+              <p>
+                Arpine arrived in the United States with a PhD in Music and years of conservatory training behind
+                her — study at the Komitas State Conservatory and time at the Aram Khachaturian Museum in Armenia —
+                and one ambition she had carried since she was a student herself: to build a teaching studio of her
+                own. Shortly after settling in Newhall in 2019, she left her job to make that dream real.
+              </p>
+              <p>
+                The first lessons were taught out of her garage, one student and one weekly time slot at a time.
+                Word travelled the way it does in a close community — a parent mentioned her to a neighbor, the
+                neighbor told a friend — and the schedule filled. What began as a single teacher with a piano became
+                a foothold in the {SITE.location.area}.
+              </p>
+              <p>
+                Today ABA Music Academy is a full academy: a team teaching piano, voice, violin, and qanun,
+                recitals every June and December, and students who compete in international competitions and test
+                through MTAC Certificate of Merit, RCM, and ABRSM. Arpine remains an active member of the Music
+                Teachers&apos; Association of California and serves on the board of its Santa Clarita Valley branch,
+                and she still teaches the way she did in that garage — one student at a time, at their pace, toward
+                what they want to play.
+              </p>
+            </div>
+          </div>
         </section>
 
-        {/* Philosophy Section */}
-        <div className="mt-24">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-3xl font-bold">Teaching Philosophy</h2>
-            <p className="mt-4 text-muted-foreground">Three pillars guide every lesson at ABA Music Academy.</p>
+        {/* Studio life */}
+        <div className="mt-16 grid gap-6 md:grid-cols-3">
+          <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-muted">
+            <Image
+              src="/students/student-focus-at-the-keys.jpg"
+              alt="A student concentrating at the keys, hands in position, during a recital"
+              width={900}
+              height={675}
+              sizes="(min-width: 768px) 33vw, 100vw"
+              className="h-full w-full object-cover object-[center_30%]"
+            />
           </div>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-                  <GraduationCap className="h-6 w-6 text-accent" />
-                </div>
-                <h3 className="mt-4 font-semibold">Strong Foundations</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Proper technique from the start prevents bad habits and enables musical freedom as skills advance.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-                  <Heart className="h-6 w-6 text-accent" />
-                </div>
-                <h3 className="mt-4 font-semibold">Joy in Learning</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Music should be enjoyable. I balance challenging material with pieces students love to keep motivation
-                  high.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-                  <Award className="h-6 w-6 text-accent" />
-                </div>
-                <h3 className="mt-4 font-semibold">Individual Growth</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Every student is unique. Lessons are tailored to individual goals, learning styles, and musical
-                  interests.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-muted">
+            <Image
+              src="/students/students-holiday-recital-joy.jpg"
+              alt="Students laughing together in Santa hats at the holiday recital"
+              width={900}
+              height={675}
+              sizes="(min-width: 768px) 33vw, 100vw"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-muted">
+            <Image
+              src="/students/recital-trophy-young-student.jpg"
+              alt="A young student holding her recital trophy beside her teacher"
+              width={900}
+              height={675}
+              sizes="(min-width: 768px) 33vw, 100vw"
+              className="h-full w-full object-cover object-[center_25%]"
+            />
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-24">
-          <CtaSection
-            body="Ready to begin your musical journey?"
-            buttonLabel="Inquire About Lessons"
-            href="/inquire"
+        {/* Closing group photo — the whole studio on stage */}
+        <div className="relative mt-16 aspect-[21/9] overflow-hidden rounded-2xl bg-muted">
+          <Image
+            src="/students/studio-recital-finale-wide.jpg"
+            alt="ABA Music Academy students gathered on stage at the recital finale"
+            fill
+            sizes="(min-width: 1536px) 1536px, 100vw"
+            className="object-cover object-[center_30%]"
           />
         </div>
       </div>

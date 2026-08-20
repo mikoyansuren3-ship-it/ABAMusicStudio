@@ -40,6 +40,8 @@ export type Program = {
   /** Hero image under /public + alt */
   image: string
   imageAlt: string
+  /** Optional recital-photo strip rendered after the content sections. */
+  gallery?: Array<{ src: string; alt: string; caption: string }>
   published?: boolean
 }
 
@@ -136,8 +138,25 @@ export const programs: Program[] = [
       },
     ],
     courseMode: ["Onsite"],
-    image: "/elegant-grand-piano-in-warm-studio-lighting.jpg",
-    imageAlt: "A grand piano in the warm lighting of the ABA Music Academy studio",
+    image: "/students/summer-2025-piano-lesson.jpg",
+    imageAlt: "An ABA Music Academy student at the grand piano during a summer lesson",
+    gallery: [
+      {
+        src: "/students/recital-june-2026-first-recital.jpg",
+        alt: "A young beginner on stage at ABA Music Academy's 2026 end-of-year concert",
+        caption: "Young beginners take the stage from their first year",
+      },
+      {
+        src: "/students/recital-june-2026-student-performing.jpg",
+        alt: "A school-age student performing at the grand piano at the June 2026 concert",
+        caption: "School-age students perform at every June concert",
+      },
+      {
+        src: "/students/recital-june-2026-teen-performing.jpg",
+        alt: "A teen student performing at the grand piano at the June 2026 concert",
+        caption: "Teens prepare recital, festival, and audition repertoire",
+      },
+    ],
     published: true,
   },
   {
@@ -293,7 +312,7 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "Who will my teacher be?",
     answer:
-      "Piano lessons are led by our founder, Arpine, who holds a PhD in Music, has over 10 years of teaching experience, and is an MTAC member, alongside award-winning pianist Valeria Boroda. Voice is taught by Marietta Galstyan, violin by Asya Anisimova, and qanun by Gohar Harutunyan. Meet the full faculty on the Faculty page.",
+      "Piano lessons are led by our founder, Arpine, who holds a PhD in Music, has over 10 years of teaching experience, and is an MTAC member, alongside award-winning pianist Valeria Boroda. Voice is taught by Marietta Galstyan, violin by Asya Anisimova, and qanun by Gohar Harutunyan. Meet everyone on the Our Teachers page.",
   },
   {
     question: "What is your cancellation policy?",

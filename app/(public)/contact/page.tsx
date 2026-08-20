@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -97,6 +98,23 @@ export default function ContactPage() {
                 ))}
               </div>
             </div>
+
+            {/* Community accent — the studio's only daylight/outdoor photo */}
+            <figure>
+              <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+                <Image
+                  src="/students/students-summer-park-gathering.jpg"
+                  alt="ABA Music Academy students and teachers gathered at a park gazebo in summer"
+                  width={1200}
+                  height={900}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <figcaption className="mt-3 text-sm text-muted-foreground">
+                Summer 2025 — the studio, out in the neighborhood.
+              </figcaption>
+            </figure>
           </div>
 
           {/* Contact Form */}
