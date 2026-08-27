@@ -1,0 +1,106 @@
+/*
+ * Scroll-reveal transitions (design-system/MASTER.md §7).
+ *
+ * The hidden state is deliberately scoped to
+ * `@media (prefers-reduced-motion: no-preference) and (scripting: enabled)`.
+ * With JavaScript disabled the rule set never applies, so the page ships
+ * visible and unanimated — no flash of invisible content, and no dependence on
+ * hydration for text to appear. Browsers too old to understand the `scripting`
+ * media feature drop the whole block, which also fails to "always visible".
+ */
+
+.reveal {
+  --reveal-distance: 44px;
+  --reveal-duration: 760ms;
+  --reveal-delay: 0ms;
+  --reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --reveal-from: translate3d(0, var(--reveal-distance), 0);
+  --reveal-clip: inset(0 0 0 0);
+  --reveal-filter: none;
+  --reveal-opacity: 0;
+}
+
+.fromUp {
+  --reveal-from: translate3d(0, var(--reveal-distance), 0);
+}
+
+.fromLeft {
+  --reveal-from: translate3d(calc(-1 * var(--reveal-distance)), 0, 0);
+}
+
+.fromRight {
+  --reveal-from: translate3d(var(--reveal-distance), 0, 0);
+}
+
+/*
+ * A bow stroke: the element is fully opaque and is uncovered left to right, so
+ * headings are "drawn" rather than faded. Clip-path runs at 1.25x the base
+ * duration — a wipe at 760ms reads as a jump.
+ */
+.fromBow {
+  --reveal-from: none;
+  --reveal-opacity: 1;
+  --reveal-clip: inset(0 101% 0 0);
+}
+
+/* Same idea, bottom to top — used on rules and full-bleed band edges. */
+.fromWipe {
+  --reveal-from: none;
+  --reveal-opacity: 1;
+  --reveal-clip: inset(102% 0 0 0);
+}
+
+/* A focus pull: the block resolves out of a shallow blur as it settles. */
+.fromFocus {
+  --reveal-from: scale(0.945);
+  --reveal-filter: blur(12px);
+}
+
+/*
+ * Stacked (single-column) layout: sideways travel fights the column and can
+ * nudge the document horizontally. Everything rises instead. The clip-path
+ * variants are direction-agnostic, so they are left alone.
+ */
+@media (max-width: 767px) {
+  .fromLeft,
+  .fromRight {
+    --reveal-from: translate3d(0, var(--reveal-distance), 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .reveal {
+    transition:
+      opacity var(--reveal-duration) var(--reveal-ease) var(--reveal-delay),
+      transform var(--reveal-duration) var(--reveal-ease) var(--reveal-delay),
+      filter var(--reveal-duration) var(--reveal-ease) var(--reveal-delay),
+      clip-path calc(var(--reveal-duration) * 1.25) var(--reveal-ease) var(--reveal-delay);
+  }
+
+  .reveal[data-revealed="false"] {
+    opacity: var(--reveal-opacity);
+    transform: var(--reveal-from);
+    filter: var(--reveal-filter);
+    clip-path: var(--reveal-clip);
+    will-change: opacity, transform, filter, clip-path;
+  }
+
+  /*
+   * Elements the page was already scrolled past (a restored scroll position, an
+   * anchor jump, a fast flick) are marked revealed on mount. Showing them with
+   * a 760ms transition would animate content the reader is already looking at,
+   * so this snaps them straight to the resting state.
+   */
+  .reveal[data-instant="true"] {
+    transition: none;
+  }
+}
+
+@media print {
+  .reveal[data-revealed="false"] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    clip-path: none;
+  }
+}
