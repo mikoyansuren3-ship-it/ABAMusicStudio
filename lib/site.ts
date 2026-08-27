@@ -43,7 +43,7 @@ export const SITE = {
   /** Square brand mark, path under /public. */
   logo: "/aba-music-academy-logo.png",
   /** Wide brand image for OG / schema `image`. */
-  heroImage: "/elegant-grand-piano-in-warm-studio-lighting.jpg",
+  heroImage: "/students/recital-june-2026-stage.jpg",
   timezone: "America/Los_Angeles",
   location: {
     /** Short label used in titles and copy. */
@@ -100,7 +100,7 @@ export const SITE = {
  * the top of the homepage and About page and as the schema.org `description`
  * — the sentence search/AI engines lift when describing the entity.
  */
-export const SITE_DEFINITION = `${SITE.name} is a private piano studio in the ${SITE.location.areaLong}, offering one-on-one piano lessons for kids, teens, and adults — from first notes to advanced repertoire — taught by a PhD-trained, MTAC-member founder.`
+export const SITE_DEFINITION = `${SITE.name} is a private music studio in the ${SITE.location.areaLong}, offering one-on-one piano, voice, violin, and qanun lessons for kids, teens, and adults — from first notes to advanced repertoire — taught by a PhD-trained, MTAC-member founder and her faculty.`
 
 /** Absolute URL for a site path ("/about" → "https://…/about"). */
 export function absoluteUrl(path = "/") {

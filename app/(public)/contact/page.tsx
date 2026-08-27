@@ -22,155 +22,155 @@ export default function ContactPage() {
       <div className="container mx-auto px-4">
         <PageHeader title="Contact Us" lede="Have a question? We'd love to hear from you." />
 
-        <div className="mt-16 grid gap-12 md:grid-cols-2">
-          {/* Contact Info */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="font-serif text-2xl font-bold">Get in Touch</h2>
-              <p className="mt-2 text-muted-foreground">
-                For lesson inquiries, please use our inquiry form for the fastest response.
-              </p>
+        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
+          {/* Community accent — the studio's only daylight/outdoor photo */}
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted lg:aspect-square">
+              <Image
+                src="/students/students-summer-park-gathering.jpg"
+                alt="ABA Music Academy students and teachers gathered at a park gazebo in summer"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority
+                className="object-cover"
+              />
             </div>
-
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                  <Mail className="h-5 w-5 text-accent" aria-hidden />
-                </div>
-                <div>
-                  <h3 className="font-medium">Email</h3>
-                  <p className="text-muted-foreground">
-                    <a
-                      href={`mailto:${SITE.email}`}
-                      className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                    >
-                      {SITE.email}
-                    </a>
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                  <Phone className="h-5 w-5 text-accent" aria-hidden />
-                </div>
-                <div>
-                  <h3 className="font-medium">Phone</h3>
-                  <p className="text-muted-foreground">
-                    <a
-                      href={`tel:${SITE.phoneE164}`}
-                      className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                    >
-                      {SITE.phone}
-                    </a>
-                  </p>
-                  <p className="text-sm text-muted-foreground">Available during business hours</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                  <MapPin className="h-5 w-5 text-accent" aria-hidden />
-                </div>
-                <div>
-                  <h3 className="font-medium">Location</h3>
-                  <p className="text-muted-foreground">
-                    Private studio in the {SITE.location.areaLong}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Serving {SITE.location.areaServed.slice(0, -1).join(", ")}, and{" "}
-                    {SITE.location.areaServed.at(-1)}. Directions are shared when you book.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-xl bg-muted/50 p-6">
-              <h3 className="font-medium">Studio Hours</h3>
-              <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                {SITE.hours.map((h) => (
-                  <p key={h.label}>
-                    {h.label}: {h.display}
-                  </p>
-                ))}
-                {SITE.closedDays.map((day) => (
-                  <p key={day}>{day}: Closed</p>
-                ))}
-              </div>
-            </div>
-
-            {/* Community accent — the studio's only daylight/outdoor photo */}
-            <figure>
-              <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
-                <Image
-                  src="/students/students-summer-park-gathering.jpg"
-                  alt="ABA Music Academy students and teachers gathered at a park gazebo in summer"
-                  width={1200}
-                  height={900}
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <figcaption className="mt-3 text-sm text-muted-foreground">
-                Summer 2025 — the studio, out in the neighborhood.
-              </figcaption>
-            </figure>
           </div>
 
-          {/* Contact Form */}
-          <Card>
-            <CardHeader>
-              <h2 className="font-semibold leading-none">Send a Message</h2>
-              <CardDescription>Fill out the form below and we&apos;ll get back to you soon.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {state.success ? (
-                <div className="flex flex-col items-center py-8 text-center" role="status">
-                  <CheckCircle className="h-12 w-12 text-accent" aria-hidden />
-                  <h3 className="mt-4 text-lg font-semibold">Message Sent!</h3>
-                  <p className="mt-2 text-muted-foreground">
-                    Thank you for reaching out. We&apos;ll respond within 1-2 business days.
-                  </p>
-                </div>
-              ) : (
-                <form action={formAction} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
-                      <Input id="name" name="name" required autoComplete="name" placeholder="Your name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        autoComplete="email"
-                        placeholder="you@example.com"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" name="subject" required placeholder="What is this regarding?" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea id="message" name="message" required placeholder="Your message..." rows={5} />
-                  </div>
-                  {state.error && (
-                    <p role="alert" aria-live="polite" className="text-sm text-destructive">
-                      {state.error}
+          {/* Right column: message form first, contact details beneath it */}
+          <div className="space-y-12">
+            {/* Contact Form */}
+            <Card>
+              <CardHeader>
+                <h2 className="font-semibold leading-none">Send a Message</h2>
+                <CardDescription>Fill out the form below and we&apos;ll get back to you soon.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {state.success ? (
+                  <div className="flex flex-col items-center py-8 text-center" role="status">
+                    <CheckCircle className="h-12 w-12 text-accent" aria-hidden />
+                    <h3 className="mt-4 text-lg font-semibold">Message Sent!</h3>
+                    <p className="mt-2 text-muted-foreground">
+                      Thank you for reaching out. We&apos;ll respond within 1-2 business days.
                     </p>
-                  )}
-                  <Button type="submit" className="w-full" disabled={isPending}>
-                    {isPending ? "Sending..." : "Send Message"}
-                  </Button>
-                </form>
-              )}
-            </CardContent>
-          </Card>
+                  </div>
+                ) : (
+                  <form action={formAction} className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input id="name" name="name" required autoComplete="name" placeholder="Your name" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          required
+                          autoComplete="email"
+                          placeholder="you@example.com"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Subject</Label>
+                      <Input id="subject" name="subject" required placeholder="What is this regarding?" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="message">Message</Label>
+                      <Textarea id="message" name="message" required placeholder="Your message..." rows={5} />
+                    </div>
+                    {state.error && (
+                      <p role="alert" aria-live="polite" className="text-sm text-destructive">
+                        {state.error}
+                      </p>
+                    )}
+                    <Button type="submit" className="w-full" disabled={isPending}>
+                      {isPending ? "Sending..." : "Send Message"}
+                    </Button>
+                  </form>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Contact Info */}
+            <div className="space-y-8">
+              <div>
+                <h2 className="font-serif text-2xl font-bold">Get in Touch</h2>
+                <p className="mt-2 text-muted-foreground">
+                  For lesson inquiries, please use our inquiry form for the fastest response.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                    <Mail className="h-5 w-5 text-accent" aria-hidden />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Email</h3>
+                    <p className="text-muted-foreground">
+                      <a
+                        href={`mailto:${SITE.email}`}
+                        className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      >
+                        {SITE.email}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                    <Phone className="h-5 w-5 text-accent" aria-hidden />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Phone</h3>
+                    <p className="text-muted-foreground">
+                      <a
+                        href={`tel:${SITE.phoneE164}`}
+                        className="rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      >
+                        {SITE.phone}
+                      </a>
+                    </p>
+                    <p className="text-sm text-muted-foreground">Available during business hours</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                    <MapPin className="h-5 w-5 text-accent" aria-hidden />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Location</h3>
+                    <p className="text-muted-foreground">
+                      Private studio in the {SITE.location.areaLong}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Serving {SITE.location.areaServed.slice(0, -1).join(", ")}, and{" "}
+                      {SITE.location.areaServed.at(-1)}. Directions are shared when you book.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-muted/50 p-6">
+                <h3 className="font-medium">Studio Hours</h3>
+                <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                  {SITE.hours.map((h) => (
+                    <p key={h.label}>
+                      {h.label}: {h.display}
+                    </p>
+                  ))}
+                  {SITE.closedDays.map((day) => (
+                    <p key={day}>{day}: Closed</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

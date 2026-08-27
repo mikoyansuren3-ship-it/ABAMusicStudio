@@ -7,6 +7,10 @@ here, MASTER applies in full.
 Current known deviations:
 
 - **home**: hero `h1` may scale to `md:text-6xl` (flagship exception; MASTER §3).
+- **programs** (owner decision, 2026-08-25): the four Music Programs pages run
+  the "Programme Notes" broadsheet template — its own type scale, a bespoke
+  1180px column, square corners, and the MASTER §7b cinematic motion tier.
+  Full record in `programs.md`.
 - **services** (owner decision, 2026-07-12): keeps its original editorial
   design — full-viewport per-subject themed panels (`--card-*` vars in
   `app/globals.css`), mono eyebrows, `rounded-[28px]`, text arrows. Exempted

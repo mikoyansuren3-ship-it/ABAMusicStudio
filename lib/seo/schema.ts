@@ -1,6 +1,6 @@
 import { SITE, SITE_DEFINITION, absoluteUrl } from "@/lib/site"
 import { publishedTeachers, type Teacher } from "@/lib/teachers"
-import type { Program, ProgramFaq } from "@/lib/programs"
+import { programTeaches, type Program, type ProgramFaq } from "@/lib/programs"
 
 /**
  * schema.org JSON-LD builders. Every builder returns a plain object; render
@@ -57,6 +57,11 @@ export function personSchema(teacher: Teacher, { minimal = false } = {}): JsonLd
     description: teacher.bio,
     knowsAbout: teacher.subjects,
     url: absoluteUrl("/faculty"),
+    // Structured credentials (lib/teachers.ts) drive both the visible
+    // credentials band and this node, so the two cannot drift apart.
+    award: teacher.credentials
+      ?.filter((c) => c.kind === "award")
+      .map((c) => [c.title, c.detail].filter(Boolean).join(" — ")),
     ...(teacher.slug === SITE.founder.slug
       ? {
           alumniOf: [
@@ -158,10 +163,10 @@ export function programSchema(program: Program): JsonLdObject[] {
     name: program.title,
     description: program.metaDescription,
     url,
-    image: absoluteUrl(program.image),
+    image: program.image ? absoluteUrl(program.image) : undefined,
     provider: { "@id": ORG_ID },
     educationalLevel: "Beginner to Advanced",
-    teaches: program.sections.find((s) => s.heading.toLowerCase().includes("learn"))?.bullets,
+    teaches: programTeaches(program),
     availableLanguage: "en",
     hasCourseInstance: {
       "@type": "CourseInstance",

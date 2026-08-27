@@ -3,9 +3,9 @@ import { publicPageMetadata } from "@/lib/seo/metadata"
 import type React from "react"
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Contact Us — Santa Clarita Valley Piano Studio",
+  title: "Contact Us — Santa Clarita Valley Music Studio",
   description:
-    "Questions about piano lessons or the studio? Call 818-836-2322, email, or send a message to ABA Music Academy in the Santa Clarita Valley.",
+    "Questions about music lessons or the studio? Call 818-836-2322, email, or send a message to ABA Music Academy in the Santa Clarita Valley.",
   path: "/contact",
 })
 

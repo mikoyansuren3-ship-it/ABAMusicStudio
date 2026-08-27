@@ -6,6 +6,7 @@ import { Check } from "lucide-react"
 import { PageHeader } from "@/components/public/page-header"
 import { LessonFormatsSection } from "@/components/lesson-formats-section"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
+import { publishedPrograms } from "@/lib/programs"
 import { SITE } from "@/lib/site"
 
 export const metadata: Metadata = publicPageMetadata({
@@ -39,9 +40,11 @@ export default function LessonsPage() {
             <Button size="lg" asChild>
               <Link href="/inquire">Book a Free Trial</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/programs/piano-lessons">About Our Piano Program</Link>
-            </Button>
+            {publishedPrograms.map((program) => (
+              <Button key={program.slug} size="lg" variant="outline" asChild>
+                <Link href={`/programs/${program.slug}`}>{program.navLabel}</Link>
+              </Button>
+            ))}
           </div>
         </div>
 
