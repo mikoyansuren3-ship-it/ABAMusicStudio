@@ -7,9 +7,9 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { SITE, SITE_DEFINITION } from "@/lib/site"
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "About Our Piano Studio",
+  title: "About Our Music Studio",
   description:
-    "Meet Arpine, founder of ABA Music Academy — PhD in Music, MTAC member, 10+ years teaching piano to students of all ages in the Santa Clarita Valley.",
+    "Meet Arpine, founder of ABA Music Academy — PhD in Music, MTAC member — and the faculty teaching piano, voice, violin, and qanun in the Santa Clarita Valley.",
   path: "/about",
 })
 

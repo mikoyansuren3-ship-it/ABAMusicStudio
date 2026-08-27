@@ -6,12 +6,12 @@ import type { Metadata } from "next"
 import { publicPageMetadata } from "@/lib/seo/metadata"
 import { SITE, SITE_DEFINITION } from "@/lib/site"
 
-const HOME_TITLE = `${SITE.name} | Piano Lessons in ${SITE.location.area}`
+const HOME_TITLE = `${SITE.name} | Music Lessons in ${SITE.location.area}`
 
 export const metadata: Metadata = {
   ...publicPageMetadata({
     title: HOME_TITLE,
-    description: `Private piano lessons in the ${SITE.location.areaLong} for kids, teens, and adults. PhD-trained, MTAC-member instruction, free trial lesson, flexible 30/45-minute formats, and easy online scheduling.`,
+    description: `Private music lessons in the ${SITE.location.area} — piano, voice, violin, and qanun — for kids, teens, and adults. Free trial lesson, easy online scheduling.`,
     path: "/",
   }),
   // Homepage keeps the full brand title (no template suffix).
@@ -42,7 +42,7 @@ export default function HomePage() {
               Begin Your Musical Journey Today
             </p>
             <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight text-balance text-cream md:text-6xl">
-              Piano Lessons in the {SITE.location.area}
+              Music Lessons in the {SITE.location.area}
             </h1>
             <p className="mt-6 text-lg text-cream/90 leading-relaxed text-pretty">{SITE_DEFINITION}</p>
             <p className="mt-3 text-cream/90 leading-relaxed text-pretty">

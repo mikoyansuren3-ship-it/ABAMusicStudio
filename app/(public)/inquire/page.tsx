@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,10 +15,6 @@ import { CheckCircle, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { submitInquiry } from "./actions"
-import { WeeklyAvailabilityCalendar } from "@/components/weekly-availability-calendar"
-import type { Availability, AvailabilityException, Booking } from "@/lib/types"
-
-type BookingSlot = Pick<Booking, "start_time" | "end_time" | "status">
 
 const daysOfWeek = [
   { id: "monday", label: "Monday" },
@@ -35,28 +31,6 @@ export default function InquirePage() {
   const [error, setError] = useState<string | null>(null)
   const [consent, setConsent] = useState(false)
   const [selectedDays, setSelectedDays] = useState<string[]>([])
-  const [availability, setAvailability] = useState<Availability[]>([])
-  const [exceptions, setExceptions] = useState<AvailabilityException[]>([])
-  const [bookings, setBookings] = useState<BookingSlot[]>([])
-  const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null)
-
-  useEffect(() => {
-    // Fetch availability
-    async function fetchAvailability() {
-      try {
-        const res = await fetch("/api/availability")
-        if (res.ok) {
-          const data = await res.json()
-          setAvailability(data.availability || [])
-          setExceptions(data.exceptions || [])
-          setBookings(data.bookings || [])
-        }
-      } catch (err) {
-        console.error("Failed to fetch availability:", err)
-      }
-    }
-    fetchAvailability()
-  }, [])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -72,11 +46,6 @@ export default function InquirePage() {
     const formData = new FormData(e.currentTarget)
     formData.set("preferred_days", JSON.stringify(selectedDays))
     formData.set("consent", "true")
-
-    if (selectedSlot) {
-      formData.set("requested_slot_start", selectedSlot.start.toISOString())
-      formData.set("requested_slot_end", selectedSlot.end.toISOString())
-    }
 
     const result = await submitInquiry(formData)
 
@@ -123,38 +92,24 @@ export default function InquirePage() {
           lede="Fill out the form below and we'll help you find the perfect lesson time."
         />
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-2">
-          {/* Availability Calendar */}
-          <div>
-            <h2 className="mb-4 font-serif text-xl font-semibold">Available Times</h2>
-            <p className="mb-6 text-sm text-muted-foreground">
-              Click on an available time slot to request it, or fill out your preferences below.
-            </p>
-            <WeeklyAvailabilityCalendar
-              availability={availability}
-              exceptions={exceptions}
-              existingBookings={bookings}
-              onSelectSlot={(start, end) => setSelectedSlot({ start, end })}
-              selectedSlot={selectedSlot}
-            />
-
-            {/* Warm accent — kept secondary to the form */}
-            <figure className="mx-auto mt-8 max-w-md">
-              <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
-                <Image
-                  src="/students/teacher-student-after-recital.jpg"
-                  alt="A teacher embracing a young student holding flowers after the recital"
-                  width={900}
-                  height={675}
-                  sizes="(min-width: 1024px) 28rem, 100vw"
-                  className="h-full w-full object-cover object-[center_25%]"
-                />
-              </div>
-              <figcaption className="mt-3 text-center text-sm text-muted-foreground">
-                Every student gets their moment — and your first lesson is free.
-              </figcaption>
-            </figure>
-          </div>
+        <div className="mx-auto mt-16 max-w-2xl space-y-12">
+          {/* Warm accent — kept secondary to the form */}
+          <figure className="mx-auto max-w-md">
+            <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+              <Image
+                src="/students/teacher-student-after-recital.jpg"
+                alt="A teacher embracing a young student holding flowers after the recital"
+                width={900}
+                height={675}
+                sizes="(min-width: 768px) 28rem, 100vw"
+                priority
+                className="h-full w-full object-cover object-[center_25%]"
+              />
+            </div>
+            <figcaption className="mt-3 text-center text-sm text-muted-foreground">
+              Every student gets their moment — and your first lesson is free.
+            </figcaption>
+          </figure>
 
           {/* Inquiry Form */}
           <Card>
@@ -232,7 +187,6 @@ export default function InquirePage() {
                         <SelectContent>
                           <SelectItem value="30">30 minutes</SelectItem>
                           <SelectItem value="45">45 minutes</SelectItem>
-                          <SelectItem value="60">60 minutes</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -260,33 +214,6 @@ export default function InquirePage() {
                     <Label htmlFor="preferred_times">Preferred Time Range</Label>
                     <Input id="preferred_times" name="preferred_times" placeholder="e.g., Afternoons after 3pm" />
                   </div>
-
-                  {selectedSlot && (
-                    <div className="rounded-lg border bg-accent/5 p-4">
-                      <p className="text-sm font-medium">Selected Time Slot:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedSlot.start.toLocaleDateString("en-US", {
-                          weekday: "long",
-                          month: "long",
-                          day: "numeric",
-                        })}{" "}
-                        at{" "}
-                        {selectedSlot.start.toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => setSelectedSlot(null)}
-                      >
-                        Clear selection
-                      </Button>
-                    </div>
-                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="message">Additional Information</Label>
