@@ -175,8 +175,86 @@ a.utilityLogin:hover {
   transition: transform 0.2s ease;
 }
 
-.navTrigger[data-state="open"] svg {
+.navTrigger svg[data-open="true"] {
   transform: rotate(180deg);
+}
+
+/* ---------------------------------------------------------- nav dropdown */
+
+/*
+ * The menu is in the markup on every render (see NavDropdown) so crawlers can
+ * follow these links; it is only hidden visually until opened. `visibility`
+ * rather than `display` keeps the fade, and also takes the links out of the
+ * tab order while closed.
+ */
+.navGroup {
+  position: relative;
+}
+
+.navMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  min-width: 13rem;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: 10px;
+  border: 1px solid rgba(201, 169, 110, 0.28);
+  background: var(--wood-darkest);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out,
+    visibility 0.2s;
+}
+
+.navMenuOpen {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navMenu {
+    transition: none;
+  }
+}
+
+.navMenuLink {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-sans), "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cream);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.navMenuLink:hover {
+  color: var(--gold-strong);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.navMenuLink:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+  color: var(--gold-strong);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.navMenuLinkActive {
+  color: var(--gold-strong);
+  font-weight: 600;
 }
 
 @media (prefers-reduced-motion: reduce) {
