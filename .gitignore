@@ -32,6 +32,9 @@ next-env.d.ts
 # local claude skills (installed by uipro)
 .claude/skills/
 
+# ephemeral agent worktrees (live checkouts of this repo, not submodules)
+.claude/worktrees/
+
 # Raw photo/video source library (multi-GB originals live outside git;
 # web-ready exports are committed under public/students/)
 /ABA Content/
