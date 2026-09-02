@@ -38,26 +38,33 @@ export async function rescheduleBooking(bookingId: string, newStartTime: string,
     return { error: "Invalid lesson time" }
   }
 
-  const [availabilityRes, exceptionsRes, bookingsRes] = await Promise.all([
+  const [availabilityRes, exceptionsRes, busyRes] = await Promise.all([
     supabase.from("availability").select("*").eq("is_active", true),
     supabase
       .from("availability_exceptions")
       .select("*")
       .gte("exception_date", dateKeyUtc(studioNow())),
-    supabase
-      .from("bookings")
-      .select("id,start_time,end_time,status")
-      .neq("id", bookingId)
-      .gte("start_time", studioNow().toISOString())
-      .in("status", ["confirmed", "pending"]),
+    // Busy slots only — see scripts/018_public_busy_times.sql. The lesson being
+    // moved is excluded so it never counts as an overlap with itself.
+    supabase.rpc("busy_lesson_times", {
+      p_from: studioNow().toISOString(),
+      p_exclude_booking_id: bookingId,
+    }),
   ])
+
+  // An empty busy list would wave a taken slot through, so treat a failed
+  // lookup as "can't confirm" rather than "free".
+  if (busyRes.error) {
+    console.error("busy_lesson_times failed:", busyRes.error)
+    return { error: "We couldn't check that time just now. Please try again." }
+  }
 
   const isAvailable = isSlotBookable({
     start,
     end,
     availability: availabilityRes.data || [],
     exceptions: exceptionsRes.data || [],
-    existingBookings: bookingsRes.data || [],
+    existingBookings: busyRes.data || [],
   })
 
   if (!isAvailable) {

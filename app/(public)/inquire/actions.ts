@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { isSlotBookable } from "@/lib/schedule"
+import { dateKeyUtc, studioNow } from "@/lib/studio-time"
 
 export async function submitInquiry(formData: FormData) {
   const supabase = await createClient()
@@ -28,25 +29,29 @@ export async function submitInquiry(formData: FormData) {
   }
 
   if (requestedSlotStart && requestedSlotEnd) {
-    const [availabilityRes, exceptionsRes, bookingsRes] = await Promise.all([
+    const [availabilityRes, exceptionsRes, busyRes] = await Promise.all([
       supabase.from("availability").select("*").eq("is_active", true),
       supabase
         .from("availability_exceptions")
         .select("*")
-        .gte("exception_date", new Date().toISOString().split("T")[0]),
-      supabase
-        .from("bookings")
-        .select("start_time,end_time,status")
-        .gte("start_time", new Date().toISOString())
-        .in("status", ["confirmed", "pending"]),
+        .gte("exception_date", dateKeyUtc(studioNow())),
+      // Busy slots only — see scripts/018_public_busy_times.sql.
+      supabase.rpc("busy_lesson_times", { p_from: studioNow().toISOString() }),
     ])
+
+    // An empty busy list would wave a taken slot through, so treat a failed
+    // lookup as "can't confirm" rather than "free".
+    if (busyRes.error) {
+      console.error("busy_lesson_times failed:", busyRes.error)
+      return { error: "We couldn't check that time just now. Please try again." }
+    }
 
     const isAvailable = isSlotBookable({
       start: new Date(requestedSlotStart),
       end: new Date(requestedSlotEnd),
       availability: availabilityRes.data || [],
       exceptions: exceptionsRes.data || [],
-      existingBookings: bookingsRes.data || [],
+      existingBookings: busyRes.data || [],
     })
 
     if (!isAvailable) {
