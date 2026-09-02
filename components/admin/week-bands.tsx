@@ -1,5 +1,12 @@
 import { AdminCard, Eyebrow } from "@/components/admin/ui"
 
+/**
+ * Chip appearance. "came"/"missed" are attendance marks (teacher portal);
+ * "past" is a finished lesson nobody has marked yet. Admin callers that don't
+ * care about attendance simply omit it and get the default chip.
+ */
+export type WeekBandTone = "default" | "came" | "missed" | "past"
+
 export interface WeekBandLesson {
   id: string
   /** Short text inside the block, e.g. "Ashot · 4:00 PM". */
@@ -9,6 +16,14 @@ export interface WeekBandLesson {
   /** Minutes since midnight, local. */
   startMinutes: number
   durationMinutes: number
+  tone?: WeekBandTone
+}
+
+const TONE_CLASSES: Record<WeekBandTone, string> = {
+  default: "bg-primary text-primary-foreground",
+  came: "bg-accent text-accent-foreground",
+  missed: "bg-destructive text-destructive-foreground",
+  past: "border border-dashed border-primary/50 bg-card text-muted-foreground",
 }
 
 export interface WeekBandDay {
@@ -152,7 +167,9 @@ export function WeekBands({ eyebrow, hourLabels, scaleStart, scaleEnd, days }: W
                   <span
                     key={lesson.id}
                     title={lesson.title}
-                    className="absolute flex items-center overflow-hidden whitespace-nowrap rounded-md bg-primary px-2 text-[11px] font-medium text-primary-foreground"
+                    className={`absolute flex items-center overflow-hidden whitespace-nowrap rounded-md px-2 text-[11px] font-medium ${
+                      TONE_CLASSES[lesson.tone ?? "default"]
+                    }`}
                     style={{
                       left: `${lesson.left}%`,
                       top: `${BAND_PADDING + lesson.lane * (chipHeight + LANE_GAP)}px`,

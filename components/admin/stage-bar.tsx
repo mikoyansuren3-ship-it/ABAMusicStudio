@@ -17,10 +17,14 @@ import type { Profile } from "@/lib/types"
 interface StageBarProps {
   profile: Profile | null
   dateLabel: string
+  /** Gold sub-label under the wordmark — which portal this is. */
+  portalLabel?: string
+  /** Fallback initial and name when the profile has none. */
+  fallbackName?: string
 }
 
-/** Dark wood top bar shared by every admin screen: brand, date, public-site link, account menu. */
-export function StageBar({ profile, dateLabel }: StageBarProps) {
+/** Dark wood top bar shared by every staff screen: brand, date, public-site link, account menu. */
+export function StageBar({ profile, dateLabel, portalLabel = "Admin portal", fallbackName = "Admin" }: StageBarProps) {
   const router = useRouter()
 
   const handleSignOut = async () => {
@@ -29,7 +33,7 @@ export function StageBar({ profile, dateLabel }: StageBarProps) {
     router.push("/")
   }
 
-  const fullName = profile?.full_name || "Admin"
+  const fullName = profile?.full_name || fallbackName
   const firstName = fullName.split(" ")[0]
 
   return (
@@ -40,7 +44,7 @@ export function StageBar({ profile, dateLabel }: StageBarProps) {
         </span>
         <span className="flex min-w-0 flex-col gap-[3px]">
           <span className="truncate font-serif text-[15px] tracking-[0.14em] text-cream">ABA MUSIC ACADEMY</span>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">Admin portal</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">{portalLabel}</span>
         </span>
       </div>
 
@@ -61,7 +65,7 @@ export function StageBar({ profile, dateLabel }: StageBarProps) {
             aria-label="Account menu"
           >
             <span className="flex size-[30px] items-center justify-center rounded-full border border-gold bg-wood-main text-xs font-semibold text-cream">
-              {initials(fullName, "A")}
+              {initials(fullName, fallbackName.charAt(0))}
             </span>
             <span className="hidden text-[13px] text-cream sm:inline">{firstName}</span>
             <ChevronDown className="size-[15px] text-cream/60" aria-hidden />

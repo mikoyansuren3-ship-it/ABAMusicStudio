@@ -18,6 +18,11 @@ export function formatMinutes(totalMinutes: number) {
   return `${hours12}:${String(minutes).padStart(2, "0")} ${meridiem}`
 }
 
+/** Minutes since midnight → "15:00", the shape the time formatters take. */
+export function minutesToTimeString(totalMinutes: number) {
+  return `${String(Math.floor(totalMinutes / 60)).padStart(2, "0")}:${String(totalMinutes % 60).padStart(2, "0")}`
+}
+
 /** "15:00[:00]" → "3:00 PM". */
 export function formatClockTime(time: string) {
   return formatMinutes(timeToMinutes(time))
