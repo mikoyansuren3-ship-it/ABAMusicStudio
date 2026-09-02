@@ -27,6 +27,7 @@ const STATIC_ROUTES: Entry[] = [
   { path: "/services", priority: 0.6, changeFrequency: "monthly" },
   { path: "/employment", priority: 0.5, changeFrequency: "monthly" },
   { path: "/policies", priority: 0.4, changeFrequency: "yearly" },
+  { path: "/cookies", priority: 0.3, changeFrequency: "yearly" },
   // /privacy is intentionally omitted while the policy is a noindexed draft.
   ...(hasRealAwards ? [{ path: "/awards", priority: 0.6, changeFrequency: "monthly" } as Entry] : []),
 ]

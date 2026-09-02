@@ -1,5 +1,4 @@
 import type React from "react"
-import { CookieNotice } from "@/components/cookie-notice"
 import { PublicHeader } from "@/components/public-header"
 import { PublicFooter } from "@/components/public-footer"
 import { JsonLd } from "@/components/seo/json-ld"
@@ -13,7 +12,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <PublicHeader />
       <main className="flex-1">{children}</main>
       <PublicFooter />
-      <CookieNotice />
     </div>
   )
 }

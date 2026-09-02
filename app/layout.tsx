@@ -1,8 +1,8 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Playfair_Display, Inter } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { ConsentManager } from "@/components/consent/consent-manager"
 import { Toaster } from "sonner"
 import { SITE } from "@/lib/site"
 import "./globals.css"
@@ -99,7 +99,8 @@ export default function RootLayout({
       <body className={`${playfair.variable} ${inter.className} font-sans antialiased`}>
         {children}
         <Toaster richColors />
-        <Analytics />
+        {/* Consent banner, preferences dialog, and every consent-gated tag. */}
+        <ConsentManager />
         <SpeedInsights />
       </body>
     </html>

@@ -307,8 +307,18 @@ export default function PrivacyPolicyPage() {
 
           <Section title="11. Cookies">
             <p>
-              We use only the cookies and similar technologies necessary to keep you signed in and to operate the
-              Service. We do not use advertising or cross-site tracking cookies.
+              We use cookies in four groups: strictly necessary (signing you in, protecting payments), functional
+              (remembering your login email and interface preferences), analytics (understanding which pages
+              families read), and advertising (measuring our ads). Only the first group is unavoidable.
+            </p>
+            <p>
+              Analytics runs unless you switch it off. Advertising cookies stay off until you switch them on, and we
+              honour Global Privacy Control signals as an opt-out of sharing. Every cookie we set is listed
+              individually — with its provider and lifetime — in our{" "}
+              <Link href="/cookies" className="text-accent underline underline-offset-2 hover:opacity-80">
+                Cookie Policy
+              </Link>
+              , where you can also change your choices at any time.
             </p>
           </Section>
 

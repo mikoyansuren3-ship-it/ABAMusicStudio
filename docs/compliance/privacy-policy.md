@@ -114,7 +114,9 @@ We operate in the United States and store data with U.S.-based providers. If you
 
 ## 11. Cookies
 
-We use only the cookies and similar technologies necessary to keep you signed in and to operate the Service. We do not use advertising or cross-site tracking cookies.
+We use cookies in four groups: strictly necessary (signing you in, protecting payments), functional (remembering your login email and interface preferences), analytics (understanding which pages families read), and advertising (measuring our ads). Only the first group is unavoidable.
+
+Analytics runs unless you switch it off. Advertising cookies stay off until you switch them on, and we honour Global Privacy Control signals as an opt-out of sharing. Every cookie we set is listed individually — with its provider and lifetime — in our Cookie Policy at /cookies, where you can also change your choices at any time.
 
 ## 12. Changes to this policy
 

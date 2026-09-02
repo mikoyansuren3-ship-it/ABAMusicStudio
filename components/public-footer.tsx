@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import { ManageCookiesButton } from "@/components/consent/manage-cookies-button"
 import { PublicFooterCurves } from "@/components/public-footer-curves"
 import styles from "@/components/public-footer.module.css"
 import { SITE } from "@/lib/site"
@@ -18,6 +19,7 @@ const QUICK_LINKS = [
   { label: "FAQ", href: "/faq" },
   { label: "Policies", href: "/policies" },
   { label: "Privacy Policy", href: "/privacy" },
+  { label: "Cookie Policy", href: "/cookies" },
 ] as const
 
 const STUDENT_LINKS = [
@@ -144,6 +146,12 @@ export function PublicFooter() {
 
         <div className={styles.bottom}>
           <p>&copy; {year} ABA Music Academy. All rights reserved.</p>
+          <nav className={styles.legalLinks} aria-label="Privacy choices">
+            <ManageCookiesButton className={styles.legalLink}>Cookie Preferences</ManageCookiesButton>
+            <ManageCookiesButton className={styles.legalLink}>
+              Do Not Sell or Share My Personal Information
+            </ManageCookiesButton>
+          </nav>
           <p className={styles.taglineBottom}>Where talent meets tradition</p>
         </div>
       </div>
