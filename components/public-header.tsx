@@ -3,16 +3,10 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ChevronDown, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { SITE } from "@/lib/site"
@@ -116,31 +110,80 @@ export function PublicHeader() {
   )
 }
 
+/**
+ * A nav group whose links are always in the server-rendered HTML.
+ *
+ * This deliberately does not use the Radix dropdown. Radix renders its menu
+ * through a portal, which produces nothing during SSR and only mounts once the
+ * user opens the menu — so /about, /faculty, /faq, /awards and all four
+ * program pages had no header link in the HTML a crawler sees, leaving them
+ * reachable from the footer alone (2026-08 SEO audit, "Header nav
+ * crawlability"). `forceMount` does not fix that: the portal still has no
+ * server output.
+ *
+ * The list below is therefore plain markup, present on every render and hidden
+ * with CSS until opened. Open state stays in React rather than living in a CSS
+ * `:hover`/`:focus-within` rule, because a menu hidden with `visibility:
+ * hidden` cannot receive focus — so a CSS-only version would be unreachable by
+ * keyboard, and `aria-expanded` would drift out of sync with what is visible.
+ */
 function NavDropdown({ group, pathname }: { group: NavGroup; pathname: string }) {
   const groupActive = group.items.some((item) => item.href === pathname)
+  const [open, setOpen] = useState(false)
+  const groupRef = useRef<HTMLDivElement>(null)
+  const menuId = `nav-${group.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`
+
+  // Dismiss on a click anywhere outside the group — the third behaviour the
+  // Radix menu provided. Only listen while the menu is actually open.
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (!groupRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener("pointerdown", onPointerDown)
+    return () => document.removeEventListener("pointerdown", onPointerDown)
+  }, [open])
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
+    <div
+      ref={groupRef}
+      className={styles.navGroup}
+      // Click to open, matching the Radix menu this replaced. Deliberately no
+      // open-on-hover: with a real pointer, mouseenter fires before click, so
+      // hovering would open the menu and the click would immediately toggle it
+      // shut again — the trigger would look inert.
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setOpen(false)
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false)
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((value) => !value)}
         className={cn(styles.navItem, styles.navTrigger, groupActive && styles.navItemActive)}
       >
         {group.label}
-        <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-52">
+        <ChevronDown className="h-3.5 w-3.5" aria-hidden data-open={open ? "true" : undefined} />
+      </button>
+      <ul id={menuId} className={cn(styles.navMenu, open && styles.navMenuOpen)}>
         {group.items.map((item) => (
-          <DropdownMenuItem key={item.href} asChild>
+          <li key={item.href}>
             <Link
               href={item.href}
               aria-current={pathname === item.href ? "page" : undefined}
-              className={cn("w-full cursor-pointer", pathname === item.href && "font-semibold text-accent-strong")}
+              onClick={() => setOpen(false)}
+              className={cn(styles.navMenuLink, pathname === item.href && styles.navMenuLinkActive)}
             >
               {item.label}
             </Link>
-          </DropdownMenuItem>
+          </li>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </ul>
+    </div>
   )
 }
 

@@ -7,12 +7,42 @@
  * Keep this in sync with the Google Business Profile once it exists.
  */
 
-const FALLBACK_URL = "https://abamusicacademy.org"
+/**
+ * The host the site is actually served on. The bare apex 301-redirects here,
+ * so canonicals, og:url, the sitemap, and the robots Host directive must all
+ * name the `www` form — pointing them at the apex makes every page
+ * canonicalise to a redirect instead of to itself.
+ *
+ * If the primary domain ever moves to the apex, change this constant and drop
+ * `canonicalHost()` below.
+ */
+const FALLBACK_URL = "https://www.abamusicacademy.org"
+const APEX_HOST = "abamusicacademy.org"
+
+/**
+ * Forces the production domain to its `www` form. `NEXT_PUBLIC_SITE_URL` is
+ * also read directly by the Stripe and auth redirect flows, so it is not
+ * rewritten globally — only the canonical URL derived from it here. That keeps
+ * the SEO surfaces correct even when the deploy environment still declares the
+ * apex.
+ */
+function canonicalHost(url: string) {
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname === APEX_HOST) {
+      parsed.hostname = `www.${APEX_HOST}`
+      return parsed.origin
+    }
+    return url
+  } catch {
+    return FALLBACK_URL
+  }
+}
 
 function resolveSiteUrl() {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim()
   if (!raw || raw.startsWith("http://localhost")) return FALLBACK_URL
-  return raw.replace(/\/$/, "")
+  return canonicalHost(raw.replace(/\/$/, ""))
 }
 
 export type OpeningHours = {
