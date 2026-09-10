@@ -82,7 +82,6 @@ export default async function AdminTeachersPage() {
   // Month actuals across everyone, grouped by each lesson's snapshot teacher.
   const monthTotals: MonthTotals = { grossCents: 0, payCents: 0, profitCents: 0, lessonCount: 0 }
   for (const student of students) {
-    if (!student.billing) continue
     const lessonsByTeacher = new Map<string | null, Booking[]>()
     for (const booking of monthBookings) {
       if (booking.student_id !== student.id || booking.status === "cancelled") continue
@@ -93,9 +92,9 @@ export default async function AdminTeachersPage() {
       const teacher = teacherId ? teachers.find((t) => t.id === teacherId) : undefined
       const actuals = periodActuals(
         lessons,
-        student.billing.rate_cents,
+        student.billing?.rate_cents ?? 0,
         teacher?.pay_hourly_cents ?? 0,
-        student.billing.duration_minutes,
+        student.billing?.duration_minutes ?? 30,
       )
       monthTotals.grossCents += actuals.grossCents
       monthTotals.payCents += actuals.payCents

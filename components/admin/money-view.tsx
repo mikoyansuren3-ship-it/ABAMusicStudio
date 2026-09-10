@@ -39,7 +39,8 @@ export interface MoneyLedgerRow {
   studentId: string
   name: string
   isActive: boolean
-  billing: StudentBilling
+  /** NULL when the student's rate has been removed but lessons remain. */
+  billing: StudentBilling | null
   slots: StudentSlot[]
   lessons: Booking[]
   expectedCents: number
@@ -507,8 +508,10 @@ export function MoneyView({
                           )}
                         </div>
                         <p className="text-[13px] text-muted-foreground">
-                          {slotsLabel(row.slots) ?? "No weekly days set"} · {row.billing.duration_minutes} min ·{" "}
-                          {formatCurrency(row.billing.rate_cents)}/lesson
+                          {slotsLabel(row.slots) ?? "No weekly days set"}
+                          {row.billing
+                            ? ` · ${row.billing.duration_minutes} min · ${formatCurrency(row.billing.rate_cents)}/lesson`
+                            : " · no rate on file — lessons keep the rate they were booked at"}
                           {" · "}
                           <button
                             type="button"

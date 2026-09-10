@@ -6,7 +6,7 @@ import type { Booking, Teacher } from "@/lib/types"
 import { ensureLessons } from "@/lib/admin/lessons"
 import { lessonRateCents, periodActuals } from "@/lib/admin/economics"
 import { formatCurrencyCompact, parseDateKey, toDateKey } from "@/lib/admin/format"
-import { dateKeyUtc, studioNow, studioToday, wallClockToUtc } from "@/lib/studio-time"
+import { dateKeyUtc, studioNow, studioToday, toStudioWallClock, wallClockToUtc } from "@/lib/studio-time"
 
 interface Period {
   mode: "month" | "week"
@@ -135,36 +135,34 @@ export default async function AdminMoneyPage({
 
   const invoices = (invoicesData || []) as InvoiceRow[]
 
-  // Ledger rows: students with billing, plus inactive ones that still have lessons in range.
+  // Ledger rows: active students with billing, plus anyone — inactive, or
+  // with their rate since removed — who still has lessons in range. Each
+  // lesson earns its own stamped rate, so a student whose billing row was
+  // deleted mid-month keeps the income their earlier lessons already earned.
   const rows: MoneyLedgerRow[] = students
-    .filter((student) => student.billing)
     .map((student) => {
       const lessons = rangeBookings.filter(
         (booking) => booking.student_id === student.id && booking.status !== "cancelled",
       )
-      // A missed lesson earns nothing unless it was made up. Each lesson
-      // earns its own stamped rate (multi-teacher slots can differ).
+      // A missed lesson earns nothing unless it was made up.
       const paidLessons = lessons.filter((lesson) => !(lesson.attendance === "missed" && !lesson.made_up_on))
+      const fallbackRate = student.billing?.rate_cents ?? 0
       return {
         studentId: student.id,
         name: student.name,
         isActive: student.is_active,
-        billing: student.billing!,
+        billing: student.billing,
         slots: student.slots,
         lessons,
-        expectedCents: paidLessons.reduce(
-          (sum, lesson) => sum + lessonRateCents(lesson, student.billing!.rate_cents),
-          0,
-        ),
+        expectedCents: paidLessons.reduce((sum, lesson) => sum + lessonRateCents(lesson, fallbackRate), 0),
       }
     })
-    .filter((row) => row.isActive || row.lessons.length > 0)
+    .filter((row) => (row.isActive && row.billing) || row.lessons.length > 0)
 
   // Per-teacher actuals: group each student's lessons by the lesson's
   // snapshot teacher_id (a mid-period reassignment splits honestly).
   const bucketMap = new Map<string, TeacherBucket>()
   for (const student of students) {
-    if (!student.billing) continue
     const lessonsByTeacher = new Map<string | null, Booking[]>()
     for (const booking of rangeBookings) {
       if (booking.student_id !== student.id || booking.status === "cancelled") continue
@@ -175,9 +173,9 @@ export default async function AdminMoneyPage({
       const teacher = teacherId ? teachers.find((t) => t.id === teacherId) : undefined
       const actuals = periodActuals(
         lessons,
-        student.billing.rate_cents,
+        student.billing?.rate_cents ?? 0,
         teacher?.pay_hourly_cents ?? 0,
-        student.billing.duration_minutes,
+        student.billing?.duration_minutes ?? 30,
       )
       const bucketKey = teacherId ?? "unassigned"
       const bucket = bucketMap.get(bucketKey) ?? {
@@ -199,13 +197,16 @@ export default async function AdminMoneyPage({
 
   const allLessons = rows.flatMap((row) => row.lessons)
   const unpaidInvoices = invoices.filter((invoice) => invoice.status === "unpaid")
-  const paidInPeriod = invoices.filter(
-    (invoice) =>
-      invoice.status === "paid" &&
-      invoice.paid_at &&
-      new Date(invoice.paid_at) >= rangeStart &&
-      new Date(invoice.paid_at) < rangeEnd,
-  )
+  // paid_at is a real instant; the period bounds are studio dates. Compare
+  // both in studio wall-clock so a payment late on the last evening of a
+  // month stays in that month regardless of the server's own time zone.
+  const periodStartMs = wallClockToUtc(toDateKey(rangeStart), "00:00:00").getTime()
+  const periodEndMs = wallClockToUtc(toDateKey(rangeEnd), "00:00:00").getTime()
+  const paidInPeriod = invoices.filter((invoice) => {
+    if (invoice.status !== "paid" || !invoice.paid_at) return false
+    const paidMs = toStudioWallClock(new Date(invoice.paid_at)).getTime()
+    return paidMs >= periodStartMs && paidMs < periodEndMs
+  })
   const missedLessons = allLessons.filter((lesson) => lesson.attendance === "missed")
 
   const stats: MoneyStats = {
@@ -222,7 +223,7 @@ export default async function AdminMoneyPage({
         sum +
         row.lessons
           .filter((lesson) => lesson.attendance === "missed" && !lesson.made_up_on)
-          .reduce((lessonSum, lesson) => lessonSum + lessonRateCents(lesson, row.billing.rate_cents), 0),
+          .reduce((lessonSum, lesson) => lessonSum + lessonRateCents(lesson, row.billing?.rate_cents ?? 0), 0),
       0,
     ),
     attendanceToMark: allLessons.filter(
