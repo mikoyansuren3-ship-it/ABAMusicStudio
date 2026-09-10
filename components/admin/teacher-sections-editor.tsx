@@ -48,7 +48,17 @@ export function sectionsFromStudent(student: {
     if (!student.teacher_id) return []
     return [{ teacherId: student.teacher_id, duration: billingDuration, rate: billingRate, rows: [] }]
   }
-  return [...groups.entries()].map(([teacherId, slots]) => {
+  // Deterministic order: the student's default teacher first (the first
+  // section becomes the default on save, so this keeps it from flipping
+  // between saves), then by earliest weekday.
+  const defaultKey = student.teacher_id ?? ""
+  const earliestDay = (slots: StudentSlot[]) => Math.min(...slots.map((slot) => slot.day_of_week))
+  const ordered = [...groups.entries()].sort(([aKey, aSlots], [bKey, bSlots]) => {
+    if (aKey === defaultKey) return -1
+    if (bKey === defaultKey) return 1
+    return earliestDay(aSlots) - earliestDay(bSlots)
+  })
+  return ordered.map(([teacherId, slots]) => {
     const sorted = slots.slice().sort((a, b) => a.day_of_week - b.day_of_week)
     const first = sorted[0]
     return {
