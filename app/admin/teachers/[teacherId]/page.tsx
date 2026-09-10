@@ -85,17 +85,16 @@ export default async function TeacherDetailPage({
   const slotsForThisTeacher = (student: { teacher_id: string | null; slots: StudentSlot[] }) =>
     student.slots.filter((slot) => (slot.teacher_id ?? student.teacher_id) === teacherId)
 
-  const students: PanelStudent[] = (studentsRes.data || [])
-    .map((student) => ({
-      ...student,
-      billing: Array.isArray(student.billing) ? (student.billing[0] ?? null) : (student.billing ?? null),
-      slots: student.slots || [],
-    }))
-    .filter(
-      (student) =>
-        slotsForThisTeacher(student).length > 0 ||
-        (student.slots.length === 0 && student.teacher_id === teacherId),
-    )
+  const allStudents: PanelStudent[] = (studentsRes.data || []).map((student) => ({
+    ...student,
+    billing: Array.isArray(student.billing) ? (student.billing[0] ?? null) : (student.billing ?? null),
+    slots: student.slots || [],
+  }))
+  const students = allStudents.filter(
+    (student) =>
+      slotsForThisTeacher(student).length > 0 ||
+      (student.slots.length === 0 && student.teacher_id === teacherId),
+  )
   const teachers = (teachersRes.data || []) as Teacher[]
   const weekBookings = (weekBookingsRes.data || []) as (Booking & { student: { id: string; name: string } | null })[]
   const monthBookings = (monthBookingsRes.data || []) as Booking[]
@@ -132,19 +131,20 @@ export default async function TeacherDetailPage({
     }
   })
 
-  // Month actuals for this teacher (pay is duration-dependent, so per student).
+  // Month actuals for this teacher: every lesson stamped with them this
+  // month, including students since moved to another teacher or whose rate
+  // was removed — the same set the Teachers page totals, so the two agree.
   const monthActuals: TeacherMonthActuals = { grossCents: 0, payCents: 0, profitCents: 0, lessonCount: 0 }
-  for (const student of students) {
-    if (!student.billing) continue
+  for (const student of allStudents) {
     const lessons = monthBookings.filter(
       (booking) => booking.student_id === student.id && booking.status !== "cancelled",
     )
     if (lessons.length === 0) continue
     const actuals = periodActuals(
       lessons,
-      student.billing.rate_cents,
+      student.billing?.rate_cents ?? 0,
       teacher.pay_hourly_cents,
-      student.billing.duration_minutes,
+      student.billing?.duration_minutes ?? 30,
     )
     monthActuals.grossCents += actuals.grossCents
     monthActuals.payCents += actuals.payCents
