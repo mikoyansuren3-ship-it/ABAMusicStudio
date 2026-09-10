@@ -86,9 +86,49 @@ Rules:
 
 ## 7. Motion
 
-- Micro-interactions 150–300ms, `ease-out` in / `ease-in` out; animate
-  `transform`/`opacity` only. Respect `prefers-reduced-motion` for anything
-  larger than a hover tint.
+Two tiers. **Standard** is the default everywhere. **Cinematic** is opt-in, and
+only on the editorial landing pages listed below.
+
+- **Micro-interactions** (hover, focus, disclosure, chevrons): 150–300ms,
+  `ease-out` in / `ease-in` out. Both tiers.
+
+### 7a. Standard entrances (default)
+
+- Content arriving the first time it enters the viewport: 500–650ms `ease-out`,
+  travel ≤ 40px, `transform`/`opacity` only.
+- Stagger between siblings ≤ 80ms, ≤ 330ms total.
+
+### 7b. Cinematic entrances (opt-in)
+
+Amended 2026-08-25 (owner decision) for the "Programme Notes" program pages,
+where the entrance choreography is part of the design rather than a polish
+layer. Permitted **only** on pages listed in `design-system/pages/` as using
+this tier — today that is `/programs/[slug]`.
+
+- Duration up to 760ms, `cubic-bezier(.16, 1, .3, 1)`; a `clip-path` wipe runs
+  at 1.25× (950ms) because a wipe at 760ms reads as a jump.
+- Travel up to 44px.
+- `clip-path` and `filter: blur()` join `transform`/`opacity` as animatable
+  properties: a left-to-right bow-stroke wipe across a heading, a bottom-to-top
+  wipe, and a shallow focus pull. Still never layout properties.
+- Stagger between siblings 60–80ms.
+- Scroll-**linked** decoration (a progress marker or a line that draws itself as
+  the reader descends) is allowed for `aria-hidden` ornament only, never for
+  content. It must be written to a CSS custom property from a passive,
+  rAF-throttled listener — never React state — and must not run at all under
+  `prefers-reduced-motion`.
+
+### 7c. Rules both tiers share
+
+- Fired once per element and never replayed.
+- Never wrap above-the-fold content or the LCP image — it must paint opaque.
+- Anything already scrolled past on mount (restored scroll position, anchor
+  jump, fast flick) is shown immediately and without transition. A block that
+  stays invisible above the viewport is the failure mode to design against.
+- Respect `prefers-reduced-motion` for anything larger than a hover tint. The
+  hidden half of a reveal must additionally be gated behind
+  `(scripting: enabled)` so it degrades to plain visible content with JS off.
+  Canonical implementation: `components/public/reveal.tsx`.
 
 ## 8. Imagery
 

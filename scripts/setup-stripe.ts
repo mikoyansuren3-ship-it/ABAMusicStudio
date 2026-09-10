@@ -146,7 +146,6 @@ async function setupPianoMakeup() {
   const lessons: Array<[Duration, number]> = [
     [30, 4500],
     [45, 6750],
-    [60, 9000],
   ]
 
   for (const [duration, cents] of lessons) {
@@ -175,7 +174,6 @@ async function setupPianoFifthWeek() {
   const lessons: Array<[Duration, number]> = [
     [30, 4500],
     [45, 6750],
-    [60, 9000],
   ]
 
   for (const [duration, cents] of lessons) {

@@ -10,8 +10,8 @@ import "./globals.css"
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
 const inter = Inter({ subsets: ["latin"] })
 
-const DEFAULT_TITLE = `${SITE.name} | Piano Lessons in ${SITE.location.area}`
-const DEFAULT_DESCRIPTION = `Private piano lessons in the ${SITE.location.areaLong} for kids, teens, and adults. Conservatory-trained, MTAC-member instruction, free trial lesson, and flexible scheduling.`
+const DEFAULT_TITLE = `${SITE.name} | Music Lessons in ${SITE.location.area}`
+const DEFAULT_DESCRIPTION = `Private music lessons in the ${SITE.location.areaLong} — piano, voice, violin, and qanun — for kids, teens, and adults. Free trial lesson and flexible scheduling.`
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -22,11 +22,14 @@ export const metadata: Metadata = {
   description: DEFAULT_DESCRIPTION,
   applicationName: SITE.name,
   keywords: [
+    "music lessons Santa Clarita",
     "piano lessons",
     `piano lessons ${SITE.location.addressLocality}`,
     `piano teacher ${SITE.location.area}`,
-    "music lessons Santa Clarita",
     "piano lessons Valencia CA",
+    "voice lessons Santa Clarita",
+    "violin lessons Santa Clarita",
+    "qanun lessons",
     "kids piano lessons",
     "adult piano lessons",
     "music school",

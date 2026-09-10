@@ -1,0 +1,566 @@
+/*
+ * "Programme Notes" — the editorial broadsheet chrome for the four program
+ * pages (design-system/pages/programs.md).
+ *
+ * This is the chrome layer MASTER.md §2 carves out for raw values: the wood
+ * band gradients, the four instrument rails, the drop cap, and the newspaper
+ * column rules. Everything that has a semantic token uses the token; only
+ * geometry and the wood/gold surface colors are literal here, matching
+ * app/globals.css.
+ *
+ * Layout is designed at 1280px with a 1180px content column. The breakpoints
+ * below are implementation decisions, not part of the desktop comp — see
+ * "Responsive decisions" in design-system/pages/programs.md.
+ */
+
+/* ------------------------------------------------------------------ shell */
+
+/*
+ * The `left`/`right` reveal transforms travel 44px outward from the page edge.
+ * `clip` (not `hidden` — it creates no scroll container) absorbs that so the
+ * hidden state can never produce a horizontal scrollbar on load.
+ */
+.page {
+  position: relative;
+  overflow-x: clip;
+}
+
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (max-width: 640px) {
+  .shell {
+    padding: 0 16px;
+  }
+}
+
+/* The notation watermark sits behind every band, full-height, inert. */
+.watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.above {
+  position: relative;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------- masthead */
+
+.ruleRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--foreground);
+}
+
+.ruleRowCenter {
+  text-align: center;
+}
+
+.ruleRowEnd {
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .ruleRow {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 4px;
+  }
+
+  .ruleRowCenter,
+  .ruleRowEnd {
+    text-align: center;
+  }
+}
+
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(150px, 236px) minmax(0, 1fr) minmax(150px, 236px);
+  gap: 28px;
+  align-items: center;
+  padding: 34px 0 30px;
+}
+
+/*
+ * Below 980px the three-column masthead cannot hold: the nameplate and the
+ * fact stacks squeeze the H1 into a two-word-per-line ribbon. They stack, and
+ * the facts become a row of three beneath the buttons.
+ */
+@media (max-width: 980px) {
+  .masthead {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    text-align: center;
+    padding: 26px 0 24px;
+  }
+}
+
+.nameplateRule {
+  width: 56px;
+  height: 2px;
+  margin: 12px 0;
+  background: var(--accent);
+}
+
+@media (max-width: 980px) {
+  .nameplateRule {
+    margin: 12px auto;
+  }
+}
+
+.facts {
+  display: grid;
+  gap: 18px;
+  text-align: right;
+  min-width: 0;
+}
+
+@media (max-width: 980px) {
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The masthead closes on a 3px double rule — the broadsheet's signature. */
+.doubleRule {
+  border: 0;
+  border-top: 3px double var(--foreground);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------- lede */
+
+.lede {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 40px;
+  padding: 42px 0 52px;
+}
+
+@media (max-width: 900px) {
+  .lede {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 32px 0 40px;
+  }
+}
+
+.ledeColumns {
+  column-count: 2;
+  column-gap: 34px;
+  column-rule: 1px solid var(--border);
+}
+
+.ledeColumns > p {
+  margin: 0 0 1.05em;
+  /* Keep a paragraph from orphaning its first line at the column break. */
+  break-inside: avoid-column;
+}
+
+.ledeColumns > p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+  .ledeColumns {
+    column-count: 1;
+  }
+}
+
+.dropCap::first-letter {
+  float: left;
+  font-family: var(--font-serif), serif;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 0.76;
+  padding: 5px 10px 0 0;
+  color: var(--accent);
+}
+
+/* The bordered plate beside the lede. Square corners are the whole look. */
+.plate {
+  border: 1px solid var(--foreground);
+  align-self: start;
+}
+
+.plateFigure {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  /* The design's image-placeholder tone, so a photo has a frame while it loads. */
+  background: oklch(0.92 0.026 78);
+  overflow: hidden;
+}
+
+/*
+ * The recolored illustrations are keyed to the paper, so they need the paper
+ * behind them — the placeholder tone reads as a grey mat around the artwork.
+ */
+.plateIllustration {
+  background: var(--background);
+}
+
+.plateCaption {
+  border-top: 1px solid var(--foreground);
+  padding: 16px 18px 18px;
+}
+
+/*
+ * Every photograph on these pages carries the same treatment so mixed sources
+ * (phone recital shots, studio portraits) sit together on the parchment.
+ * Illustrations are exempt — they are already keyed to the paper.
+ */
+.photo {
+  filter: sepia(0.18) contrast(1.02);
+}
+
+/* --------------------------------------------------- rail + body sections */
+
+.railGrid {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 56px;
+  align-items: stretch;
+}
+
+/*
+ * The rail is decoration with a scroll-linked marker. Below 1024px there is no
+ * room for a 120px gutter beside readable measure, so it is removed outright
+ * rather than shrunk into an unreadable sliver.
+ */
+@media (max-width: 1024px) {
+  .railGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .railColumn {
+    display: none;
+  }
+}
+
+.railColumn {
+  position: relative;
+}
+
+.railInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* The travelling marker, positioned from --rp (0–1 scroll progress). */
+.railMarker {
+  position: absolute;
+  left: 50%;
+  width: 92px;
+  height: 5px;
+  margin-left: -46px;
+  top: calc(var(--rp, 0) * 100%);
+  background: linear-gradient(90deg, transparent, #dcbf85 22%, #c9a96e 78%, transparent);
+  box-shadow: 0 0 18px rgba(220, 191, 133, 0.75);
+  transform: rotate(-2.4deg);
+  pointer-events: none;
+}
+
+/* Violin — ebony fingerboard, four strings at true relative gauges. */
+.violinBoard {
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(90deg, #1e1008, #4e3425 26%, #3b2518 52%, #2a1810 78%, #150b05);
+}
+
+/*
+ * The four strings at their true relative gauges — G is more than twice the
+ * width of E, which is what makes the rail read as a fingerboard rather than
+ * four lines. Each carries a dark shadow behind it and a cream highlight along
+ * its lit edge.
+ */
+.violinString {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  box-shadow:
+    -1.5px 0 2px rgba(0, 0, 0, 0.62),
+    inset -0.7px 0 0 #fdf8ee;
+}
+
+.stringG {
+  width: 3.2px;
+  left: 5px;
+  background: #cbbda4;
+}
+
+.stringD {
+  width: 2.5px;
+  left: 14px;
+  background: #d5c8b1;
+}
+
+.stringA {
+  width: 1.9px;
+  left: 23px;
+  background: #ded2bc;
+}
+
+.stringE {
+  width: 1.4px;
+  left: 32px;
+  background: #e7dcc8;
+}
+
+/* Piano — a CSS keyboard, so key proportions stay fixed at any rail height. */
+.pianoBoard {
+  position: relative;
+  width: 52px;
+  height: 100%;
+  background: #f7f2e7;
+  box-shadow:
+    inset 2px 0 4px rgba(0, 0, 0, 0.16),
+    inset -2px 0 4px rgba(0, 0, 0, 0.16);
+  background-image: repeating-linear-gradient(180deg, transparent 0 23px, #c2b49a 23px 24px);
+}
+
+/*
+ * The black keys. An explicit 168px cycle with keys at 17/41/89/113/137px
+ * reproduces the C-major gap pattern (no black key between E–F and B–C).
+ */
+.pianoBlackKeys {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 27px;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 17px,
+    #1e1008 17px 31px,
+    transparent 31px 41px,
+    #1e1008 41px 55px,
+    transparent 55px 89px,
+    #1e1008 89px 103px,
+    transparent 103px 113px,
+    #1e1008 113px 127px,
+    transparent 127px 137px,
+    #1e1008 137px 151px,
+    transparent 151px 168px
+  );
+}
+
+/* Voice — a five-line staff. */
+.voiceStaff {
+  width: 100%;
+  height: 100%;
+}
+
+/* Qanun — wood soundboard with graded string gauges. */
+.qanunBoard {
+  width: 68px;
+  height: 100%;
+  background: linear-gradient(90deg, #e4d6bb, #b39c74);
+}
+
+/* Geometry comes from the component as --w/--x; the color stays here. */
+.qanunString {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--w);
+  left: var(--x);
+  background: #8a6a3c;
+}
+
+/* Only the three thickest strings catch the light. */
+.qanunHighlight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.7px;
+  left: calc(var(--x) + var(--w));
+  background: #fdf8ee;
+  opacity: 0.55;
+}
+
+/* The gold progress line each rail draws as the reader descends. */
+.drawLine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.section {
+  border-top: 1px solid var(--foreground);
+  padding-bottom: 74px;
+}
+
+.section:last-child {
+  padding-bottom: 64px;
+}
+
+/* -------------------------------------------------------------- band (wood) */
+
+.band {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e1008, #3b2518 55%, #2a1810);
+  color: #f5ebd9;
+  padding: 88px 0 96px;
+}
+
+.bandGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 20%, rgba(201, 169, 110, 0.1), transparent 62%);
+}
+
+@media (max-width: 700px) {
+  .band {
+    padding: 60px 0 64px;
+  }
+}
+
+.bandHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 40px;
+  align-items: end;
+  border-bottom: 1px solid #c9a96e;
+  padding-bottom: 26px;
+}
+
+@media (max-width: 900px) {
+  .bandHead {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+
+.tally {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+
+.groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px;
+  padding-top: 34px;
+}
+
+@media (max-width: 1000px) {
+  .groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+  }
+}
+
+@media (max-width: 560px) {
+  .groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.group {
+  border-top: 2px solid #c9a96e;
+  padding-top: 14px;
+}
+
+.entry + .entry {
+  border-top: 1px solid rgba(201, 169, 110, 0.22);
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+/* Rotated gold note-head bullets for lists of names and places. */
+.noteBullet {
+  display: inline-block;
+  width: 13px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c9a96e;
+  transform: rotate(-22deg);
+  flex: none;
+  margin-top: 5px;
+}
+
+.bandFoot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: center;
+  border-top: 1px solid #c9a96e;
+  margin-top: 40px;
+  padding-top: 30px;
+}
+
+@media (max-width: 760px) {
+  .bandFoot {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The gold pill CTA on wood. */
+.goldPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: #c9a96e;
+  color: #1e1008;
+  white-space: nowrap;
+  transition: background-color 200ms ease-out;
+}
+
+.goldPill:hover {
+  background: #dcbf85;
+}
+
+.goldPill:focus-visible {
+  outline: 2px solid #f5ebd9;
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------- closing */
+
+.steps {
+  display: grid;
+  gap: 28px;
+  padding-top: 8px;
+}
+
+.step {
+  border-top: 2px solid var(--foreground);
+  padding-top: 14px;
+}
+
+.closingBand {
+  border-top: 3px double var(--foreground);
+  border-bottom: 3px double var(--foreground);
+  padding: 34px 0;
+  text-align: center;
+}

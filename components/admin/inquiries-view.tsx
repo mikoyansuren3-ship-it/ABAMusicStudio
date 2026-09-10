@@ -89,6 +89,7 @@ export function InquiriesList({ inquiries, tab, declinedCount }: InquiriesListPr
 
   function metaLine(inquiry: Inquiry) {
     const parts: string[] = []
+    if (inquiry.instrument) parts.push(inquiry.instrument)
     if (inquiry.student_age) parts.push(`Age ${inquiry.student_age}`)
     if (inquiry.experience_level) parts.push(experienceLabel(inquiry.experience_level))
     if (inquiry.preferred_lesson_duration) parts.push(`${inquiry.preferred_lesson_duration} min`)
@@ -214,6 +215,11 @@ export function InquiriesList({ inquiries, tab, declinedCount }: InquiriesListPr
                   </span>
                 </div>
                 <div className="flex flex-col gap-1.5 text-sm">
+                  {selectedInquiry.instrument && (
+                    <p>
+                      <span className="font-semibold">Instrument:</span> {selectedInquiry.instrument}
+                    </p>
+                  )}
                   {selectedInquiry.student_age && (
                     <p>
                       <span className="font-semibold">Age:</span> {selectedInquiry.student_age}

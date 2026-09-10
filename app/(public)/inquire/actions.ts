@@ -9,6 +9,7 @@ export async function submitInquiry(formData: FormData) {
   const name = formData.get("name") as string
   const email = formData.get("email") as string
   const phone = (formData.get("phone") as string) || null
+  const instrument = (formData.get("instrument") as string) || null
   const studentAge = formData.get("student_age") ? Number.parseInt(formData.get("student_age") as string) : null
   const experienceLevel = (formData.get("experience_level") as string) || null
   const preferredLessonDuration = Number.parseInt(formData.get("preferred_lesson_duration") as string) || 30
@@ -57,6 +58,7 @@ export async function submitInquiry(formData: FormData) {
     name,
     email,
     phone,
+    instrument,
     student_age: studentAge,
     experience_level: experienceLevel,
     preferred_lesson_duration: preferredLessonDuration,

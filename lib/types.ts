@@ -118,6 +118,7 @@ export interface Inquiry {
   name: string
   email: string
   phone: string | null
+  instrument: string | null
   student_age: number | null
   experience_level: "beginner" | "intermediate" | "advanced" | null
   preferred_lesson_duration: 30 | 45 | 60

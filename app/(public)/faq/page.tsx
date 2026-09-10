@@ -12,14 +12,14 @@ import { faqSchema } from "@/lib/seo/schema"
 import { SITE } from "@/lib/site"
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Frequently Asked Questions — Piano Lessons",
-  description: `Answers about piano lessons at ABA Music Academy in the ${SITE.location.area}: ages, pricing, free trial, location, cancellations, payment, hours, and recitals.`,
+  title: "Frequently Asked Questions — Music Lessons",
+  description: `Answers about music lessons at ABA Music Academy in the ${SITE.location.area}: ages, tuition, free trial, location, cancellations, payment, hours, and recitals.`,
   path: "/faq",
 })
 
 const RELATED = [
   { label: "Piano Lessons", href: "/programs/piano-lessons" },
-  { label: "Lessons & Pricing", href: "/lessons" },
+  { label: "Lessons", href: "/lessons" },
   { label: "Studio Policies", href: "/policies" },
   { label: "Meet the Faculty", href: "/faculty" },
 ] as const

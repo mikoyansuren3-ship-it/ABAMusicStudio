@@ -69,9 +69,10 @@ export function AwardsSection({
         </div>
 
         <ul className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 md:mt-16 lg:grid-cols-3">
-          {shown.map((award) => (
+          {shown.map((award, index) => (
             <li key={award.id}>
-              <AwardTile award={award} headingLevel={headingLevel + 1} />
+              {/* On the dedicated page (H1) the first row sits above the fold — load it eagerly (LCP). */}
+              <AwardTile award={award} headingLevel={headingLevel + 1} priority={headingLevel === 1 && index < 3} />
             </li>
           ))}
         </ul>
@@ -92,18 +93,34 @@ export function AwardsSection({
   )
 }
 
-function AwardTile({ award, headingLevel }: { award: Award; headingLevel: number }) {
+function AwardTile({
+  award,
+  headingLevel,
+  priority = false,
+}: {
+  award: Award
+  headingLevel: number
+  priority?: boolean
+}) {
   const TileHeading = `h${Math.min(headingLevel, 6)}` as "h2" | "h3" | "h4"
+  // Certificate/medal scans sit matted inside a landscape frame; photos of
+  // award moments fill a portrait frame edge to edge (Award.imageFit).
+  const isCover = award.imageFit === "cover"
   const framed = (
     <>
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gold/25 bg-wood-card">
+      <div
+        className={`relative overflow-hidden rounded-lg border border-gold/25 bg-wood-card ${
+          isCover ? "aspect-[4/5]" : "aspect-[4/3]"
+        }`}
+      >
         {award.image ? (
           <Image
             src={award.image}
             alt={award.imageAlt ?? award.title}
             fill
+            priority={priority}
             sizes="(min-width: 1024px) 20rem, (min-width: 640px) 45vw, 90vw"
-            className="object-contain p-2"
+            className={isCover ? "object-cover object-[center_20%]" : "object-contain p-2"}
           />
         ) : (
           <PlaceholderArt />

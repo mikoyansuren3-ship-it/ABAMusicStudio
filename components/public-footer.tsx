@@ -7,10 +7,14 @@ import { SITE } from "@/lib/site"
 const QUICK_LINKS = [
   { label: "About", href: "/about" },
   { label: "Piano Lessons", href: "/programs/piano-lessons" },
-  { label: "Faculty", href: "/faculty" },
+  { label: "Voice Lessons", href: "/programs/voice-lessons" },
+  { label: "Violin Lessons", href: "/programs/violin-lessons" },
+  { label: "Qanun Lessons", href: "/programs/qanun-lessons" },
+  { label: "Our Teachers", href: "/faculty" },
   { label: "Awards", href: "/awards" },
-  { label: "Lessons & Pricing", href: "/lessons" },
+  { label: "Lessons", href: "/lessons" },
   { label: "Services", href: "/services" },
+  { label: "Employment", href: "/employment" },
   { label: "FAQ", href: "/faq" },
   { label: "Policies", href: "/policies" },
   { label: "Privacy Policy", href: "/privacy" },
@@ -55,7 +59,8 @@ export function PublicFooter() {
               />
             </Link>
             <p className={styles.tagline}>
-              Professional piano instruction for students of all ages and skill levels, serving the{" "}
+              Professional piano, voice, violin, and qanun instruction for students of all ages and skill levels,
+              serving the{" "}
               {SITE.location.areaLong}.
             </p>
           </div>
