@@ -61,6 +61,19 @@
   --vine-pink-2: #e8a2bf;
   --vine-pink-3: #d47a9f;
   --vine-pink-4: #b65c82;
+
+  /* Teacher identity swatches — admin schedule only (design-system/MASTER.md §1).
+     Data colours, not UI accents: six fixed slots assigned to teachers in
+     roster order and never cycled; a seventh teacher falls back to the default
+     chip. Validated with the dataviz palette checks on the card surface
+     (adjacent-pair CVD ΔE ≥ 9, normal-vision ΔE ≥ 19). Chips use a tint +
+     stripe with foreground text, so text never sits on the raw hue. */
+  --teacher-1: #2a78d6;
+  --teacher-2: #eb6834;
+  --teacher-3: #1baf7a;
+  --teacher-4: #eda100;
+  --teacher-5: #e87ba4;
+  --teacher-6: #008300;
 }
 
 .dark {
@@ -96,6 +109,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  /* Teacher swatches stepped for the dark surface (same hues, not a flip). */
+  --teacher-1: #3987e5;
+  --teacher-2: #d95926;
+  --teacher-3: #199e70;
+  --teacher-4: #c98500;
+  --teacher-5: #d55181;
+  --teacher-6: #008300;
 }
 
 @theme inline {
@@ -151,6 +171,12 @@
   --color-wood-card-muted: var(--wood-card-muted);
   --color-wood-btn: var(--wood-btn);
   --color-wood-btn-hover: var(--wood-btn-hover);
+  --color-teacher-1: var(--teacher-1);
+  --color-teacher-2: var(--teacher-2);
+  --color-teacher-3: var(--teacher-3);
+  --color-teacher-4: var(--teacher-4);
+  --color-teacher-5: var(--teacher-5);
+  --color-teacher-6: var(--teacher-6);
 }
 
 @layer base {
