@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { REMEMBER_EMAIL_COOKIE, rememberEmailCookieOptions } from "@/lib/supabase/auth-cookies"
+import { getConsentState } from "@/lib/consent/server"
 import { type AuthRole, roleDestinations, roleLabels } from "@/lib/auth/roles"
 import { isOwnerEmail, promoteOwnerIfNeeded } from "@/lib/auth/owner"
 import { headers } from "next/headers"
@@ -81,8 +82,13 @@ export async function loginWithRole(
     return { error: `This is a ${roleLabels[actualRole as AuthRole] || actualRole} account. Please use the correct login option.` }
   }
 
+  // The email prefill is a convenience, not part of signing in, so it is only
+  // written when the visitor has left functional cookies on. The session token
+  // itself (and its "Remember me" lifetime) is strictly necessary — it is the
+  // service the visitor explicitly asked for.
   const cookieStore = await cookies()
-  if (rememberMe) {
+  const { functional } = await getConsentState()
+  if (rememberMe && functional) {
     cookieStore.set(REMEMBER_EMAIL_COOKIE, email, rememberEmailCookieOptions())
   } else {
     cookieStore.delete(REMEMBER_EMAIL_COOKIE)

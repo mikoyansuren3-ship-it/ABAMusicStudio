@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { AdminCard, Eyebrow, PageHeader } from "@/components/admin/ui"
 import { AddLessonButton } from "@/components/admin/add-lesson-dialog"
+import { ensureLessons } from "@/lib/admin/lessons"
 import {
   formatCurrencyCompact,
   formatMinutes,
@@ -33,6 +34,10 @@ export default async function AdminTodayPage() {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
   const todayKey = toDateKey(today)
+
+  // Today's lessons come from weekly slots — materialize them before reading,
+  // the same way the Schedule page does, so this landing page is never stale.
+  await ensureLessons(supabase, today, tomorrow)
 
   const {
     data: { user },

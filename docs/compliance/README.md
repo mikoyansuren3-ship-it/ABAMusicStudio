@@ -15,6 +15,7 @@ This folder holds the governance documents required to complete the **Plaid prod
 |------|----------------------|----------|
 | [information-security-policy.md](information-security-policy.md) | Q2, Q3, Q5, Q6, Q7, Q8 | Internal (may be requested by Plaid) |
 | [privacy-policy.md](privacy-policy.md) | Q9, Q10 | Public — publish at `/privacy` |
+| [cookie-consent.md](cookie-consent.md) | Q9, Q10 | Internal — consent design + owner actions; public page is `/cookies` |
 | [data-retention-and-deletion-policy.md](data-retention-and-deletion-policy.md) | Q11 | Internal + summarized in Privacy Policy |
 | [mfa-checklist.md](mfa-checklist.md) | Q5 | Internal — owner worklist |
 | [consumer-mfa-plan.md](consumer-mfa-plan.md) | Q4 | Internal — agreed design, builds with Plaid |

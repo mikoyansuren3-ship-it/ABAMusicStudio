@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { planLessonReconcile, type LessonPatch, type ReconcileStudent } from "@/lib/admin/lessons"
 import { studioNow } from "@/lib/studio-time"
 import { revalidatePath } from "next/cache"
 
@@ -19,19 +20,21 @@ function optionalText(formData: FormData, field: string) {
   return ((formData.get(field) as string) || "").trim() || null
 }
 
-/** Every field except the name may be blank. */
+/**
+ * Name, level, and guardian contact. Every field except the name may be
+ * blank. Lesson length lives on the teacher sections (student panel), so it
+ * is deliberately not parsed here — editing details never touches it.
+ */
 function parseStudentFields(formData: FormData) {
   const name = ((formData.get("name") as string) || "").trim()
   if (!name) return { error: "Enter the student's name." as const }
 
   const experienceRaw = (formData.get("experience_level") as string) || ""
-  const durationRaw = Number.parseInt((formData.get("duration") as string) || "")
 
   return {
     student: {
       name,
       experience_level: EXPERIENCE_LEVELS.includes(experienceRaw) ? experienceRaw : null,
-      preferred_lesson_duration: DURATIONS.includes(durationRaw) ? durationRaw : 30,
       contact_name: optionalText(formData, "contact_name"),
       contact_phone: optionalText(formData, "contact_phone"),
       contact_email: optionalText(formData, "contact_email"),
@@ -138,7 +141,7 @@ export async function createStudent(formData: FormData) {
     .from("students")
     .insert({
       ...parsed.student,
-      preferred_lesson_duration: firstSection?.duration_minutes ?? parsed.student.preferred_lesson_duration,
+      preferred_lesson_duration: firstSection?.duration_minutes ?? 30,
       teacher_id: firstSection?.teacher_id ?? null,
       parent_id: null,
     })
@@ -167,6 +170,7 @@ export async function createStudent(formData: FormData) {
   return { success: true }
 }
 
+/** Edit-details dialog: name, level, guardian contact. Scheduling is untouched. */
 export async function updateStudent(studentId: string, formData: FormData) {
   const supabase = await createClient()
 
@@ -175,20 +179,6 @@ export async function updateStudent(studentId: string, formData: FormData) {
 
   const { error } = await supabase.from("students").update(parsed.student).eq("id", studentId)
   if (error) return { error: error.message }
-
-  // Keep an existing billing row's duration in step with the edited duration.
-  const { data: billing } = await supabase
-    .from("student_billing")
-    .select("student_id")
-    .eq("student_id", studentId)
-    .maybeSingle()
-  if (billing) {
-    const { error: billingError } = await supabase
-      .from("student_billing")
-      .update({ duration_minutes: parsed.student.preferred_lesson_duration })
-      .eq("student_id", studentId)
-    if (billingError) return { error: billingError.message }
-  }
 
   revalidateStudentViews()
   return { success: true }
@@ -241,12 +231,29 @@ export async function deleteStudent(studentId: string) {
   return { success: true }
 }
 
+/**
+ * Pausing a student clears their upcoming weekly lessons off the schedule
+ * (unmarked, generated ones only — one-off lessons the admin booked by hand
+ * stay). Reactivating regenerates the weekly lessons from their slots.
+ */
 export async function toggleStudentActive(studentId: string, isActive: boolean) {
   const supabase = await createClient()
 
   const { error } = await supabase.from("students").update({ is_active: isActive }).eq("id", studentId)
 
   if (error) return { error: error.message }
+
+  if (!isActive) {
+    const { error: pruneError } = await supabase
+      .from("bookings")
+      .delete()
+      .eq("student_id", studentId)
+      .eq("is_recurring", true)
+      .is("attendance", null)
+      .in("status", ["confirmed", "pending"])
+      .gte("start_time", studioNow().toISOString())
+    if (pruneError) return { error: pruneError.message }
+  }
 
   revalidateStudentViews()
   return { success: true }
@@ -256,8 +263,13 @@ export async function toggleStudentActive(studentId: string, isActive: boolean) 
  * Save from the student slide-over panel: teacher sections (each teacher's
  * days, length, and rate) plus internal notes in one go. No sections removes
  * the billing record and all slots. The first section is the student's
- * default teacher and standing billing. Changes re-stamp only FUTURE
- * lessons, so past months' teacher pay and income reports never drift.
+ * default teacher and standing billing.
+ *
+ * Upcoming lessons are then reconciled with the new slots right away (the
+ * admin pages also do this on every load — see ensureLessons): confirmed
+ * weekly lessons move to the slot's time, dropped days disappear, and past
+ * or attendance-marked lessons are never touched so past months' teacher
+ * pay and income reports never drift.
  */
 export async function saveStudentPanel(studentId: string, formData: FormData) {
   const supabase = await createClient()
@@ -317,37 +329,60 @@ export async function saveStudentPanel(studentId: string, formData: FormData) {
     .eq("id", studentId)
   if (updateError) return { error: updateError.message }
 
-  // Re-stamp only FUTURE lessons so past months' pay and income never drift.
-  // Recurring lessons take their slot's teacher/rate/duration; one-off
-  // lessons follow the default teacher only when it changed.
-  const { data: futureBookings, error: futureError } = await supabase
-    .from("bookings")
-    .select("id, start_time, end_time, teacher_id, rate_cents, is_recurring, recurring_day_of_week, status")
-    .eq("student_id", studentId)
-    .gte("start_time", studioNow().toISOString())
-  if (futureError) return { error: futureError.message }
+  // Reconcile only FUTURE lessons so past months' pay and income never drift.
+  // Weekly lessons follow the shared roster rules (planLessonReconcile);
+  // one-off lessons follow the default teacher only when it changed.
+  const [futureRes, freshRes] = await Promise.all([
+    supabase
+      .from("bookings")
+      .select(
+        "id, start_time, end_time, teacher_id, rate_cents, is_recurring, recurring_day_of_week, status, attendance",
+      )
+      .eq("student_id", studentId)
+      .gte("start_time", studioNow().toISOString()),
+    supabase
+      .from("students")
+      .select("is_active, teacher_id, billing:student_billing(*), slots:student_slots(*)")
+      .eq("id", studentId)
+      .single(),
+  ])
+  if (futureRes.error) return { error: futureRes.error.message }
+  if (freshRes.error || !freshRes.data) return { error: "Student not found." }
+  const fresh: ReconcileStudent = {
+    is_active: freshRes.data.is_active,
+    teacher_id: freshRes.data.teacher_id ?? null,
+    billing: Array.isArray(freshRes.data.billing)
+      ? (freshRes.data.billing[0] ?? null)
+      : (freshRes.data.billing ?? null),
+    slots: freshRes.data.slots || [],
+  }
 
-  const billingRate = firstSection?.rate_cents ?? 0
-  const slotsByDay = new Map(slots.map((slot) => [slot.day_of_week, slot]))
-  for (const booking of futureBookings || []) {
-    if (booking.status === "cancelled") continue
-    const slot = booking.is_recurring ? slotsByDay.get(booking.recurring_day_of_week ?? -1) : undefined
-    const patch: { teacher_id?: string | null; rate_cents?: number | null; end_time?: string } = {}
-    if (slot) {
-      const newTeacher = slot.teacher_id ?? teacherId
-      const newRate = slot.rate_cents ?? billingRate
-      const newEnd = new Date(
-        new Date(booking.start_time).getTime() + slot.duration_minutes * 60000,
-      ).toISOString()
-      if (newTeacher !== booking.teacher_id) patch.teacher_id = newTeacher
-      if (newRate !== booking.rate_cents) patch.rate_cents = newRate
-      if (newEnd !== new Date(booking.end_time).toISOString()) patch.end_time = newEnd
-    } else if (existing.teacher_id !== teacherId && booking.teacher_id === existing.teacher_id) {
-      patch.teacher_id = teacherId
+  const toDelete: string[] = []
+  for (const booking of futureRes.data || []) {
+    let patch: LessonPatch = {}
+    if (!booking.is_recurring || booking.recurring_day_of_week === null) {
+      if (booking.status === "cancelled" || booking.attendance) continue
+      if (existing.teacher_id !== teacherId && booking.teacher_id === existing.teacher_id) {
+        patch.teacher_id = teacherId
+      }
+    } else {
+      const plan = planLessonReconcile(booking, fresh)
+      if (!plan) continue
+      if (plan.action === "delete") {
+        toDelete.push(booking.id)
+        continue
+      }
+      patch = plan.patch
     }
+
     if (Object.keys(patch).length === 0) continue
     const { error: restampError } = await supabase.from("bookings").update(patch).eq("id", booking.id)
     if (restampError) return { error: restampError.message }
+  }
+
+  if (toDelete.length > 0) {
+    const { error: deleteError } = await supabase.from("bookings").delete().in("id", toDelete)
+    if (deleteError) return { error: deleteError.message }
   }
 
   revalidateStudentViews()

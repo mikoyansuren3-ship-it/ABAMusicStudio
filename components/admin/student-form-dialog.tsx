@@ -131,30 +131,7 @@ export function StudentFormDialog({ open, onOpenChange, student, teachers }: Stu
                 className={fieldClass}
               />
             </div>
-            {student ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="flex flex-col gap-[7px]">
-                  <Label htmlFor="student-duration" className="text-xs font-semibold">
-                    Lesson duration
-                  </Label>
-                  <Select
-                    name="duration"
-                    defaultValue={String(student.billing?.duration_minutes ?? student.preferred_lesson_duration ?? 30)}
-                  >
-                    <SelectTrigger id="student-duration" className={`${fieldClass} w-full`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="30">30 minutes</SelectItem>
-                      <SelectItem value="45">45 minutes</SelectItem>
-                      <SelectItem value="60">60 minutes</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            ) : (
-              <TeacherSectionsEditor teachers={teachers} />
-            )}
+            {!student && <TeacherSectionsEditor teachers={teachers} />}
             {formError && (
               <p role="alert" aria-live="polite" className="text-sm text-destructive">
                 {formError}

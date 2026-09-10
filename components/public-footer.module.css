@@ -233,3 +233,33 @@ a.contactValue:focus-visible {
     text-align: center;
   }
 }
+
+.legalLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 1rem;
+}
+
+.legalLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.75rem;
+  color: rgba(245, 235, 217, 0.82);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.legalLink:hover {
+  color: var(--gold-strong);
+}
+
+.legalLink:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+  color: var(--gold-strong);
+}
