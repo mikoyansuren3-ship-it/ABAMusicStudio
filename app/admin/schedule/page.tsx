@@ -6,6 +6,7 @@ import { AddLessonButton } from "@/components/admin/add-lesson-dialog"
 import { RescheduleRequests } from "@/components/admin/reschedule-requests"
 import { WeekBands, type WeekBandDay } from "@/components/admin/week-bands"
 import { ensureLessons } from "@/lib/admin/lessons"
+import { UNASSIGNED_SWATCH, swatchFor, teacherSwatches } from "@/lib/admin/teacher-colors"
 import { buildWeekSkeleton, resolveWeekAnchor, weekRangeLabel } from "@/lib/admin/week"
 import { formatTimeRange, numberWord, toDateKey } from "@/lib/admin/format"
 import { formatTime } from "@/lib/portal/format"
@@ -94,6 +95,12 @@ export default async function AdminSchedulePage({
     return `/admin/schedule${qs ? `?${qs}` : ""}`
   }
 
+  // Colour follows the teacher, in roster order, so it never changes with the
+  // filter or the week. The filter tabs below double as the legend.
+  const swatches = teacherSwatches(teachers)
+  const teacherName = (teacherId: string | null) =>
+    teachers.find((teacher) => teacher.id === teacherId)?.name ?? null
+
   const skeleton = buildWeekSkeleton({ anchor, today, availability, exceptions })
   const days: WeekBandDay[] = skeleton.days.map((day) => {
     const dayLessons = bookings.filter((booking) => dateKeyUtc(booking.start_time) === day.key)
@@ -121,12 +128,16 @@ export default async function AdminSchedulePage({
         const start = new Date(booking.start_time)
         const end = new Date(booking.end_time)
         const range = formatTimeRange(minutesToTimeString(minutesUtc(start)), minutesToTimeString(minutesUtc(end)))
+        const withTeacher = teacherName(booking.teacher_id)
         return {
           id: booking.id,
           label: `${booking.student?.name || "Student"} · ${range}`,
-          title: `${booking.student?.name || "Student"}, ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`,
+          title: `${booking.student?.name || "Student"}, ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}${
+            withTeacher ? ` · with ${withTeacher}` : " · no teacher assigned"
+          }`,
           startMinutes: minutesUtc(start),
           durationMinutes: Math.max((end.getTime() - start.getTime()) / 60000, 15),
+          chipClass: swatchFor(swatches, booking.teacher_id).chip,
         }
       }),
     }
@@ -192,6 +203,7 @@ export default async function AdminSchedulePage({
               href: weekHref(anchorKey, teacher.id),
               label: teacher.name,
               active: teacherFilter === teacher.id,
+              swatchClass: swatchFor(swatches, teacher.id).dot,
             })),
             ...(hasUnassigned || teacherFilter === "unassigned"
               ? [
@@ -199,6 +211,7 @@ export default async function AdminSchedulePage({
                     href: weekHref(anchorKey, "unassigned"),
                     label: "Unassigned",
                     active: teacherFilter === "unassigned",
+                    swatchClass: UNASSIGNED_SWATCH.dot,
                   },
                 ]
               : []),

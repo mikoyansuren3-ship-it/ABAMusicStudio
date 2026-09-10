@@ -22,6 +22,12 @@ Rules:
   never as a general UI color (text, buttons, borders, states, icons).
 - The 7 services subject themes supply `--svc-accent` (AA on cream) + `--svc-tint`
   per subject, defined in `app/globals.css`. Cards otherwise share `bg-card`.
+- Teacher identity colours (`--teacher-1..6`, `app/globals.css`) are **data
+  colours for the admin schedule only** — six fixed swatches handed out in
+  roster order (`lib/admin/teacher-colors.ts`), never cycled, validated with the
+  dataviz palette checks. They appear as a chip stripe + tint (text stays
+  `text-foreground`) and as legend dots on the teacher filter tabs. Not UI
+  accents: never use them for buttons, links, states, or text.
 - Status semantics: money due / attention = `text-accent`; overdue / errors /
   destructive = `text-destructive`; success = accent or neutral + icon, never
   raw `green-600`.

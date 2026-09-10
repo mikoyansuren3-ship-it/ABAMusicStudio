@@ -17,6 +17,12 @@ export interface WeekBandLesson {
   startMinutes: number
   durationMinutes: number
   tone?: WeekBandTone
+  /**
+   * Identity colouring for the default tone (e.g. the teacher swatch on the
+   * admin schedule). Ignored when an attendance tone is set — attendance
+   * state always wins over identity.
+   */
+  chipClass?: string
 }
 
 const TONE_CLASSES: Record<WeekBandTone, string> = {
@@ -168,7 +174,9 @@ export function WeekBands({ eyebrow, hourLabels, scaleStart, scaleEnd, days }: W
                     key={lesson.id}
                     title={lesson.title}
                     className={`absolute flex items-center overflow-hidden whitespace-nowrap rounded-md px-2 text-[11px] font-medium ${
-                      TONE_CLASSES[lesson.tone ?? "default"]
+                      (lesson.tone ?? "default") === "default" && lesson.chipClass
+                        ? lesson.chipClass
+                        : TONE_CLASSES[lesson.tone ?? "default"]
                     }`}
                     style={{
                       left: `${lesson.left}%`,

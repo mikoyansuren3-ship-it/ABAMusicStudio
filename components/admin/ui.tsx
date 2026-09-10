@@ -91,6 +91,8 @@ interface PillTab {
   label: string
   count?: number
   active: boolean
+  /** Background class for a small identity dot before the label (e.g. a teacher's colour). */
+  swatchClass?: string
 }
 
 /** Bordered pill-tab group (Inquiries statuses, Money tabs). Tabs are links so state lives in the URL. */
@@ -109,6 +111,16 @@ export function PillTabs({ tabs, className }: { tabs: PillTab[]; className?: str
               : "font-medium text-foreground hover:bg-muted/50",
           )}
         >
+          {tab.swatchClass && (
+            <span
+              aria-hidden
+              className={cn(
+                "size-2.5 shrink-0 rounded-full",
+                tab.swatchClass,
+                tab.active && "ring-2 ring-primary-foreground/60",
+              )}
+            />
+          )}
           {tab.label}
           {tab.count !== undefined && (
             <span className={tab.active ? "opacity-70" : "text-muted-foreground"}>{tab.count}</span>
