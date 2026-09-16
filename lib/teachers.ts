@@ -112,6 +112,37 @@ export const teachers: Teacher[] = [
     ],
   },
   {
+    slug: "viktoria-poghosyan",
+    name: "Viktoria Poghosyan",
+    role: "Voice Instructor",
+    subjects: ["Voice"],
+    image: "/teachers/viktoria-poghosyan.jpg",
+    imageAlt: "Viktoria Poghosyan, voice teacher at ABA Music Academy",
+    published: true,
+    bio: "Viktoria's musical journey began in 2001 at the P. I. Tchaikovsky Music School in Yerevan, Armenia, where twelve years of piano study built strong technical skills and a deep understanding of music. She went on to the Komitas State Conservatory of Yerevan to study Jazz Vocal Performance, then earned a Master's degree to further expand her professional knowledge and teaching skills. Years of working with children have shaped her belief that music education is not only about developing vocal ability and musical hearing, but about nurturing creativity, confidence, and self-expression. She teaches students of every level — from beginners taking their first steps in music to singers pursuing vocal studies professionally — and sees each one as a unique talent with their own story and potential. Her goal is a supportive, inspiring environment where students build skills and confidence, discover a lifelong love for music, and unlock their voices.",
+    // Every item below is already asserted by the bio above. If one changes,
+    // change both — this feeds the Person JSON-LD (`award`). The visible
+    // credentials band is curated per page in lib/programs.ts.
+    credentials: [
+      {
+        kind: "training",
+        title: "12 Years of Piano Study",
+        detail: "P. I. Tchaikovsky Music School, Yerevan, Armenia",
+        year: "From 2001",
+      },
+      {
+        kind: "training",
+        title: "Jazz Vocal Performance",
+        detail: "Komitas State Conservatory of Yerevan",
+      },
+      {
+        kind: "training",
+        title: "Master's Degree",
+        detail: "Advanced professional and teaching studies",
+      },
+    ],
+  },
+  {
     slug: "asya-anisimova",
     name: "Asya Anisimova",
     role: "Violin Instructor",

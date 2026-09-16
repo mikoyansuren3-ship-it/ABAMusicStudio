@@ -47,6 +47,7 @@ Christmas recital, Summer 2025).
 | `programs/violin-hero.jpg` | Violin social card / schema image only — derived crop of `teachers/asya-anisimova.jpg`; not rendered on the page |
 | `teachers/*.jpg` | Program pages — the "Your <instrument> teacher" section · `/faculty` |
 | `teachers/marietta-galstyan-closeup.jpg` | Voice program teacher section only — head-and-shoulders crop of `teachers/marietta-galstyan.jpg` |
+| `teachers/viktoria-poghosyan.jpg` | Voice program teacher section · `/faculty` — 3:4 crop of a square studio portrait, sides trimmed to keep the face and hand |
 
 ## Seasonal rotation — every December
 

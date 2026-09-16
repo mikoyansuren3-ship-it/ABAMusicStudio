@@ -385,7 +385,7 @@ export const programs: Program[] = [
     ],
     intro: [
       `ABA Music Academy offers private voice lessons for singers across the ${SITE.location.areaLong}. Lessons are one-on-one and tailored to the student's voice, age, and goals.`,
-      "Voice lessons are taught by Marietta Galstyan, a singer with an extensive international background who has earned top prizes at competitions and festivals across Europe, and who loves working with kids.",
+      "Voice lessons are taught by Marietta Galstyan, a singer with an extensive international background who has earned top prizes at competitions and festivals across Europe, and Viktoria Poghosyan, a Komitas State Conservatory-trained jazz vocalist with a Master's degree and twelve years of piano behind her singing. Both love working with kids.",
       `Families come to the studio from ${AREA_SERVED}. There is no minimum experience, and the first lesson is free.`,
     ],
     plate: {
@@ -419,27 +419,32 @@ export const programs: Program[] = [
         },
       },
       {
-        heading: "Your voice teacher",
-        block: { kind: "teachers", teachers: ["marietta-galstyan"] },
+        heading: "Your voice teachers",
+        block: { kind: "teachers", teachers: ["marietta-galstyan", "viktoria-poghosyan"] },
       },
     ],
     credentials: {
       title: "Training, Prizes & Stage Experience",
       intro:
-        "What Marietta brings to every voice lesson — the training, the competition record, and the years of performing behind the teaching.",
+        "What our voice faculty brings to every lesson — the conservatory training, the competition record, and the years of performing behind the teaching.",
       tally: [
-        { figure: "4", label: "Countries performed in" },
-        { figure: "Top", label: "Prizes across competitions" },
-        { figure: "Multi", label: "Genre versatility" },
-        { figure: "Kids", label: "A specialty she loves" },
+        { figure: "2", label: "Voice instructors" },
+        { figure: "Master's", label: "Degree in music (Viktoria)" },
+        { figure: "4", label: "Countries performed in (Marietta)" },
+        { figure: "Kids", label: "A specialty they share" },
       ],
       groups: [
         {
           label: "Training",
           entries: [
             {
+              title: "Jazz Vocal Performance",
+              detail: "Komitas State Conservatory of Yerevan — Viktoria Poghosyan",
+              bullets: ["Master's degree", "12 years of piano, P. I. Tchaikovsky Music School"],
+            },
+            {
               title: "Music school graduate",
-              detail: "Raised in a deeply musical environment, singing and playing piano from early childhood",
+              detail: "Marietta Galstyan — singing and playing piano from early childhood",
             },
           ],
         },
@@ -448,7 +453,7 @@ export const programs: Program[] = [
           entries: [
             {
               title: "Top prizes",
-              detail: "International competitions and festivals across Europe, consistently",
+              detail: "Marietta Galstyan — international competitions and festivals across Europe, consistently",
               bullets: ["Hungary", "Italy", "France", "Bulgaria"],
             },
           ],
@@ -456,7 +461,7 @@ export const programs: Program[] = [
         {
           label: "Stage experience",
           entries: [
-            { title: "International concerts", detail: "Performing from a young age" },
+            { title: "International concerts", detail: "Marietta Galstyan — performing from a young age" },
             { title: "Charity events", detail: "Concerts supporting children" },
           ],
         },
@@ -465,17 +470,21 @@ export const programs: Program[] = [
           entries: [
             {
               title: "Praised for",
-              detail: "Emotional depth, vocal precision, and stage presence — and for versatility across genres",
+              detail: "Marietta Galstyan — emotional depth, vocal precision, and stage presence, and versatility across genres",
+            },
+            {
+              title: "Every level",
+              detail: "Viktoria Poghosyan — from first steps in music to professional-track vocal study",
             },
           ],
         },
       ],
       quote:
-        "Singers preparing for auditions, recitals, or their first time on a stage work toward it with a teacher who has done it in four countries.",
+        "Singers preparing for auditions, recitals, or their first time on a stage work toward it with teachers who trained at the conservatory and have stood on stages in four countries.",
     },
     steps: [
       "Send an inquiry with the singer's age, experience, and preferred times.",
-      "Book a free trial lesson and meet Marietta.",
+      "Book a free trial lesson and meet your voice teacher.",
       "Choose a weekly time and enroll online through the student portal.",
     ],
     faqs: [],
@@ -762,7 +771,7 @@ export const siteFaqs: ProgramFaq[] = [
   {
     question: "Who will my teacher be?",
     answer:
-      "Piano lessons are led by our founder, Arpine, who holds a PhD in Music, has over 10 years of teaching experience, and is an MTAC member, alongside award-winning pianist Valeria Boroda. Voice is taught by Marietta Galstyan, violin by Asya Anisimova, and qanun by Gohar Harutunyan. Meet everyone on the Our Teachers page.",
+      "Piano lessons are led by our founder, Arpine, who holds a PhD in Music, has over 10 years of teaching experience, and is an MTAC member, alongside award-winning pianist Valeria Boroda. Voice is taught by Marietta Galstyan and Viktoria Poghosyan, violin by Asya Anisimova, and qanun by Gohar Harutunyan. Meet everyone on the Our Teachers page.",
   },
   {
     question: "What is your cancellation policy?",
